@@ -1,4 +1,4 @@
 /target/
 **/target/
 *.class
-application.properties
+/src/main/resources/application.properties
