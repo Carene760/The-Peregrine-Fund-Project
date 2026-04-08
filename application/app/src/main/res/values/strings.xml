@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Application Name -->
+    <string name="app_name">The Peregrine Fund</string>
+
+    <!-- Login Screen -->
+    <string name="slogan_text">Saving raptors, enriching lives.</string>
+    <string name="name_hint">Name</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="send_mess_text">Envoyer</string>
+
+    <!-- Error/Success Messages -->
+    <string name="error_name_required">Le nom est requis</string>
+    <string name="error_password_required">Le mot de passe est requis</string>
+    <string name="error_invalid_credentials">Nom d\'utilisateur ou mot de passe incorrect</string>
+    <string name="success_login">Connexion réussie!</string>
+
+    <!-- Main Interface -->
+    <string name="welcome_message">Bienvenue dans The Peregrine Fund!</string>
+    <string name="app_description">Découvrez le monde fascinant des rapaces et contribuez à leur protection. Explorez, apprenez et agissez pour la conservation de ces magnifiques oiseaux de proie.</string>
+    <string name="explore_button">Explorer</string>
+    <string name="profile_button">Mon Profil</string>
+
+    <!-- Menu Items -->
+    <string name="action_logout">Déconnexion</string>
+    <string name="action_settings">Paramètres</string>
+
+    <!-- Accessibility -->
+    <string name="logo_description">Logo de l\'application raptor</string>
+    <string name="decoration_description">Image décorative centrale</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Dashboard Raptor</string>
+    <string name="history_title">History of sent messages</string>
+    <string name="fire_message">Informations des messages </string>
+    <string name="fire_message_date"> </string>
+    
+    
+    <!-- Information Card -->
+    <string name="code_label">Code</string>
+    <string name="code_sample">dshdgs/hdjsa/23-09-25</string>
+    <string name="information_label">l\'information</string>
+    
+    <!-- Grid Headers
+    <string name="category_label">Categorie</string>
+    <string name="datetime_label">Date/ heure</string>
+    <string name="surface_label">Surface</string> -->
+
+    <!-- Texte pour l'ouverture et la fermeture du Drawer -->
+    <string name="open_drawer">Ouvrir le menu</string>
+    <string name="close_drawer">Fermer le menu</string>
+
+    <!-- Message -->
+    <string name="thank_message">Merci de remplir les champs</string>
+    
+    <!-- Form specific strings -->
+    <string name="form_title">Formulaire d\'informations</string>
+    <string name="form_instruction">Merci de remplir</string>
+    <string name="general_info_title">Informations générales</string>
+    <string name="general_info_title2">Informations supplementaires</string>
+
+    <!-- Form fields -->
+    <string name="category_label">Categorie</string>
+    <string name="datetime_label">Date et heure</string>
+
+    <!-- Sample values -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>   
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="datetime_hint">Select Date-Heure</string>
+    <string name="status_label">Statut</string>
+    <string name="status_hint">Choisir un statut</string>
+    <string-array name="status_options">
+        <item>Debut de feu</item>
+        <item>En cours</item>
+        <item>Maitrise</item>
+    </string-array>
+
+    <string name="intervention_label">Intervention</string>
+    <string name="intervention_hint">Choisir une intervention</string>
+    <string-array name="intervention_options">
+        <item>Possible</item>
+        <item>Partielle</item>
+        <item>Impossible</item>
+    </string-array>
+
+    <string name="zone_label">Renfort</string>
+    <string name="zone_hint">Besoin de renfort?</string>
+    <string-array name="zone_options">
+        <item>Non</item>
+        <item>Oui</item>
+    </string-array>
+
+    <string name="direction_label">Direction</string>
+    <string name="direction_hint">Choisir une direction</string>
+    <string-array name="direction_options">
+        <item>Nord</item>
+        <item>Sud</item>
+        <item>Est</item>
+        <item>Ouest</item>
+    </string-array>
+
+    <string name="surface_label">Surface</string>
+    <string name="surface_hint">Surface approximative</string>
+
+    <string name="pointR_label">Point Repere</string>
+    <string name="pointR_hint">Point de repere</string>
+
+    <string name="desc_label">Description</string>
+    <string name="desc_hint">Description</string>
+
+
+    <!-- Navigation -->
+    <string name="next_button">Suivant</string>
+    <string name="previous_button">Précédent</string>
+    <string name="save_button">Sauvegarder</string>
+
+    <!-- Validation messages -->
+    <string name="error_category_required">La catégorie est requise</string>
+    <string name="error_date_required">La date est requise</string>
+    <string name="error_status_required">Le statut est requis</string>
+    <string name="form_saved_success">Formulaire sauvegardé avec succès</string>
+
+    <string name="map_title">Carte des feux de brousse</string>
+    <string name="piechart_title">Répartition des Zones d alerte</string>
+    <string name="barchart_title">Nombre de messages par site</string>
+</resources>

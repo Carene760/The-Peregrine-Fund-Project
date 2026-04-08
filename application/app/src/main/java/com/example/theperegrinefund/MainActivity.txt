@@ -1,0 +1,183 @@
+package com.example.theperegrinefund;
+
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.widget.TextView;
+import android.util.Log;
+
+import com.example.theperegrinefund.dao.MessageDao;
+import com.example.theperegrinefund.dao.AlerteDao;
+import com.example.theperegrinefund.service.SyncService;
+import com.example.theperegrinefund.Intervention;
+import com.example.theperegrinefund.dao.InterventionDao;
+import com.example.theperegrinefund.StatusMessage;
+import com.example.theperegrinefund.dao.StatusMessageDao;
+import com.example.theperegrinefund.HistoriqueMessageStatus;
+import com.example.theperegrinefund.dao.HistoriqueMessageStatusDao; 
+
+
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView textView;
+    private static final int FIXED_USER_ID = 1;
+    private StatusMessageDao statusDao; // Déclarer en variable de classe
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        textView = findViewById(R.id.textView);
+
+        MessageDao messageDao = new MessageDao(this);
+        AlerteDao alerteDao = new AlerteDao(this);
+        InterventionDao interventionDao = new InterventionDao(this);
+        StatusMessageDao statusDao = new StatusMessageDao(this); // Initialiser
+       HistoriqueMessageStatusDao historiqueDao = new HistoriqueMessageStatusDao(this); // Initialiser
+
+        // ---------- INSERT LOCAL TEST ----------
+        Message message = new Message();
+        message.setDateSignalement("2025-08-18");
+        message.setDescription("Incendie observé");
+        message.setPointRepere("Arbre du centre");
+        message.setSurfaceApproximative(45.5);
+        message.setDirection("Nord");
+        message.setElementsVisibles("Fumée visible");
+        message.setDegats("Forêt brûlée");
+        message.setContenuCode("CODE123");
+        message.setIdUserApp(FIXED_USER_ID);
+
+        long messageId = messageDao.insertMessage(message);
+        
+
+        // ---------- SYNCHRONISATION ----------
+        SyncService syncService = new SyncService(this);
+
+        // Interventions
+        syncService.downloadIntervention(new SyncService.InterventionCallback() {
+            @Override
+            public void onComplete(List<Intervention> interventions) {
+                runOnUiThread(() -> {
+                      refreshUI(messageDao, alerteDao, interventionDao, statusDao, historiqueDao);
+                    Log.d("MAIN_ACTIVITY", "Interventions synchronisées: " + interventions.size());
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(() -> {
+                    Log.e("MAIN_ACTIVITY", "Erreur de synchronisation Interventions", e);
+                    textView.setText("Erreur de synchronisation Interventions : " + e.getMessage());
+                });
+            }
+        });
+
+        // Status messages
+        syncService.downloadStatus(new SyncService.StatusCallback() {
+            @Override
+            public void onComplete(List<StatusMessage> statusMessages) {
+                runOnUiThread(() -> {
+                      refreshUI(messageDao, alerteDao, interventionDao, statusDao, historiqueDao);
+                    Log.d("MAIN_ACTIVITY", "Status synchronisés: " + statusMessages.size());
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(() -> {
+                    Log.e("MAIN_ACTIVITY", "Erreur de synchronisation Status", e);
+                    textView.setText("Erreur de synchronisation Status : " + e.getMessage());
+                });
+            }
+        });
+        // Historique
+        syncService.downloadHistorique(FIXED_USER_ID, new SyncService.HistoriqueCallback() {
+            @Override
+            public void onComplete(List<HistoriqueMessageStatus> historiques) {
+                runOnUiThread(() -> {
+                      refreshUI(messageDao, alerteDao, interventionDao, statusDao, historiqueDao);
+                    Log.d("MAIN_ACTIVITY", "Historiques synchronisés: " + historiques.size());
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(() -> {
+                    Log.e("MAIN_ACTIVITY", "Erreur de synchronisation Historique", e);
+                    textView.setText("Erreur de synchronisation Historique : " + e.getMessage());
+                });
+            }
+        });
+        // Messages
+        syncService.downloadMessages(FIXED_USER_ID, new SyncService.MessageCallback() {
+            @Override
+            public void onComplete(List<Message> messages) {
+                 refreshUI(messageDao, alerteDao, interventionDao, statusDao, historiqueDao);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(() -> textView.setText(
+                        "Erreur de synchronisation Messages : " + e.getMessage()));
+            }
+        });
+
+        // ---------- AFFICHER LES DONNÉES LOCALES (initialement) ----------
+        refreshUI(messageDao, alerteDao, interventionDao, statusDao, historiqueDao);
+    }
+    
+
+    private void refreshUI(MessageDao messageDao, AlerteDao alerteDao, InterventionDao interventionDao, 
+                      StatusMessageDao statusDao, HistoriqueMessageStatusDao historiqueDao) {
+    List<Message> messages = messageDao.getAllMessages();
+    List<String> alertes = alerteDao.getAllAlertes();
+    List<Intervention> interventions = interventionDao.getAllInterventions();
+    List<StatusMessage> statusMessages = statusDao.getAllStatus();
+    List<HistoriqueMessageStatus> historiques = historiqueDao.getAllHistorique();
+
+    StringBuilder builder = new StringBuilder();
+
+        // Messages
+        builder.append("📩 MESSAGES:\n");
+        for (Message m : messages) {
+            builder.append("- ")
+                    .append(m.getDateSignalement()).append(" | ")
+                    .append(m.getDescription()).append(" | ")
+                    .append(m.getPointRepere())
+                    .append("\n");
+        }
+
+        // Alertes
+        builder.append("\n🚨 ALERTES:\n");
+        for (String a : alertes) builder.append("- ").append(a).append("\n");
+
+        // Interventions
+        builder.append("\n🛠️ INTERVENTIONS:\n");
+        for (Intervention i : interventions) {
+            builder.append("- Intervention ID: ").append(i.getIdIntervention())
+                    .append(" | Détail: ").append(i.getIntervention())
+                    .append("\n");
+        }
+
+        // Status messages
+        builder.append("\n📊 STATUS MESSAGES:\n");
+        for (StatusMessage s : statusMessages) {
+            builder.append("- ID: ").append(s.getIdStatusMessage())
+                    .append(" | Status: ").append(s.getStatus())
+                    .append("\n");
+        }
+         // Historique
+        builder.append("\n📋 HISTORIQUE:\n");
+        for (HistoriqueMessageStatus h : historiques) {
+            builder.append("- ID: ").append(h.getIdHistorique())
+                    .append(" | Date: ").append(h.getDateChangement())
+                    .append(" | ID Status: ").append(h.getIdStatusMessage())
+                    .append(" | ID Message: ").append(h.getIdMessage())
+                    .append("\n");
+        }
+
+        runOnUiThread(() -> textView.setText(builder.toString()));
+    }
+}
