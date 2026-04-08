@@ -1,0 +1,230 @@
+[
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_fragment_page1.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/fragment_page1.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_item_history.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/item_history.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/xml_data_extraction_rules.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_circle_inactive.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/circle_inactive.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_code_background.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/code_background.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/xml_network_security_config.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_ic_back.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/ic_back.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_base.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_base.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_dashboard.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_dashboard.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_circle_active.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/circle_active.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_info_grid_background.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/info_grid_background.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xxxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.theperegrinefund.app-pngs-34:/drawable-hdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/menu_main_menu.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/menu/main_menu.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_ic_new.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/ic_new.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_db_debug.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_db_debug.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_history_item_selected.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/history_item_selected.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.theperegrinefund.app-pngs-34:/drawable-xxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_stat.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_stat.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_ic_filter.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/ic_filter.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_logo_raptor.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/logo_raptor.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_send_message.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_send_message.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_splash_background.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/splash_background.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_main.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_ic_info.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/ic_info.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-mdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-hdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-hdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.theperegrinefund.app-pngs-34:/drawable-xxxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xxhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.theperegrinefund.app-pngs-34:/drawable-mdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xhdpi/ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
+        "source": "com.example.theperegrinefund.app-pngs-34:/drawable-anydpi-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_ic_logout.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/ic_logout.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_central_decoration.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/central_decoration.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_sendalert.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_sendalert.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.theperegrinefund.app-pngs-34:/drawable-xhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_fragment_page2.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/fragment_page2.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/menu_dashboard_menu.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/menu/dashboard_menu.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_history_item_normal.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/history_item_normal.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_ic_menu.png.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/ic_menu.png"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable_progress_background.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/drawable/progress_background.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/xml_backup_rules.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/layout_activity_login.xml.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_login.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.theperegrinefund.app-main-40:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-debug-38:/drawable-ldpi_ic_launcher_foreground.png.flat",
+        "source": "com.example.theperegrinefund.app-pngs-34:/drawable-ldpi/ic_launcher_foreground.png"
+    }
+]

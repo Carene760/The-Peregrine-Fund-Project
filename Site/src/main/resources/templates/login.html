@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>The Peregrine Fund - Login</title>
+    <link rel="stylesheet" th:href="@{/css/globals.css}" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <div class="desktop">
+      <main class="div">
+        <header class="frame">
+          <img
+            class="frame-2"
+            src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png"
+            alt="The Peregrine Fund Logo"
+          />
+          <div class="saving-raptors-wrapper">
+            <p class="saving-raptors">"Saving raptors, enriching lives."</p>
+          </div>
+        </header>
+        
+        <!-- Message d'erreur -->
+        <div th:if="${error}" class="error-message" role="alert" aria-live="polite">
+          <span th:text="${error}">Nom d'utilisateur ou mot de passe incorrect</span>
+        </div>
+        
+        <section class="frame-3">
+          <img class="frame-4" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-56.png" alt="Raptor icon" />
+          <h1 class="text-wrapper">LOG IN</h1>
+        </section>
+        <form class="frame-5" action="/login" method="post" id="login-form" role="form" aria-labelledby="login-heading" novalidate>
+          <div class="div-wrapper">
+            <label for="name-input" class="visually-hidden">Email</label>
+            <input
+              type="text"
+              name="email"
+              id="name-input"
+              class="text-wrapper-2"
+              placeholder="Email"
+              required
+              aria-required="true"
+              autocomplete="email"
+            />
+          </div>
+          <div class="div-wrapper">
+            <label for="password-input" class="visually-hidden">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password-input"
+              class="text-wrapper-2"
+              placeholder="Password"
+              required
+              aria-required="true"
+              autocomplete="current-password"
+            />
+          </div>
+        </form>
+        <button type="submit" form="login-form" class="frame-6" aria-describedby="signin-description">
+          <span class="text-wrapper-3">Sign in</span>
+        </button>
+        
+      </main>
+    </div>
+  </body>
+</html>

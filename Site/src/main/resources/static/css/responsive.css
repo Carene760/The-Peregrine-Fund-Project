@@ -1,0 +1,115 @@
+/* Styles responsives supplémentaires */
+
+/* Pour les tablettes en mode portrait */
+@media screen and (max-width: 1024px) and (orientation: portrait) {
+    .desktop {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .div {
+      width: 90%;
+      margin: 0 auto;
+    }
+  }
+  
+  /* Pour les téléphones en mode paysage */
+  @media screen and (max-width: 900px) and (orientation: landscape) {
+    .div {
+      padding: 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .frame {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    
+    .frame-2 {
+      max-width: 120px;
+    }
+    
+    .saving-raptors-wrapper p {
+      font-size: 14px;
+    }
+  }
+  
+  /* Pour éviter les problèmes de zoom sur les inputs iOS */
+  @media screen and (max-width: 768px) {
+    input, select, textarea {
+      font-size: 16px !important; /* Empêche le zoom sur iOS */
+    }
+  }
+  
+  /* Amélioration de l'accessibilité tactile */
+  @media (hover: none) and (pointer: coarse) {
+    .text-wrapper-2, .frame-6 {
+      min-height: 44px; /* Taille minimale pour les doigts */
+    }
+    
+    .frame-6 {
+      cursor: pointer;
+    }
+  }
+  
+  /* Support pour le mode sombre */
+  @media (prefers-color-scheme: dark) {
+    .div {
+      background-color: rgba(255, 255, 255, 0.95);
+    }
+  }
+  
+  /* Pour les écrans avec une hauteur limitée */
+  @media screen and (max-height: 700px) {
+    .frame-3 {
+      padding: 10px 0;
+    }
+    
+    .frame-5 {
+      margin: 15px auto;
+    }
+    
+    .frame-6 {
+      margin-top: 15px;
+    }
+    
+    .frame-4 {
+      width: 50px;
+      height: 50px;
+    }
+  }
+  
+  /* Ajustements pour les très petits écrans */
+  @media screen and (max-width: 320px) {
+    .text-wrapper {
+      font-size: 20px;
+    }
+    
+    .frame-4 {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .text-wrapper-2 {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    
+    .frame-6 {
+      padding: 10px;
+    }
+    
+    .text-wrapper-3 {
+      font-size: 14px;
+    }
+  }
+  
+  /* Pour les inputs sur mobile - éviter le zoom */
+  @supports (-webkit-touch-callout: none) {
+    .text-wrapper-2 {
+      font-size: 16px;
+    }
+  }

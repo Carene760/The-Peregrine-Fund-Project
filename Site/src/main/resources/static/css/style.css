@@ -1,0 +1,573 @@
+/* Code CSS original */
+.desktop {
+  background-color: #ffffff;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  width: 100%;
+}
+
+.desktop .div {
+  background-color: #ffffff;
+  width: 1032px;
+  height: 842px;
+  position: relative;
+}
+
+.desktop .frame {
+  position: absolute;
+  width: 1032px;
+  height: 129px;
+  top: 0;
+  left: 0;
+  background-color: #ffffff;
+}
+
+.desktop .frame-2 {
+  position: absolute;
+  width: 117px;
+  height: 117px;
+  top: 12px;
+  left: 0;
+  background: url(https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png) 50%
+    50% / cover;
+}
+
+.desktop .saving-raptors-wrapper {
+  position: absolute;
+  width: 344px;
+  height: 60px;
+  top: 12px;
+  left: 688px;
+}
+
+.desktop .saving-raptors {
+  position: absolute;
+  width: 287px;
+  top: 8px;
+  left: 28px;
+  font-family: "Inknut Antiqua", Helvetica;
+  font-weight: 300;
+  color: #333333;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.desktop .frame-3 {
+  position: absolute;
+  width: 172px;
+  height: 66px;
+  top: 145px;
+  left: 470px;
+}
+
+.desktop .frame-4 {
+  position: absolute;
+  width: 55px;
+  height: 59px;
+  top: 0;
+  left: 104px;
+  background: url(https://c.animaapp.com/mebffkcgJYBuIF/img/frame-56.png) 50%
+    50% / cover;
+}
+
+.desktop .text-wrapper {
+  position: absolute;
+  top: 3px;
+  left: 2px;
+  font-family: "Inknut Antiqua", Helvetica;
+  font-weight: 300;
+  color: #000000;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.desktop .frame-5 {
+  display: flex;
+  flex-direction: column;
+  width: 618px;
+  height: 280px;
+  align-items: flex-start;
+  gap: 51px;
+  padding: 77px 16px;
+  position: absolute;
+  top: 234px;
+  left: 208px;
+  background-color: #333333;
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+.desktop .div-wrapper {
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  height: 78px;
+  background-color: #ffffff;
+}
+
+.desktop .text-wrapper-2 {
+  width: 100%;
+    height: 100%;
+    padding: 27px 21px;
+    border: none;
+    background: transparent;
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    color: #333333;
+    font-size: 18px;
+    outline: none;
+}
+
+.desktop .frame-6 {
+  position: absolute;
+  width: 619px;
+  height: 78px;
+  top: 574px;
+  left: 208px;
+  background-color: #333333;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.desktop .text-wrapper-3 {
+  position: absolute;
+  top: 15px;
+  left: 275px;
+  font-family: "Inknut Antiqua", Helvetica;
+  font-weight: 600;
+  color: #60da85;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+/* Additional styles for accessibility and form functionality */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.desktop .text-wrapper-2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 27px 21px;
+  border: none;
+  background: transparent;
+  font-family: "Inter", Helvetica;
+  font-weight: 400;
+  color: #333333;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: normal;
+  outline: none;
+}
+
+.desktop .text-wrapper-2::placeholder {
+  color: #a39797;
+}
+
+.desktop .text-wrapper-2:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: -2px;
+}
+
+.desktop .frame-6 {
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.desktop .frame-6:hover {
+  background-color: #2a2a2a;
+}
+
+.desktop .frame-6:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+.desktop .frame-6:active {
+  background-color: #1a1a1a;
+}
+
+.desktop .frame-5 {
+  border-radius: 32px;
+}
+
+.desktop .div-wrapper {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  padding: 16px 20px;
+  border-radius: 6px;
+  margin: 20px 0;
+  font-size: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  animation: fadeIn 0.3s ease-in;
+  position: relative;
+}
+
+.error-message:before {
+  content: "!";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: #d32f2f;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.error-close {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.error-close:hover {
+  color: #b71c1c;
+}
+
+.error-persistent {
+  border-left: 5px solid #d32f2f;
+}
+
+.error-temporary {
+  border-left: 5px solid #ff9800;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-in forwards;
+}
+
+/* ================================================
+   MEDIA QUERIES POUR LA RESPONSIVITÉ
+   ================================================ */
+
+/* Mobile (320px à 767px) */
+@media screen and (max-width: 767px) {
+  .desktop .div {
+    width: 100%;
+    max-width: 100vw;
+    height: auto;
+    min-height: 100vh;
+    padding: 10px;
+  }
+
+  .desktop .frame {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .desktop .frame-2 {
+    position: static;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+  }
+
+  .desktop .saving-raptors-wrapper {
+    position: static;
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
+
+  .desktop .saving-raptors {
+    position: static;
+    width: 100%;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .desktop .frame-3 {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .desktop .frame-4 {
+    position: static;
+    width: 45px;
+    height: 48px;
+    margin-right: 10px;
+  }
+
+  .desktop .text-wrapper {
+    position: static;
+    font-size: 18px;
+  }
+
+  .desktop .frame-5 {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    padding: 30px 15px;
+    margin: 20px 0;
+    gap: 30px;
+  }
+
+  .desktop .frame-6 {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    margin: 20px 0;
+  }
+
+  .desktop .text-wrapper-3 {
+    position: static;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+  }
+
+  .desktop .text-wrapper-2 {
+    font-size: 16px;
+    padding: 20px 15px;
+  }
+}
+
+/* Tablette (768px à 1023px) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .desktop .div {
+    width: 100%;
+    max-width: 750px;
+    height: auto;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .desktop .frame {
+    width: 100%;
+    height: auto;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .desktop .frame-2 {
+    position: static;
+    width: 90px;
+    height: 90px;
+  }
+
+  .desktop .saving-raptors-wrapper {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+
+  .desktop .saving-raptors {
+    position: static;
+    width: auto;
+    font-size: 15px;
+  }
+
+  .desktop .frame-3 {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 30px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .desktop .frame-4 {
+    position: static;
+    width: 50px;
+    height: 54px;
+    margin-right: 15px;
+  }
+
+  .desktop .text-wrapper {
+    position: static;
+    font-size: 19px;
+  }
+
+  .desktop .frame-5 {
+    position: static;
+    width: 90%;
+    max-width: 550px;
+    height: auto;
+    padding: 50px 20px;
+    margin: 30px auto;
+    gap: 40px;
+  }
+
+  .desktop .frame-6 {
+    position: static;
+    width: 90%;
+    max-width: 550px;
+    margin: 30px auto;
+  }
+
+  .desktop .text-wrapper-3 {
+    position: static;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+  }
+
+  .desktop .text-wrapper-2 {
+    font-size: 17px;
+    padding: 25px 20px;
+  }
+}
+
+/* Desktop petit (1024px à 1199px) */
+@media screen and (min-width: 1024px) and (max-width: 1199px) {
+  .desktop .div {
+    width: 900px;
+    height: auto;
+    min-height: 750px;
+  }
+
+  .desktop .frame {
+    width: 900px;
+  }
+
+  .desktop .saving-raptors-wrapper {
+    left: 550px;
+  }
+
+  .desktop .frame-3 {
+    left: 364px;
+  }
+
+  .desktop .frame-5 {
+    width: 500px;
+    left: 200px;
+  }
+
+  .desktop .frame-6 {
+    width: 500px;
+    left: 200px;
+  }
+
+  .desktop .text-wrapper-3 {
+    left: 220px;
+  }
+}
+
+/* Desktop large (1200px et plus) - Styles originaux conservés */
+@media screen and (min-width: 1200px) {
+  /* Les styles originaux s'appliquent déjà */
+}
+
+/* Orientations spécifiques */
+@media screen and (orientation: landscape) and (max-height: 600px) {
+  .desktop .frame-5 {
+    padding: 30px 16px;
+    gap: 25px;
+  }
+  
+  .desktop .div {
+    min-height: auto;
+  }
+}
+
+/* Accessibilité - Préférences utilisateur */
+@media (prefers-reduced-motion: reduce) {
+  .desktop .frame-6 {
+    transition: none;
+  }
+  
+  .error-message {
+    animation: none;
+  }
+  
+  .fade-out {
+    animation: none;
+  }
+}
+
+/* Amélioration pour les très petits écrans */
+@media screen and (max-width: 320px) {
+  .desktop .div {
+    padding: 5px;
+  }
+  
+  .desktop .frame-5 {
+    padding: 20px 10px;
+    gap: 20px;
+  }
+  
+  .desktop .text-wrapper-2 {
+    font-size: 14px;
+    padding: 15px 10px;
+  }
+  
+  .desktop .saving-raptors {
+    font-size: 12px;
+  }
+  
+  .desktop .text-wrapper {
+    font-size: 16px;
+  }
+}

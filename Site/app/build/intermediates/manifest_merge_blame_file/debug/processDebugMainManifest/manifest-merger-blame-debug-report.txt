@@ -1,0 +1,278 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.theperegrinefund"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="36" />
+10
+11    <!-- Permissions -->
+12    <uses-permission android:name="android.permission.SEND_SMS" />
+12-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:5:5-67
+12-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:5:22-64
+13    <uses-permission android:name="android.permission.INTERNET" />
+13-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:6:5-67
+13-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:6:22-64
+14    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+14-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:7:5-79
+14-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:7:22-76
+15    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+15-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:8:5-78
+15-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:8:22-76
+16    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+16-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:9:5-80
+16-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:9:22-78
+17    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+17-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:10:5-80
+17-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:10:22-78
+18    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+18-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:11:5-79
+18-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:11:22-77
+19    <uses-permission android:name="android.permission.READ_SMS" />
+19-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:12:5-66
+19-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:12:22-64
+20    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+20-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:13:5-69
+20-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:13:22-67
+21
+22    <permission
+22-->[androidx.core:core:1.12.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\4cb8080aa133f1ce88d7877e6d677075\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+23        android:name="com.example.theperegrinefund.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+23-->[androidx.core:core:1.12.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\4cb8080aa133f1ce88d7877e6d677075\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+24        android:protectionLevel="signature" />
+24-->[androidx.core:core:1.12.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\4cb8080aa133f1ce88d7877e6d677075\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+25
+26    <uses-permission android:name="com.example.theperegrinefund.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+26-->[androidx.core:core:1.12.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\4cb8080aa133f1ce88d7877e6d677075\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+26-->[androidx.core:core:1.12.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\4cb8080aa133f1ce88d7877e6d677075\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+27
+28    <supports-screens
+28-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:9:5-12:40
+29        android:anyDensity="true"
+29-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:10:9-34
+30        android:largeScreens="true"
+30-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:11:9-36
+31        android:normalScreens="true" />
+31-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:12:9-37
+32
+33    <uses-feature
+33-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:14:5-16:36
+34        android:name="android.hardware.location.network"
+34-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:15:9-57
+35        android:required="false" />
+35-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:16:9-33
+36    <uses-feature
+36-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:17:5-19:36
+37        android:name="android.hardware.location.gps"
+37-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:18:9-53
+38        android:required="false" />
+38-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:19:9-33
+39    <uses-feature
+39-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:20:5-22:36
+40        android:name="android.hardware.telephony"
+40-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:21:9-50
+41        android:required="false" />
+41-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:22:9-33
+42    <uses-feature
+42-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:23:5-25:36
+43        android:name="android.hardware.wifi"
+43-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:24:9-45
+44        android:required="false" />
+44-->[org.osmdroid:osmdroid-android:6.1.16] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\f840d87a4449a25d01c93c695ec9b459\transformed\osmdroid-android-6.1.16\AndroidManifest.xml:25:9-33
+45
+46    <application
+46-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:15:5-72:19
+47        android:allowBackup="true"
+47-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:16:9-35
+48        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+48-->[androidx.core:core:1.12.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\4cb8080aa133f1ce88d7877e6d677075\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+49        android:dataExtractionRules="@xml/data_extraction_rules"
+49-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:17:9-65
+50        android:debuggable="true"
+51        android:extractNativeLibs="true"
+52        android:fullBackupContent="@xml/backup_rules"
+52-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:18:9-54
+53        android:icon="@mipmap/ic_launcher"
+53-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:19:9-43
+54        android:label="@string/app_name"
+54-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:20:9-41
+55        android:networkSecurityConfig="@xml/network_security_config"
+55-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:24:9-69
+56        android:roundIcon="@mipmap/ic_launcher_round"
+56-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:21:9-54
+57        android:supportsRtl="true"
+57-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:22:9-35
+58        android:theme="@style/Theme.ThePeregrineFund" >
+58-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:23:9-54
+59        <activity
+59-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:27:9-36:20
+60            android:name="com.example.theperegrinefund.LoginActivity"
+60-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:28:13-42
+61            android:exported="true"
+61-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:29:13-36
+62            android:screenOrientation="portrait"
+62-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:30:13-49
+63            android:windowSoftInputMode="adjustResize" >
+63-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:31:13-55
+64            <intent-filter>
+64-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:32:13-35:29
+65                <action android:name="android.intent.action.MAIN" />
+65-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:33:17-68
+65-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:33:25-66
+66
+67                <category android:name="android.intent.category.LAUNCHER" />
+67-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:34:17-76
+67-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:34:27-74
+68            </intent-filter>
+69        </activity>
+70        <activity
+70-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:37:9-41:51
+71            android:name="com.example.theperegrinefund.DashboardActivity"
+71-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:38:13-46
+72            android:exported="false"
+72-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:39:13-37
+73            android:screenOrientation="portrait"
+73-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:41:13-49
+74            android:theme="@style/Theme.ThePeregrineFund.NoActionBar" />
+74-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:40:13-70
+75        <activity
+75-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:42:11-46:52
+76            android:name="com.example.theperegrinefund.BaseActivity"
+76-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:43:13-41
+77            android:exported="false"
+77-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:44:13-37
+78            android:screenOrientation="portrait"
+78-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:46:13-49
+79            android:theme="@style/Theme.ThePeregrineFund.NoActionBar" />
+79-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:45:13-70
+80        <activity
+80-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:47:13-51:52
+81            android:name="com.example.theperegrinefund.SendAlerteActivity"
+81-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:48:13-47
+82            android:exported="false"
+82-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:49:13-37
+83            android:screenOrientation="portrait"
+83-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:51:13-49
+84            android:theme="@style/Theme.ThePeregrineFund.NoActionBar" />
+84-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:50:13-70
+85        <activity
+85-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:53:9-57:52
+86            android:name="com.example.theperegrinefund.StatActivity"
+86-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:54:13-41
+87            android:exported="false"
+87-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:55:13-37
+88            android:screenOrientation="portrait"
+88-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:57:13-49
+89            android:theme="@style/Theme.ThePeregrineFund.NoActionBar" />
+89-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:56:13-70
+90        <activity
+90-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:59:9-63:52
+91            android:name="com.example.theperegrinefund.DbDebugActivity"
+91-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:60:13-44
+92            android:exported="false"
+92-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:61:13-37
+93            android:screenOrientation="portrait"
+93-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:63:13-49
+94            android:theme="@style/Theme.ThePeregrineFund.NoActionBar" />
+94-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:62:13-70
+95
+96        <receiver
+96-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:66:9-70:20
+97            android:name="com.example.theperegrinefund.SmsReceiver"
+97-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:66:19-46
+98            android:exported="true" >
+98-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:66:47-70
+99            <intent-filter>
+99-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:67:13-69:29
+100                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+100-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:68:17-81
+100-->C:\Users\Fenitra Sarobidy\Documents\GitHub\The-Peregrine-Fund-App\app\src\main\AndroidManifest.xml:68:25-79
+101            </intent-filter>
+102        </receiver>
+103
+104        <activity
+104-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\b119d35d43d4c1ffd96e4c93ad0f3bc1\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:9-22:45
+105            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+105-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\b119d35d43d4c1ffd96e4c93ad0f3bc1\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:19-85
+106            android:exported="false"
+106-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\b119d35d43d4c1ffd96e4c93ad0f3bc1\transformed\play-services-base-18.1.0\AndroidManifest.xml:22:19-43
+107            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+107-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\b119d35d43d4c1ffd96e4c93ad0f3bc1\transformed\play-services-base-18.1.0\AndroidManifest.xml:21:19-78
+108
+109        <meta-data
+109-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\07e69b333c2812dc5556e2bf10528d65\transformed\play-services-basement-18.1.0\AndroidManifest.xml:21:9-23:69
+110            android:name="com.google.android.gms.version"
+110-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\07e69b333c2812dc5556e2bf10528d65\transformed\play-services-basement-18.1.0\AndroidManifest.xml:22:13-58
+111            android:value="@integer/google_play_services_version" />
+111-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\07e69b333c2812dc5556e2bf10528d65\transformed\play-services-basement-18.1.0\AndroidManifest.xml:23:13-66
+112
+113        <provider
+113-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\28ab657406bb80da0bf1f8d192d76175\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+114            android:name="androidx.startup.InitializationProvider"
+114-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\28ab657406bb80da0bf1f8d192d76175\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+115            android:authorities="com.example.theperegrinefund.androidx-startup"
+115-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\28ab657406bb80da0bf1f8d192d76175\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+116            android:exported="false" >
+116-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\28ab657406bb80da0bf1f8d192d76175\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+117            <meta-data
+117-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\28ab657406bb80da0bf1f8d192d76175\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+118                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+118-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\28ab657406bb80da0bf1f8d192d76175\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+119                android:value="androidx.startup" />
+119-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\28ab657406bb80da0bf1f8d192d76175\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+120            <meta-data
+120-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\afede548c21828291751967bdc02bc73\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+121                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+121-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\afede548c21828291751967bdc02bc73\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+122                android:value="androidx.startup" />
+122-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\afede548c21828291751967bdc02bc73\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+123            <meta-data
+123-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+124                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+124-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+125                android:value="androidx.startup" />
+125-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+126        </provider>
+127
+128        <receiver
+128-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+129            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+129-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+130            android:directBootAware="false"
+130-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+131            android:enabled="true"
+131-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+132            android:exported="true"
+132-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+133            android:permission="android.permission.DUMP" >
+133-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+134            <intent-filter>
+134-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+135                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+135-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+135-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+136            </intent-filter>
+137            <intent-filter>
+137-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+138                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+138-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+138-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+139            </intent-filter>
+140            <intent-filter>
+140-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+141                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+141-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+141-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+142            </intent-filter>
+143            <intent-filter>
+143-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+144                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+144-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+144-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Fenitra Sarobidy\.gradle\caches\8.13\transforms\6949c23e6048b1988db41950cf51592d\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+145            </intent-filter>
+146        </receiver>
+147    </application>
+148
+149</manifest>

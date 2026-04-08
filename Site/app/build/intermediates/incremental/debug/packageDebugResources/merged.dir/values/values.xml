@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <string-array name="direction_options">
+        <item>Nord</item>
+        <item>Sud</item>
+        <item>Est</item>
+        <item>Ouest</item>
+    </string-array>
+    <string-array name="intervention_options">
+        <item>Possible</item>
+        <item>Partielle</item>
+        <item>Impossible</item>
+    </string-array>
+    <string-array name="status_options">
+        <item>Debut de feu</item>
+        <item>En cours</item>
+        <item>Maitrise</item>
+    </string-array>
+    <string-array name="zone_options">
+        <item>Non</item>
+        <item>Oui</item>
+    </string-array>
+    <color name="black">#FF000000</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorError">#F44336</color>
+    <color name="colorOnBackground">#333333</color>
+    <color name="colorOnError">#FFFFFF</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorOnSecondary">#000000</color>
+    <color name="colorOnSurface">#333333</color>
+    <color name="colorPrimary">#333333</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryVariant">#1A1A1A</color>
+    <color name="colorSecondary">#60DA85</color>
+    <color name="colorSecondaryVariant">#4CAF50</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="dark_gray">#333333</color>
+    <color name="green_accent">#60DA85</color>
+    <color name="light_gray">#A39797</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="white">#FFFFFF</color>
+    <string name="action_logout">Déconnexion</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="app_description">Découvrez le monde fascinant des rapaces et contribuez à leur protection. Explorez, apprenez et agissez pour la conservation de ces magnifiques oiseaux de proie.</string>
+    <string name="app_name">The Peregrine Fund</string>
+    <string name="barchart_title">Nombre de messages par site</string>
+    <string name="category_label">Categorie</string>
+    <string name="close_drawer">Fermer le menu</string>
+    <string name="code_label">Code</string>
+    <string name="code_sample">dshdgs/hdjsa/23-09-25</string>
+    <string name="dashboard_title">Dashboard Raptor</string>
+    <string name="datetime_hint">Select Date-Heure</string>
+    <string name="datetime_label">Date et heure</string>
+    <string name="decoration_description">Image décorative centrale</string>
+    <string name="desc_hint">Description</string>
+    <string name="desc_label">Description</string>
+    <string name="direction_hint">Choisir une direction</string>
+    <string name="direction_label">Direction</string>
+    <string name="error_category_required">La catégorie est requise</string>
+    <string name="error_date_required">La date est requise</string>
+    <string name="error_invalid_credentials">Nom d\'utilisateur ou mot de passe incorrect</string>
+    <string name="error_name_required">Le nom est requis</string>
+    <string name="error_password_required">Le mot de passe est requis</string>
+    <string name="error_status_required">Le statut est requis</string>
+    <string name="explore_button">Explorer</string>
+    <string name="fire_message">Informations des messages </string>
+    <string name="fire_message_date"> </string>
+    <string name="form_instruction">Merci de remplir</string>
+    <string name="form_saved_success">Formulaire sauvegardé avec succès</string>
+    <string name="form_title">Formulaire d\'informations</string>
+    <string name="general_info_title">Informations générales</string>
+    <string name="general_info_title2">Informations supplementaires</string>
+    <string name="history_title">History of sent messages</string>
+    <string name="information_label">l\'information</string>
+    <string name="intervention_hint">Choisir une intervention</string>
+    <string name="intervention_label">Intervention</string>
+    <string name="logo_description">Logo de l\'application raptor</string>
+    <string name="map_title">Carte des feux de brousse</string>
+    <string name="name_hint">Name</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="next_button">Suivant</string>
+    <string name="open_drawer">Ouvrir le menu</string>
+    <string name="password_hint">Password</string>
+    <string name="piechart_title">Répartition des Zones d alerte</string>
+    <string name="pointR_hint">Point de repere</string>
+    <string name="pointR_label">Point Repere</string>
+    <string name="previous_button">Précédent</string>
+    <string name="profile_button">Mon Profil</string>
+    <string name="save_button">Sauvegarder</string>
+    <string name="send_mess_text">Envoyer</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="slogan_text">Saving raptors, enriching lives.</string>
+    <string name="status_hint">Choisir un statut</string>
+    <string name="status_label">Statut</string>
+    <string name="success_login">Connexion réussie!</string>
+    <string name="surface_hint">Surface approximative</string>
+    <string name="surface_label">Surface</string>
+    <string name="thank_message">Merci de remplir les champs</string>
+    <string name="welcome_message">Bienvenue dans The Peregrine Fund!</string>
+    <string name="zone_hint">Besoin de renfort?</string>
+    <string name="zone_label">Renfort</string>
+    <style name="HistoryItemStyle">
+        <item name="android:layout_width">127dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:textColor">#444444</item>
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+    <style name="InfoTextStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+    <style name="Theme.RaptorApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorOnError</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="android:statusBarColor" ns1:targetApi="l">?attr/colorPrimaryVariant</item>
+    </style>
+    <style name="Theme.RaptorApp.Launcher" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+    </style>
+    <style name="Theme.RaptorApp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.ThePeregrineFund" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+
+        
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorOnError</item>
+
+        
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+
+        
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+
+        
+        <item name="android:statusBarColor" ns1:targetApi="l">?attr/colorPrimaryVariant</item>
+    </style>
+    <style name="Theme.ThePeregrineFund.Launcher" parent="Theme.ThePeregrineFund.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+    </style>
+    <style name="Theme.ThePeregrineFund.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>

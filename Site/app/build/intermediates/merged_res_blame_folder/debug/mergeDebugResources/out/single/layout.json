@@ -1,0 +1,46 @@
+[
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_main.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_db_debug.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_db_debug.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_send_message.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_send_message.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_login.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_login.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/item_history.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/item_history.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_sendalert.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_sendalert.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_stat.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_stat.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_base.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_base.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/fragment_page1.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/fragment_page1.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/fragment_page2.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/fragment_page2.xml"
+    },
+    {
+        "merged": "com.example.theperegrinefund.app-mergeDebugResources-37:/layout/activity_dashboard.xml",
+        "source": "com.example.theperegrinefund.app-main-40:/layout/activity_dashboard.xml"
+    }
+]

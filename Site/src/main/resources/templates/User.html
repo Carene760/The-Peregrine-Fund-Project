@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/user.css">
+    <title>Add User</title>
+    <style>
+        /* Styles pour les messages */
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+            position: relative;
+        }
+        
+        .error-message:before {
+            content: "!";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #d32f2f;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        
+        .success-message {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+            position: relative;
+        }
+        
+        .success-message:before {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #2e7d32;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        
+        .message-close {
+            background: none;
+            border: none;
+            color: #d32f2f;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+        
+        .success-message .message-close {
+            color: #2e7d32;
+        }
+        
+        .message-close:hover {
+            opacity: 0.8;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        .messages-container {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            width: 100%;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img
+                        class="frame-2"
+                        src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png"
+                        alt="The Peregrine Fund Logo"
+                    />
+                </div>
+                <div class="nav-tabs">
+                    <div class="nav-tab active"><a href="/history">Historique</a></div>
+                    <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                    <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                        <a href="/users">Admin</a>
+                    </div>
+                    <div class="nav-tab active" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                        <a href="/gateway">Gateway</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tagline-admin">
+                <div class="tagline">"Saving raptors, enriching lives."</div>
+                <div class="admin-label"><span th:text="${currentUser.fonction.fonction}"></span></div>
+
+            </div>
+        </header>
+
+        <div class="messages-container">
+            <!-- Message d'erreur -->
+            <div class="error-message" th:if="${errorMessage}">
+                <span th:text="${errorMessage}"></span>
+                <button class="message-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            
+            <!-- Message de succès -->
+            <div class="success-message" th:if="${successMessage}">
+                <span th:text="${successMessage}"></span>
+                <button class="message-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/users-app" method="get" id="agent-form" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="agent-form" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Agent Form</span>
+            </button>
+        </div>
+
+        <!-- Titre du formulaire -->
+        <section class="form-header">
+            <h1 class="form-title">USER FORM</h1>
+            <div class="raptor-icon"></div>
+        </section>
+
+        <!-- Container du formulaire -->
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="user-form" th:action="@{/users/save}" th:object="${user}" method="post" id="user-form" role="form" novalidate>
+                <div class="form-grid">
+                    <!-- Ligne 1: Name + Phone -->
+                    <div class="input-group">
+                        <label for="name-input" class="visually-hidden">Name</label>
+                        <input type="text" th:field="*{nom}" id="name-input" class="input-field" placeholder="Name" autocomplete="given-name"/>
+                    </div>
+                    <div class="input-group">
+                        <label for="phone-input" class="visually-hidden">Phone</label>
+                        <input type="tel" th:field="*{telephone}" id="phone-input" class="input-field" placeholder="Phone" autocomplete="tel"/>
+                    </div>
+
+                    <!-- Ligne 2: Email + Address -->
+                    <div class="input-group">
+                        <label for="email-input" class="visually-hidden">Email</label>
+                        <input type="email" th:field="*{email}" id="email-input" class="input-field" placeholder="Email" autocomplete="email"/>
+                    </div>
+                    <div class="input-group">
+                        <label for="address-input" class="visually-hidden">Address</label>
+                        <input type="text" th:field="*{adresse}" id="address-input" class="input-field" placeholder="Address" autocomplete="street-address"/>
+                    </div>
+
+                    <!-- Ligne 3: Fonction + Password (affiché seulement si non-Responsable) -->
+                    <div class="input-group">
+                        <label for="fonction-select" class="visually-hidden">Fonction</label>
+                        <select name="fonction.idFonction" id="fonction-select" class="input-field">
+                            <option value="">-- Sélectionnez une fonction --</option>
+                            <option th:each="fonction : ${fonctions}" 
+                                    th:value="${fonction.idFonction}" 
+                                    th:text="${fonction.fonction}"
+                                    th:selected="${user.fonction != null and user.fonction.idFonction == fonction.idFonction}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" id="password-group">
+                        <label for="password-input" class="visually-hidden">Password</label>
+                        <input type="password"
+                               name="motDePasse"
+                               id="password-input"
+                               class="input-field"
+                               placeholder="Password"
+                               autocomplete="new-password"
+                               value="defaultPassword123"/> <!-- MOT DE PASSE PAR DÉFAUT -->
+                        <small class="password-hint" id="password-hint" style="display: none; color: #666; font-size: 12px; margin-top: 5px;">
+                            Obligatoire pour les utilisateurs non-Responsable
+                        </small>
+                    </div>
+
+                    <div class="input-group" id="site-group" style="display:none;">
+                        <label for="site-select" class="visually-hidden">Site</label>
+                        <select name="siteId" id="site-select" class="input-field">
+                            <option value="" selected>-- Sélectionnez un site --</option>
+                            <!-- Les options seront ajoutées dynamiquement par JavaScript -->
+                        </select>
+                        <small class="site-hint" style="color: #666; font-size: 12px; margin-top: 5px;">
+                            Obligatoire pour les Responsables
+                        </small>
+                    </div> 
+                </div>
+                
+                <!-- Bouton de soumission DOIT être dans le formulaire -->
+                <button type="submit" class="submit-btn" aria-describedby="signin-description">
+                    <span class="submit-text">Add User</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+     <!-- Footer -->
+    <footer class="footer">
+        <div class="main-container">
+            <a href="/logout" class="logout-btn">
+                <div class="logout-icon">
+                    <img
+                        class="logout-icon"
+                        src="images/logout.png"
+                        alt="The Peregrine Fund Logo"
+                    />
+                </div>
+                Déconnexion
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // Fonction pour gérer l'affichage des champs
+        function updateFormFields() {
+            const fonctionSelect = document.getElementById("fonction-select");
+            const selectedText = fonctionSelect.value ? fonctionSelect.options[fonctionSelect.selectedIndex].text : "";
+            const isResponsable = selectedText === "Responsable";
+            
+            const siteGroup = document.getElementById("site-group");
+            const passwordGroup = document.getElementById("password-group");
+            const passwordInput = document.getElementById("password-input");
+            const passwordHint = document.getElementById("password-hint");
+            
+            if (isResponsable) {
+                // Afficher le champ site
+                siteGroup.style.display = "block";
+                
+                // Cacher le champ mot de passe
+                passwordGroup.style.display = "none";
+                passwordHint.style.display = "none";
+                
+                // Définir un mot de passe par défaut pour les Responsables
+                passwordInput.value = "defaultPassword123";
+                
+            } else {
+                // Cacher le champ site
+                siteGroup.style.display = "none";
+                
+                // Afficher le champ mot de passe
+                passwordGroup.style.display = "block";
+                passwordHint.style.display = "block";
+                
+                // Vider le champ mot de passe pour les autres utilisateurs
+                // L'utilisateur devra entrer son propre mot de passe
+                passwordInput.value = "";
+                passwordInput.placeholder = "Password (obligatoire)";
+            }
+        }
+    
+        // Initialiser
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("Page chargée");
+            
+            // Charger les sites
+            fetch('/users/sites')
+                .then(response => response.json())
+                .then(sites => {
+                    const siteSelect = document.getElementById("site-select");
+                    siteSelect.innerHTML = '<option value="" selected>-- Sélectionnez un site --</option>';
+                    sites.forEach(site => {
+                        const option = document.createElement("option");
+                        option.value = site.idSite;
+                        option.textContent = site.nom;
+                        siteSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Erreur:", error));
+            
+            // Initialiser l'affichage
+            updateFormFields();
+            
+            // Écouter les changements
+            document.getElementById("fonction-select").addEventListener("change", function() {
+                console.log("Fonction changée:", this.value);
+                updateFormFields();
+            });
+            
+            // Validation avant soumission
+            document.getElementById("user-form").addEventListener("submit", function(event) {
+                console.log("=== Validation formulaire ===");
+                
+                const fonctionSelect = document.getElementById("fonction-select");
+                const selectedText = fonctionSelect.value ? fonctionSelect.options[fonctionSelect.selectedIndex].text : "";
+                const isResponsable = selectedText === "Responsable";
+                
+                // Validation de base
+                const nom = document.getElementById("name-input").value.trim();
+                const telephone = document.getElementById("phone-input").value.trim();
+                const email = document.getElementById("email-input").value.trim();
+                const adresse = document.getElementById("address-input").value.trim();
+                const fonction = document.getElementById("fonction-select").value;
+                
+                if (!nom || !telephone || !email || !adresse || !fonction) {
+                    alert("Tous les champs sont obligatoires");
+                    event.preventDefault();
+                    return false;
+                }
+                
+                if (isResponsable) {
+                    // Validation pour Responsable
+                    const siteSelect = document.getElementById("site-select");
+                    if (!siteSelect.value) {
+                        alert("Le site est obligatoire pour un Responsable");
+                        event.preventDefault();
+                        return false;
+                    }
+                } else {
+                    // Validation pour utilisateur normal
+                    const passwordInput = document.getElementById("password-input");
+                    if (!passwordInput.value.trim()) {
+                        alert("Le mot de passe est obligatoire");
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+                
+                console.log("Validation réussie");
+                return true;
+            });
+        });
+    </script>
+        
+
+</body>
+</html>

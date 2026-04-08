@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/historique.css}" />
+    <title>Historique</title>
+</head>
+<body>
+<div class="main-container">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img class="frame-2" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png" alt="The Peregrine Fund Logo"/>
+            </div>
+            <div class="nav-tabs">
+                <div class="nav-tab"><a href="/history">Historique</a></div>
+                <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
+                    <a href="/users">Admin</a>
+                </div>
+                <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
+                    <a href="/gateway">Gateway</a>
+                </div>
+            </div>
+        </div>
+        <div class="tagline-admin">
+            <div class="tagline">"Saving raptors, enriching lives."</div>
+            <div class="admin-label"><span th:text="${user.fonction.fonction}"></span></div>
+        </div>
+    </header>
+
+    <!-- Filtres -->
+    <section class="filters-section">
+        <div class="filter-group">
+            <label>Année</label>
+            <select id="filterYear" class="filter-select">
+                <option value="">Toutes</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Mois</label>
+            <select id="filterMonth" class="filter-select">
+                <option value="">Tous</option>
+                <option value="01">Janvier</option>
+                <option value="02">Février</option>
+                <option value="03">Mars</option>
+                <option value="04">Avril</option>
+                <option value="05">Mai</option>
+                <option value="06">Juin</option>
+                <option value="07">Juillet</option>
+                <option value="08">Août</option>
+                <option value="09">Septembre</option>
+                <option value="10">Octobre</option>
+                <option value="11">Novembre</option>
+                <option value="12">Décembre</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Alerte</label>
+            <select id="filterAlerte" class="filter-select">
+                <option value="">Toutes</option>
+                <option value="Rouge">Rouge</option>
+                <option value="Orange">Orange</option>
+                <option value="Jaune">Jaune</option>
+                <option value="Vert">Vert</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Site</label>
+            <select id="filterSite" class="filter-select">
+                <option value="">Tous</option>
+                <option th:each="site : ${sites}" th:value="${site.getNom()}" th:text="${site.getNom()}"></option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Status</label>
+            <select id="filterStatus" class="filter-select">
+                <option value="">Tous</option>
+                <option value="Debut de feu">Debut de feu</option>
+                <option value="En cours">En cours</option>
+                <option value="Maitrise">Maitrise</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- Table des données -->
+    <section class="data-table-container">
+        <table class="data-table">
+            <thead class="table-header">
+            <tr>
+                <th>Site</th>
+                <th>Alerte</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Agent</th>
+                <th>Surface</th>
+            </tr>
+            </thead>
+            <tbody class="table-body" id="messageTable">
+            <tr class="table-row"
+                th:each="msg : ${messages}"
+                th:data-annee="${#temporals.format(msg.dateCommencement, 'yyyy')}"
+                th:data-mois="${#temporals.format(msg.dateCommencement, 'MM')}"
+                th:data-alerte="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}"
+                th:data-site="${msg.userApp.patrouilleur.site.nom}"
+                th:data-status="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}">
+
+                <!-- Site -->
+                <td class="table-cell" th:text="${msg.userApp.patrouilleur.site.nom}"></td>
+
+                <!-- Alerte -->
+                <td class="table-cell">
+                    <span th:each="a : ${alerteMessage[msg.idMessage]}"
+                          th:text="${a.typeAlerte.zone}"></span>
+                </td>
+
+                <!-- Dernier statut -->
+                <td class="table-cell"
+                    th:text="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}">
+                </td>
+
+                <!-- Date -->
+                <td class="table-cell" th:text="${#temporals.format(msg.dateCommencement, 'yyyy-MM-dd HH:mm')}"></td>
+
+                <!-- Agent -->
+                <td class="table-cell" th:text="${msg.userApp.patrouilleur.nom}"></td>
+
+                <!-- Surface -->
+                <td class="table-cell" th:text="${msg.surfaceApproximative}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="main-container">
+        <a href="/logout" class="logout-btn">
+            <div class="logout-icon">
+                <img class="logout-icon" src="images/logout.png" alt="The Peregrine Fund Logo"/>
+            </div>
+            Déconnexion
+        </a>
+    </div>
+</footer>
+
+<!-- Script pour filtres -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const filterYear = document.getElementById("filterYear");
+    const filterMonth = document.getElementById("filterMonth");
+    const filterAlerte = document.getElementById("filterAlerte");
+    const filterSite = document.getElementById("filterSite");
+    const filterStatus = document.getElementById("filterStatus");
+    const rows = document.querySelectorAll("#messageTable tr");
+
+    function applyFilters() {
+        const year = (filterYear.value || "").trim();
+        const month = (filterMonth.value || "").trim();
+        const alerte = (filterAlerte.value || "").trim().toLowerCase();
+        const site = (filterSite.value || "").trim().toLowerCase();
+        const status = (filterStatus.value || "").trim().toLowerCase();
+
+        rows.forEach(row => {
+            const rowYear = (row.dataset.annee || "").trim();
+            const rowMonth = (row.dataset.mois || "").trim();
+            const rowAlerte = (row.dataset.alerte || "").trim().toLowerCase();
+            const rowSite = (row.dataset.site || "").trim().toLowerCase();
+            const rowStatus = (row.dataset.status || "").trim().toLowerCase();
+
+            let visible = true;
+            if (year && rowYear !== year) visible = false;
+            if (month && rowMonth !== month) visible = false;
+            if (alerte && rowAlerte !== alerte) visible = false;
+            if (site && rowSite !== site) visible = false;
+            if (status && rowStatus !== status) visible = false;
+
+            row.style.display = visible ? "" : "none";
+        });
+    }
+
+    [filterYear, filterMonth, filterAlerte, filterSite, filterStatus].forEach(el => {
+        el.addEventListener("change", applyFilters);
+    });
+});
+</script>
+</body>
+</html>
