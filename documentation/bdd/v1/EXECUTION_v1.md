@@ -6,26 +6,26 @@
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 1. [Prérequis](#prérequis)
 2. [Configuration du serveur PostgreSQL](#configuration-du-serveur-postgresql)
-3. [Procédure d'exécution par étapes](#procédure-dexécution-par-étapes)
-4. [Vérification de l'installation](#vérification-de-linstallation)
+3. [Procédure d&#39;exécution par étapes](#procédure-dexécution-par-étapes)
+4. [Vérification de l&#39;installation](#vérification-de-linstallation)
 5. [Dépannage](#dépannage)
 6. [Sauvegardes et restauration](#sauvegardes-et-restauration)
 
 ---
 
-## ⚙️ Prérequis
+## Prérequis
 
 ### Obligatoire
 
-- ✅ **PostgreSQL 16.4+** installé et démarré
-- ✅ **Outil psql** (fourni avec PostgreSQL)
-- ✅ **Accès administrateur** à PostgreSQL (utilisateur `postgres`)
-- ✅ **Fichiers SQL** disponibles dans le dossier `/bdd/` du projet
-- ✅ **Encodage UTF-8** configuré sur la base (par défaut sous PostgreSQL)
+- **PostgreSQL 16.4+** installé et démarré
+- **Outil psql** (fourni avec PostgreSQL)
+- **Accès administrateur** à PostgreSQL (utilisateur `postgres`)
+- **Fichiers SQL** disponibles dans le dossier `/bdd/` du projet
+- **Encodage UTF-8** configuré sur la base (par défaut sous PostgreSQL)
 
 ### Vérification de l'installation
 
@@ -39,15 +39,17 @@ psql --version
 ```
 
 Si vous obtenez "commande non reconnue" :
+
 > PostgreSQL n'est pas ajouté au PATH. Ajoutez le chemin : `C:\Program Files\PostgreSQL\16\bin` au PATH Windows.
 
 ---
 
-## 🔧 Configuration du serveur PostgreSQL
+## Configuration du serveur PostgreSQL
 
 ### 1. Vérifier le service PostgreSQL
 
 **Sous Windows** :
+
 ```powershell
 # Vérifier que le service est actif
 Get-Service | Where-Object {$_.Name -like "*postgres*"}
@@ -57,6 +59,7 @@ Start-Service -Name "postgresql-x64-16"  # Adaptez la version
 ```
 
 **Sous Linux/Mac** :
+
 ```bash
 sudo systemctl status postgresql
 sudo systemctl start postgresql  # Si nécessaire
@@ -64,7 +67,7 @@ sudo systemctl start postgresql  # Si nécessaire
 
 ### 2. Créer un utilisateur PostgreSQL pour l'application
 
-⚠️ **OPTIONNEL** - À faire une seule fois
+**OPTIONNEL** - À faire une seule fois
 
 ```bash
 # Connectez-vous en administrateur
@@ -82,7 +85,7 @@ ALTER USER tpf_user CREATEDB;
 
 ---
 
-## 📊 Procédure d'exécution par étapes
+## Procédure d'exécution par étapes
 
 ### Phase 1 : Créer la base de données
 
@@ -105,6 +108,7 @@ CREATE DATABASE tpf WITH
 ```
 
 **Résultat attendu** :
+
 ```
 CREATE DATABASE
 You are now connected to database "tpf" as user "postgres".
@@ -137,6 +141,7 @@ psql -U postgres -d tpf -f structure_lisible.sql
 ```
 
 **Vérification** :
+
 ```bash
 psql -U postgres -d tpf -c "\dt"
 
@@ -152,13 +157,13 @@ psql -U postgres -d tpf -c "\dt"
 
 ---
 
-### Phase 3 : Charger les données initiales (data)
+### Phase 3 : Charger les données test (optionnel)
 
 Le fichier `data.sql` insère les données de base (sites, utilisateurs, alertes types, etc.).
 
 #### Option A : Avec fichier original (`data.sql`)
 
-⚠️ **ATTENTION** : Ce fichier peut avoir des problèmes d'encodage UTF-16
+**ATTENTION** : Ce fichier peut avoir des problèmes d'encodage UTF-16
 
 ```bash
 # Méthode 1 : Directe (peut échouer sur Windows)
@@ -170,7 +175,7 @@ Get-Content -Path "data.sql" -Encoding Unicode | psql -U postgres -d tpf
 
 #### Option B : Avec fichier lisible (`data_lisible.sql`)
 
-✅ **RECOMMANDÉ** - Format UTF-8 standard
+**RECOMMANDÉ** - Format UTF-8 standard
 
 ```bash
 # Depuis le répertoire /bdd/
@@ -180,6 +185,7 @@ psql -U postgres -d tpf -f data_lisible.sql
 ```
 
 **Vérification** :
+
 ```bash
 psql -U postgres -d tpf -c "SELECT COUNT(*) as nombre_sites FROM site;"
 
@@ -192,21 +198,7 @@ psql -U postgres -d tpf -c "SELECT COUNT(*) as nombre_sites FROM site;"
 
 ---
 
-### Phase 4 : Charger la sauvegarde complète (optionnel)
-
-Si vous disposez d'un dump complet (`backup.sql`) avec données en production :
-
-```bash
-# Attention : ceci écrase les données existantes !
-psql -U postgres -d tpf -f backup.sql
-
-# Vérification
-psql -U postgres -d tpf -c "SELECT COUNT(*) as total_messages FROM message;"
-```
-
----
-
-## ✅ Vérification de l'installation
+## Vérification de l'installation
 
 ### 1. Vérifier la connexion
 
@@ -214,7 +206,7 @@ psql -U postgres -d tpf -c "SELECT COUNT(*) as total_messages FROM message;"
 psql -U postgres -d tpf -c "SELECT NOW();"
 
 # Résultat :
-#              now              
+#              now          
 # ──────────────────────────────
 #  2025-01-15 14:30:45.123456+00
 ```
@@ -274,13 +266,14 @@ psql -U postgres -d tpf -c "
 
 ---
 
-## 🔧 Dépannage
+## Dépannage
 
-### ❌ Erreur : "psql: commande non trouvée"
+### Erreur : "psql: commande non trouvée"
 
 **Cause** : PostgreSQL n'est pas dans le PATH
 
 **Solution Windows** :
+
 ```powershell
 # Ajouter au PATH temporairement
 $env:Path += ";C:\Program Files\PostgreSQL\16\bin"
@@ -289,11 +282,12 @@ $env:Path += ";C:\Program Files\PostgreSQL\16\bin"
 psql --version
 ```
 
-### ❌ Erreur : "FATAL: database "tpf" does not exist"
+### Erreur : "FATAL: database "tpf" does not exist"
 
 **Cause** : La base n'a pas été créée
 
 **Solution** :
+
 ```bash
 # Créez-la
 psql -U postgres -c "CREATE DATABASE tpf;"
@@ -301,11 +295,12 @@ psql -U postgres -c "CREATE DATABASE tpf;"
 # Ou réexécutez la Phase 1 ci-dessus
 ```
 
-### ❌ Erreur : "permission denied for schema public"
+### Erreur : "permission denied for schema public"
 
 **Cause** : Utilisateur sans droits d'accès
 
 **Solution** :
+
 ```bash
 psql -U postgres -d tpf -c "
   GRANT USAGE ON SCHEMA public TO tpf_user;
@@ -314,11 +309,12 @@ psql -U postgres -d tpf -c "
 "
 ```
 
-### ❌ Erreur : "Encoding error", "invalid byte sequence"
+### Erreur : "Encoding error", "invalid byte sequence"
 
 **Cause** : Fichier SQL en encodage incorrect (UTF-16 au lieu de UTF-8)
 
 **Solution Windows (PowerShell)** :
+
 ```powershell
 # Convertir le fichier
 Get-Content "data.sql" -Encoding Unicode | Set-Content "data_utf8.sql" -Encoding UTF8
@@ -327,11 +323,12 @@ Get-Content "data.sql" -Encoding Unicode | Set-Content "data_utf8.sql" -Encoding
 psql -U postgres -d tpf -f data_utf8.sql
 ```
 
-### ❌ Erreur : "constraint violation", "duplicate key"
+### Erreur : "constraint violation", "duplicate key"
 
 **Cause** : Données dupliquées ou séquences mal initialisées
 
 **Solution** :
+
 ```bash
 # Réinitialiser les séquences
 psql -U postgres -d tpf << EOF
@@ -345,7 +342,7 @@ EOF
 
 ---
 
-## 💾 Sauvegardes et restauration
+## Sauvegardes et restauration
 
 ### Créer une sauvegarde complète
 
@@ -386,28 +383,11 @@ spring.datasource.password=VotreMotDePasse123
 
 ---
 
-## 🚀 Résumé rapide (pour administrateurs BDD)
+## Résumé
 
-1. **Créer la base** : `CREATE DATABASE tpf ...` 
+1. **Créer la base** : `CREATE DATABASE tpf ...`
 2. **Charger schéma** : `psql -U postgres -d tpf -f structure_lisible.sql`
-3. **Charger données** : `psql -U postgres -d tpf -f data_lisible.sql`
+3. **Charger données test (optionnel)**: `psql -U postgres -d tpf -f data_lisible.sql`
 4. **Vérifier** : `psql -U postgres -d tpf -c "SELECT COUNT(*) FROM site;"`
 5. **Configurer app** : Mettre à jour `application.properties` avec les credentials
 6. **Démarrer** : Application se connecte automatiquement
-
----
-
-## 📚 Fichiers SQL référencés
-
-| Fichier | Usage | Taille | Format |
-|---------|-------|--------|--------|
-| `structure.sql` | Schéma original | ~150 KB | SQL standard |
-| `structure_lisible.sql` | Schéma formaté | ~150 KB | UTF-8 avec commentaires |
-| `data.sql` | Données originales | ~200 KB | UTF-16 (problématique) |
-| `data_lisible.sql` | Données formatées | ~200 KB | UTF-8 (RECOMMANDÉ) |
-| `backup.sql` | Dump complet | Variable | Dépend du dump |
-
----
-
-**Dernière mise à jour** : 2025-01-15
-**Prochaine version** : Sera créée en `EXECUTION_v2.md` si procédures changent

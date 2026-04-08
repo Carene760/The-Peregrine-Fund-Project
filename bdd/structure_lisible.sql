@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS tpf WITH ENCODING 'UTF8';
-\c tpf;
-
 -- Necessaire pour la fonction UNACCENT utilisee dans un trigger
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
