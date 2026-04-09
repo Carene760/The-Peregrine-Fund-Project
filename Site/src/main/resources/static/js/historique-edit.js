@@ -23,6 +23,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    document.querySelectorAll('.table-cell[data-column="alerte"] select').forEach(select => {
+        select.addEventListener('change', function() {
+            const row = this.closest('[data-message-id]');
+            if (!row) {
+                return;
+            }
+
+            row.dataset.alertEdited = (this.value !== (row.dataset.alertId || "")) ? "true" : "false";
+        });
+    });
+
     /**
      * Active le mode édition pour une ligne de message
      */
@@ -42,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         row.querySelector(".js-edit-message").classList.add("is-hidden");
         row.querySelector(".js-validate-message").classList.remove("is-hidden");
         row.querySelector(".js-cancel-message").classList.remove("is-hidden");
+        row.dataset.alertEdited = "false";
 
         // Focus sur le premier input
         const firstInput = row.querySelector(".edit-input");
@@ -98,10 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Mettre à jour les valeurs affichées et désactiver le mode édition
-                updateDisplayValues(row, updateData);
-                disableEditMode(messageId);
                 alert("Message modifié avec succès!");
+                window.location.reload();
             } else {
                 alert("Erreur: " + (data.message || "Mise à jour échouée"));
             }
@@ -151,6 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateData[fieldName] = value;
             }
         });
+
+        updateData.alertManuallyEdited = row.dataset.alertEdited === "true";
 
         return updateData;
     }

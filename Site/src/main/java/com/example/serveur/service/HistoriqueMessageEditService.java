@@ -64,6 +64,7 @@ public class HistoriqueMessageEditService {
         }
 
         StatusMessage newStatus = null;
+        boolean alertManuallyEdited = Boolean.parseBoolean(String.valueOf(updateData.getOrDefault("alertManuallyEdited", "false")));
 
         // dateCommencement
         if (updateData.containsKey("dateCommencement") && updateData.get("dateCommencement") != null) {
@@ -167,9 +168,7 @@ public class HistoriqueMessageEditService {
         }
 
         // idTypeAlerte
-        boolean alertEditedManually = false;
-        if (updateData.containsKey("idTypeAlerte")) {
-            alertEditedManually = true;
+        if (alertManuallyEdited && updateData.containsKey("idTypeAlerte") && updateData.get("idTypeAlerte") != null) {
             try {
                 Integer typeAlerteId = Integer.parseInt(String.valueOf(updateData.get("idTypeAlerte")));
                 TypeAlerte typeAlerte = typeAlerteRepository.findById(typeAlerteId).orElse(null);
@@ -198,7 +197,7 @@ public class HistoriqueMessageEditService {
             historiqueMessageStatusRepository.save(historique);
         }
 
-        if (!alertEditedManually) {
+        if (!alertManuallyEdited) {
             niveauAlerteService.recalculerEtPersisterAlerteMessage(savedMessage);
         }
         return true;

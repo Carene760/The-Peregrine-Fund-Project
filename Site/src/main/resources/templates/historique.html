@@ -183,6 +183,7 @@
             <tr class="table-row"
                 th:each="msg : ${messages}"
                 th:attr="data-message-id=${msg.idMessage}"
+                th:data-alert-id="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.idTypeAlerte : ''}"
                 th:data-annee="${#temporals.format(msg.dateCommencement, 'yyyy')}"
                 th:data-mois="${#temporals.format(msg.dateCommencement, 'MM')}"
                 th:data-alerte="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}"
