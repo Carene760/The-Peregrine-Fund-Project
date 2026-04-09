@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,6 +28,8 @@ import com.example.theperegrinefund.security.CryptoUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG = "LoginActivity";
+
     private static final int PERMISSION_REQUEST_SEND_SMS = 1;
     private static final int PERMISSION_REQUEST_RECEIVE_SMS = 2;
 
@@ -35,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     private SmsSender smsSender;
     private String lastChiffre;
     private boolean waitingForResponse = false;
+    private boolean isSmsReceiverRegistered = false;
    
 
     private BroadcastReceiver smsReceiver; // pour écouter les réponses
@@ -92,27 +97,51 @@ public class LoginActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if ("SMS_RECU_APP".equals(intent.getAction())) {
                     String corps = intent.getStringExtra("message");
-                    if (waitingForResponse && corps != null) {
+                    String sender = intent.getStringExtra("sender");
+                    if (!waitingForResponse || corps == null) {
+                        return;
+                    }
+
+                    textViewSms.setText(corps);
+
+                    // Ignore les messages qui ne viennent pas du numéro configuré.
+                    if (!isFromConfiguredSender(sender)) {
+                        Log.d(TAG, "SMS ignoré (expéditeur inattendu): " + sender);
+                        return;
+                    }
+
+                    int userId = extraireIdUser(corps);
+                    if (userId > 0) {
                         waitingForResponse = false;
+                        Toast.makeText(LoginActivity.this, "Authentification réussie!", Toast.LENGTH_SHORT).show();
+                        AppData.setCurrentUserId(userId);
 
-                        if (corps.contains("ID")) {
-
-                            Toast.makeText(LoginActivity.this, "Authentification réussie!", Toast.LENGTH_SHORT).show();
-                            int userId = extraireIdUser(corps);
-                            AppData.setCurrentUserId(userId);
-
-                             Intent intentDashboard = new Intent(LoginActivity.this, DashboardActivity.class);
-                                startActivity(intentDashboard);
-
-                                // (Optionnel) : fermer LoginActivity pour que l'utilisateur ne revienne pas dessus
-                                finish();
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Échec de l'authentification", Toast.LENGTH_SHORT).show();
-                        }
+                        Intent intentDashboard = new Intent(LoginActivity.this, DashboardActivity.class);
+                        startActivity(intentDashboard);
+                        finish();
+                    } else {
+                        // Ne pas annuler l'attente ici: on peut recevoir d'autres SMS non-auth.
+                        Toast.makeText(LoginActivity.this, "Réponse reçue mais ID introuvable", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         };
+    }
+
+    private boolean isFromConfiguredSender(String sender) {
+        if (sender == null) return false;
+        try {
+            String configured = ConfigLoader.getFixedNumber(this);
+            if (configured == null) return false;
+            return normalizePhone(sender).contains(normalizePhone(configured));
+        } catch (Exception e) {
+            Log.e(TAG, "Impossible de lire fixed.number", e);
+            return false;
+        }
+    }
+
+    private String normalizePhone(String number) {
+        return number.replaceAll("[^0-9]", "");
     }
     private int extraireIdUser(String sms) {
         if (sms == null) return -1;
@@ -146,13 +175,26 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(smsReceiver, new IntentFilter("SMS_RECU_APP"));
+        IntentFilter filter = new IntentFilter("SMS_RECU_APP");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(smsReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(smsReceiver, filter);
+        }
+        isSmsReceiverRegistered = true;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(smsReceiver);
+        if (isSmsReceiverRegistered) {
+            try {
+                unregisterReceiver(smsReceiver);
+            } catch (IllegalArgumentException ignored) {
+                // Receiver was already unregistered by the framework lifecycle.
+            }
+            isSmsReceiverRegistered = false;
+        }
     }
 
     @Override

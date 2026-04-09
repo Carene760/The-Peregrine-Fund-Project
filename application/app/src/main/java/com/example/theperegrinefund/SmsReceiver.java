@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Build;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
@@ -19,7 +20,13 @@ public class SmsReceiver extends BroadcastReceiver {
             Object[] pdus = (Object[]) bundle.get("pdus");
             if (pdus != null) {
                 for (Object pdu : pdus) {
-                    SmsMessage sms = SmsMessage.createFromPdu((byte[]) pdu);
+                    String format = bundle.getString("format");
+                    SmsMessage sms;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        sms = SmsMessage.createFromPdu((byte[]) pdu, format);
+                    } else {
+                        sms = SmsMessage.createFromPdu((byte[]) pdu);
+                    }
                     String sender = sms.getDisplayOriginatingAddress();
                     String body = sms.getMessageBody();
 
@@ -32,7 +39,9 @@ public class SmsReceiver extends BroadcastReceiver {
 
                         // Envoie du SMS déchiffré vers LoginActivity
                         Intent i = new Intent("SMS_RECU_APP");
+                        i.setPackage(context.getPackageName());
                         i.putExtra("message", dechiffre);
+                        i.putExtra("sender", sender);
                         context.sendBroadcast(i);
 
                     } catch (Exception e) {

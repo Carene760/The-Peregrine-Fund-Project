@@ -226,7 +226,7 @@ public class StatActivity extends AppCompatActivity {
         pieChart = findViewById(R.id.pieChart);
         entries.clear();
 
-        String[] labels = {"Zone verte", "Zone jaune", "Zone orange", "Zone rouge"};
+        String[] labels = {"Verte", "Jaune", "Orange", "Rouge"};
 
         try {
             String[] parts = dataString.split("/"); // découpe "40/25/20/15"
