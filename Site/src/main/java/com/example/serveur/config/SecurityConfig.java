@@ -14,6 +14,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.logout(logout -> logout
             .logoutUrl("/logout")                     // l’URL pour déclencher la déconnexion
+            .invalidateHttpSession(true)
+            .deleteCookies("rememberUserEmail", "JSESSIONID")
             .logoutSuccessUrl("/")     // où rediriger après déconnexion
             .permitAll()
         );
@@ -28,9 +30,11 @@ public class SecurityConfig {
                     "/css/statistique.css",
                     "/css/style.css",
                     "/css/user.css",
+                    "/js/**",
                     "/images/**",
                     "/stat/**", 
-                    "/history/**", 
+                    "/history/**",
+                    "/evenements/**", 
                     "/login", 
                     "/alertes/**",
                     "/fonctions/**",
@@ -45,6 +49,8 @@ public class SecurityConfig {
                     "/types-alerte/**",
                     "/users-app/**",
                     "/users/**",
+                    "/userslist",
+                    "/agentslist",
                     "/api/**",
                     "/sync/download/**",
                     "/sync/upload/**",

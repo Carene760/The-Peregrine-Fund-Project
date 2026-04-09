@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
+    <meta name="description" content="Historique des messages, alertes et statuts pour le suivi opérationnel." />
     <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
@@ -8,7 +9,7 @@
     <title>Historique</title>
 </head>
 <body>
-<div class="main-container">
+<div class="main-container" role="main" aria-label="Contenu principal">
     <!-- Header -->
     <header class="header">
         <div class="logo-section">
@@ -35,7 +36,7 @@
     <!-- Filtres -->
     <section class="filters-section">
         <div class="filter-group">
-            <label>Année</label>
+            <label for="filterYear">Année</label>
             <select id="filterYear" class="filter-select">
                 <option value="">Toutes</option>
                 <option value="2025">2025</option>
@@ -45,7 +46,7 @@
         </div>
 
         <div class="filter-group">
-            <label>Mois</label>
+            <label for="filterMonth">Mois</label>
             <select id="filterMonth" class="filter-select">
                 <option value="">Tous</option>
                 <option value="01">Janvier</option>
@@ -64,7 +65,7 @@
         </div>
 
         <div class="filter-group">
-            <label>Alerte</label>
+            <label for="filterAlerte">Alerte</label>
             <select id="filterAlerte" class="filter-select">
                 <option value="">Toutes</option>
                 <option value="Rouge">Rouge</option>
@@ -75,7 +76,7 @@
         </div>
 
         <div class="filter-group">
-            <label>Site</label>
+            <label for="filterSite">Site</label>
             <select id="filterSite" class="filter-select">
                 <option value="">Tous</option>
                 <option th:each="site : ${sites}" th:value="${site.getNom()}" th:text="${site.getNom()}"></option>
@@ -83,7 +84,7 @@
         </div>
 
         <div class="filter-group">
-            <label>Status</label>
+            <label for="filterStatus">Status</label>
             <select id="filterStatus" class="filter-select">
                 <option value="">Tous</option>
                 <option value="Debut de feu">Debut de feu</option>
@@ -140,6 +141,22 @@
             </tr>
             </tbody>
         </table>
+
+        <div class="pagination-toolbar">
+            <div class="pagination-info" id="paginationInfo">0 résultat</div>
+            <div class="page-size-group">
+                <label for="pageSize">Lignes par page</label>
+                <select id="pageSize" class="filter-select page-size-select">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="pagination-controls" id="paginationControls"></div>
+        <div class="empty-state" id="emptyState" hidden>Aucun résultat ne correspond aux filtres sélectionnés.</div>
     </section>
 </div>
 
@@ -163,36 +180,118 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterAlerte = document.getElementById("filterAlerte");
     const filterSite = document.getElementById("filterSite");
     const filterStatus = document.getElementById("filterStatus");
-    const rows = document.querySelectorAll("#messageTable tr");
+    const pageSize = document.getElementById("pageSize");
+    const paginationInfo = document.getElementById("paginationInfo");
+    const paginationControls = document.getElementById("paginationControls");
+    const emptyState = document.getElementById("emptyState");
+    const rows = Array.from(document.querySelectorAll("#messageTable tr.table-row"));
 
-    function applyFilters() {
+    let currentPage = 1;
+
+    function getFilteredRows() {
         const year = (filterYear.value || "").trim();
         const month = (filterMonth.value || "").trim();
         const alerte = (filterAlerte.value || "").trim().toLowerCase();
         const site = (filterSite.value || "").trim().toLowerCase();
         const status = (filterStatus.value || "").trim().toLowerCase();
 
-        rows.forEach(row => {
+        return rows.filter(row => {
             const rowYear = (row.dataset.annee || "").trim();
             const rowMonth = (row.dataset.mois || "").trim();
             const rowAlerte = (row.dataset.alerte || "").trim().toLowerCase();
             const rowSite = (row.dataset.site || "").trim().toLowerCase();
             const rowStatus = (row.dataset.status || "").trim().toLowerCase();
 
-            let visible = true;
-            if (year && rowYear !== year) visible = false;
-            if (month && rowMonth !== month) visible = false;
-            if (alerte && rowAlerte !== alerte) visible = false;
-            if (site && rowSite !== site) visible = false;
-            if (status && rowStatus !== status) visible = false;
-
-            row.style.display = visible ? "" : "none";
+            if (year && rowYear !== year) return false;
+            if (month && rowMonth !== month) return false;
+            if (alerte && rowAlerte !== alerte) return false;
+            if (site && rowSite !== site) return false;
+            if (status && rowStatus !== status) return false;
+            return true;
         });
     }
 
+    function createPageButton(label, pageNumber, isActive = false, isDisabled = false) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `pagination-btn${isActive ? " active" : ""}`;
+        button.textContent = label;
+        button.disabled = isDisabled;
+        button.addEventListener("click", () => {
+            currentPage = pageNumber;
+            renderTable();
+        });
+        return button;
+    }
+
+    function renderPagination(totalPages) {
+        paginationControls.innerHTML = "";
+
+        if (totalPages <= 1) {
+            return;
+        }
+
+        paginationControls.appendChild(createPageButton("Précédent", currentPage - 1, false, currentPage === 1));
+
+        const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+        const visiblePages = Array.from(pages)
+            .filter(page => page >= 1 && page <= totalPages)
+            .sort((a, b) => a - b);
+
+        let previousPage = 0;
+        visiblePages.forEach(page => {
+            if (page - previousPage > 1) {
+                const ellipsis = document.createElement("span");
+                ellipsis.className = "pagination-ellipsis";
+                ellipsis.textContent = "...";
+                paginationControls.appendChild(ellipsis);
+            }
+
+            paginationControls.appendChild(createPageButton(String(page), page, page === currentPage));
+            previousPage = page;
+        });
+
+        paginationControls.appendChild(createPageButton("Suivant", currentPage + 1, false, currentPage === totalPages));
+    }
+
+    function renderTable() {
+        const filteredRows = getFilteredRows();
+        const selectedPageSize = Number(pageSize.value) || 10;
+        const totalPages = Math.max(1, Math.ceil(filteredRows.length / selectedPageSize));
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        const startIndex = (currentPage - 1) * selectedPageSize;
+        const visibleRows = filteredRows.slice(startIndex, startIndex + selectedPageSize);
+
+        rows.forEach(row => {
+            row.style.display = "none";
+        });
+
+        visibleRows.forEach(row => {
+            row.style.display = "";
+        });
+
+        paginationInfo.textContent = `${filteredRows.length} résultat(s) - page ${filteredRows.length === 0 ? 0 : currentPage}/${totalPages}`;
+        emptyState.hidden = filteredRows.length !== 0;
+        renderPagination(totalPages);
+    }
+
     [filterYear, filterMonth, filterAlerte, filterSite, filterStatus].forEach(el => {
-        el.addEventListener("change", applyFilters);
+        el.addEventListener("change", () => {
+            currentPage = 1;
+            renderTable();
+        });
     });
+
+    pageSize.addEventListener("change", () => {
+        currentPage = 1;
+        renderTable();
+    });
+
+    renderTable();
 });
 </script>
 </body>

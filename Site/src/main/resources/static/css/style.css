@@ -109,6 +109,11 @@
   background-color: #ffffff;
 }
 
+.desktop .div-wrapper.password-wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
 .desktop .text-wrapper-2 {
   width: 100%;
     height: 100%;
@@ -139,7 +144,7 @@
   left: 275px;
   font-family: "Inknut Antiqua", Helvetica;
   font-weight: 600;
-  color: #60da85;
+  color: #ffffff;
   font-size: 18px;
   letter-spacing: 0;
   line-height: normal;
@@ -177,12 +182,42 @@
 }
 
 .desktop .text-wrapper-2::placeholder {
-  color: #a39797;
+  color: #5f5f5f;
 }
 
 .desktop .text-wrapper-2:focus {
   outline: 2px solid #4a90e2;
   outline-offset: -2px;
+}
+
+.desktop .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  border: none;
+  background: #333333;
+  color: #ffffff;
+  font-family: "Inter", Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.desktop .password-wrapper .text-wrapper-2 {
+  padding-right: 110px;
+}
+
+.desktop .password-toggle:hover {
+  background: #1a1a1a;
+}
+
+.desktop .password-toggle:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
 }
 
 .desktop .frame-6 {

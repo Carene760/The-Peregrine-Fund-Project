@@ -30,55 +30,43 @@ public class UserAppController {
     public String showUserApp(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("availablePatrouilleurs", patrouilleurService.findWithoutUserApp());
         return "agent"; // Vue Thymeleaf
     }
 
     // Ajouter des utilisateurs agents
     @PostMapping("/save")
-    public String saveUserApp(@RequestParam(required = false) Integer nombreAgent, 
-                            RedirectAttributes redirectAttributes) {
+    public String saveUserApp(@RequestParam(required = false) Integer patrouilleurId,
+                              @RequestParam(required = false) String login,
+                              @RequestParam(required = false) String motDePasse,
+                              RedirectAttributes redirectAttributes) {
 
-        // Validation
-        if (nombreAgent == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Le nombre d'agents est requis");
+        if (patrouilleurId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Veuillez sélectionner un patrouilleur.");
             return "redirect:/users-app";
         }
 
-        if (nombreAgent <= 0) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Le nombre d'agents doit être supérieur à 0");
-            redirectAttributes.addFlashAttribute("nombreAgentError", "Veuillez entrer un nombre valide (1-100)");
+        if (login == null || login.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Le login est obligatoire.");
             return "redirect:/users-app";
         }
 
-        if (nombreAgent > 100) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Le nombre d'agents ne peut pas dépasser 100");
-            redirectAttributes.addFlashAttribute("nombreAgentError", "Veuillez entrer un nombre entre 1 et 100");
+        if (motDePasse == null || motDePasse.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Le mot de passe est obligatoire.");
             return "redirect:/users-app";
         }
 
         try {
-            List<UserApp> usersapp = userAppService.GenererUser(nombreAgent, patrouilleurService);
+            Patrouilleurs patrouilleur = patrouilleurService.findById(patrouilleurId)
+                    .orElseThrow(() -> new RuntimeException("Patrouilleur introuvable"));
 
-            if (usersapp.isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorMessage", 
-                    "Aucun agent n'a pu être créé car tous les agents sont déjà pris.");
-            } else {
-                usersapp.forEach(userAppService::save);
-                String message = "";
-                if(usersapp.size() == nombreAgent)
-                {
-                    message = usersapp.size() + " agent(s) ajouté(s) avec succès!";
-                }
-                else if(usersapp.size() < nombreAgent) 
-                {
-                    message = "Seul(s) " + usersapp.size() + " agent(s) ont(a) été ajouté(s) car le nombre d'agents disponibles est limité";
-                }
-                redirectAttributes.addFlashAttribute("successMessage", message);
-            }
+            UserApp userApp = userAppService.createForPatrouilleur(patrouilleur, login.trim(), motDePasse.trim());
+            userAppService.save(userApp);
+            redirectAttributes.addFlashAttribute("successMessage", "Compte créé avec succès pour " + patrouilleur.getNom() + ".");
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", 
-                "Erreur lors de l'ajout des agents: " + e.getMessage());
+                "Erreur lors de la création du compte: " + e.getMessage());
         }
 
         return "redirect:/users-app";
