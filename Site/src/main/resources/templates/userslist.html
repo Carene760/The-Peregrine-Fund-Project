@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta name="description" content="Liste des utilisateurs du système avec accès à la modification des comptes." />
+    <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/user.css">
+    <title>Add User</title>
+    <style>
+        /* Styles pour les messages */
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+            position: relative;
+        }
+        
+        .error-message:before {
+            content: "!";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #d32f2f;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        
+        .success-message {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+            position: relative;
+        }
+        
+        .success-message:before {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: #2e7d32;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        
+        .message-close {
+            background: none;
+            border: none;
+            color: #d32f2f;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+        
+        .success-message .message-close {
+            color: #2e7d32;
+        }
+        
+        .message-close:hover {
+            opacity: 0.8;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        .messages-container {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            width: 100%;
+        }
+
+        .shortcut-buttons {
+            max-width: 980px;
+            margin: 8px auto 26px auto;
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 14px;
+        }
+
+        .shortcut-buttons .form-container {
+            margin: 0;
+            flex: 1 0 180px;
+        }
+
+        .shortcut-buttons .agent-form {
+            display: none;
+        }
+
+        .shortcut-buttons .submit-redirect {
+            width: 100%;
+            min-height: 56px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px;
+        }
+
+        .shortcut-buttons .submit-text-redirect {
+            text-align: center;
+            line-height: 1.3;
+            font-size: 15px;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="main-container" role="main" aria-label="Contenu principal">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img
+                        class="frame-2"
+                        src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png"
+                        alt="The Peregrine Fund Logo"
+                    />
+                </div>
+                <div class="nav-tabs">
+                    <div class="nav-tab active"><a href="/history">Historique</a></div>
+                    <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                    <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                        <a href="/users">Admin</a>
+                    </div>
+                    <div class="nav-tab active" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                        <a href="/gateway">Gateway</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tagline-admin">
+                <div class="tagline">"Saving raptors, enriching lives."</div>
+                <div class="admin-label"><span th:text="${currentUser.fonction.fonction}"></span></div>
+
+            </div>
+        </header>
+
+        <div class="messages-container">
+            <!-- Message d'erreur -->
+            <div class="error-message" th:if="${errorMessage}">
+                <span th:text="${errorMessage}"></span>
+                <button class="message-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            
+            <!-- Message de succès -->
+            <div class="success-message" th:if="${successMessage}">
+                <span th:text="${successMessage}"></span>
+                <button class="message-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+        </div>
+
+        <section class="shortcut-buttons">
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/users" id="user-form-nav" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="user-form-nav" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">User Form</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/userslist" id="users-list-form" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="users-list-form" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Liste des utilisateurs</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/users-app" method="get" id="agent-form" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="agent-form" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Agent Form</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/agentslist" id="agents-list-form" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="agents-list-form" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Liste des agents</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <form class="agent-form" action="/patrouilleurs/form" id="patrouilleur-form-nav" role="form" novalidate>
+            </form>
+            <button type="submit" form="patrouilleur-form-nav" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Patrouilleur Form</span>
+            </button>
+        </div>
+        </section>
+
+        <!-- Titre du formulaire -->
+        <section class="form-header">
+            <h1 class="form-title">LISTE DES UTILISATEURS</h1>
+            <div class="raptor-icon"></div>
+        </section>
+
+        <!-- Container du formulaire -->
+        <div class="form-container">
+            <section class="data-table-container">
+                <div class="table-filters">
+                    <div class="table-filter-group table-search-group">
+                        <label for="usersSearch">Recherche</label>
+                        <input id="usersSearch" class="table-search-input" type="search" placeholder="Nom, email, téléphone, adresse...">
+                    </div>
+                    <div class="table-filter-group">
+                        <label for="usersFunctionFilter">Fonction</label>
+                        <select id="usersFunctionFilter" class="filter-select table-filter-select">
+                            <option value="">Toutes</option>
+                            <option value="Administrateur">Administrateur</option>
+                            <option value="Responsable">Responsable</option>
+                            <option value="Utilisateur">Utilisateur</option>
+                        </select>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead class="table-header">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Adresse</th>
+                        <th>Fonction</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-body">
+                    <tr class="table-row"
+                        th:each="u : ${users}"
+                        th:attr="data-search=${(u.nom + ' ' + u.email + ' ' + u.telephone + ' ' + u.adresse + ' ' + (u.fonction != null ? u.fonction.fonction : ''))}, data-function=${u.fonction != null ? u.fonction.fonction : ''}">
+                        <td class="table-cell" th:text="${u.nom}"></td>
+                        <td class="table-cell" th:text="${u.email}"></td>
+                        <td class="table-cell" th:text="${u.telephone}"></td>
+                        <td class="table-cell" th:text="${u.adresse}"></td>
+                        <td class="table-cell" th:text="${u.fonction != null ? u.fonction.fonction : ''}"></td>
+                        <td class="table-cell">
+                            <a th:href="@{'/users/edit/' + ${u.idUser}}" style="color: #fff; text-decoration: underline;">Modifier</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="pagination-toolbar">
+                    <div class="pagination-info" id="usersPaginationInfo">0 résultat</div>
+                    <div class="page-size-group">
+                        <label for="usersPageSize">Lignes par page</label>
+                        <select id="usersPageSize" class="filter-select page-size-select">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pagination-controls" id="usersPaginationControls"></div>
+                <div class="empty-state" id="usersEmptyState" hidden>Aucun utilisateur à afficher.</div>
+            </section>
+        </div>
+    </div>
+
+
+     <!-- Footer -->
+    <footer class="footer">
+        <div class="main-container">
+            <a href="/logout" class="logout-btn">
+                <div class="logout-icon">
+                    <img
+                        class="logout-icon"
+                        src="images/logout.png"
+                        alt="The Peregrine Fund Logo"
+                    />
+                </div>
+                Déconnexion
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const rows = Array.from(document.querySelectorAll(".data-table .table-row"));
+            const searchInput = document.getElementById("usersSearch");
+            const functionFilter = document.getElementById("usersFunctionFilter");
+            const pageSize = document.getElementById("usersPageSize");
+            const paginationInfo = document.getElementById("usersPaginationInfo");
+            const paginationControls = document.getElementById("usersPaginationControls");
+            const emptyState = document.getElementById("usersEmptyState");
+            let currentPage = 1;
+
+            function populateOptions(select, values) {
+                const currentValue = select.value;
+                const uniqueValues = Array.from(new Set(values.map(value => (value || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+                select.innerHTML = '<option value="">Toutes</option>';
+                uniqueValues.forEach(value => {
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                });
+                if ([...select.options].some(option => option.value === currentValue)) {
+                    select.value = currentValue;
+                }
+            }
+
+            populateOptions(functionFilter, rows.map(row => row.dataset.function));
+
+            function matchesFilters(row) {
+                const query = (searchInput.value || "").trim().toLowerCase();
+                const selectedFunction = (functionFilter.value || "").trim().toLowerCase();
+                const rowSearch = (row.dataset.search || "").trim().toLowerCase();
+                const rowFunction = (row.dataset.function || "").trim().toLowerCase();
+
+                if (query && !rowSearch.includes(query)) {
+                    return false;
+                }
+
+                if (selectedFunction && rowFunction !== selectedFunction) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            function getFilteredRows() {
+                return rows.filter(matchesFilters);
+            }
+
+            function createPageButton(label, pageNumber, isActive = false, isDisabled = false) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = `pagination-btn${isActive ? " active" : ""}`;
+                button.textContent = label;
+                button.disabled = isDisabled;
+                button.addEventListener("click", () => {
+                    currentPage = pageNumber;
+                    renderTable();
+                });
+                return button;
+            }
+
+            function renderPagination(totalPages) {
+                paginationControls.innerHTML = "";
+
+                if (totalPages <= 1) {
+                    return;
+                }
+
+                paginationControls.appendChild(createPageButton("Précédent", currentPage - 1, false, currentPage === 1));
+
+                const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+                const visiblePages = Array.from(pages)
+                    .filter(page => page >= 1 && page <= totalPages)
+                    .sort((a, b) => a - b);
+
+                let previousPage = 0;
+                visiblePages.forEach(page => {
+                    if (page - previousPage > 1) {
+                        const ellipsis = document.createElement("span");
+                        ellipsis.className = "pagination-ellipsis";
+                        ellipsis.textContent = "...";
+                        paginationControls.appendChild(ellipsis);
+                    }
+
+                    paginationControls.appendChild(createPageButton(String(page), page, page === currentPage));
+                    previousPage = page;
+                });
+
+                paginationControls.appendChild(createPageButton("Suivant", currentPage + 1, false, currentPage === totalPages));
+            }
+
+            function renderTable() {
+                const filteredRows = getFilteredRows();
+                const selectedPageSize = Number(pageSize.value) || 10;
+                const totalPages = Math.max(1, Math.ceil(filteredRows.length / selectedPageSize));
+
+                if (currentPage > totalPages) {
+                    currentPage = totalPages;
+                }
+
+                const startIndex = (currentPage - 1) * selectedPageSize;
+                const visibleRows = filteredRows.slice(startIndex, startIndex + selectedPageSize);
+
+                rows.forEach(row => {
+                    row.style.display = "none";
+                });
+
+                visibleRows.forEach(row => {
+                    row.style.display = "";
+                });
+
+                paginationInfo.textContent = `${filteredRows.length} résultat(s) - page ${filteredRows.length === 0 ? 0 : currentPage}/${totalPages}`;
+                emptyState.hidden = filteredRows.length !== 0;
+                renderPagination(totalPages);
+            }
+
+            searchInput.addEventListener("input", () => {
+                currentPage = 1;
+                renderTable();
+            });
+
+            functionFilter.addEventListener("change", () => {
+                currentPage = 1;
+                renderTable();
+            });
+
+            pageSize.addEventListener("change", () => {
+                currentPage = 1;
+                renderTable();
+            });
+
+            renderTable();
+        });
+
+        // Fonction pour gérer l'affichage des champs
+        function updateFormFields() {
+            const fonctionSelect = document.getElementById("fonction-select");
+            const selectedText = fonctionSelect.value ? fonctionSelect.options[fonctionSelect.selectedIndex].text : "";
+            const isResponsable = selectedText === "Responsable";
+            
+            const siteGroup = document.getElementById("site-group");
+            const passwordGroup = document.getElementById("password-group");
+            const passwordInput = document.getElementById("password-input");
+            const passwordHint = document.getElementById("password-hint");
+            
+            if (isResponsable) {
+                // Afficher le champ site
+                siteGroup.style.display = "block";
+                
+                // Cacher le champ mot de passe
+                passwordGroup.style.display = "none";
+                passwordHint.style.display = "none";
+                
+                // Définir un mot de passe par défaut pour les Responsables
+                passwordInput.value = "defaultPassword123";
+                
+            } else {
+                // Cacher le champ site
+                siteGroup.style.display = "none";
+                
+                // Afficher le champ mot de passe
+                passwordGroup.style.display = "block";
+                passwordHint.style.display = "block";
+                
+                // Vider le champ mot de passe pour les autres utilisateurs
+                // L'utilisateur devra entrer son propre mot de passe
+                passwordInput.value = "";
+                passwordInput.placeholder = "Password (obligatoire)";
+            }
+        }
+    
+        // Initialiser
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("Page chargée");
+            
+            // Charger les sites
+            fetch('/users/sites')
+                .then(response => response.json())
+                .then(sites => {
+                    const siteSelect = document.getElementById("site-select");
+                    siteSelect.innerHTML = '<option value="" selected>-- Sélectionnez un site --</option>';
+                    sites.forEach(site => {
+                        const option = document.createElement("option");
+                        option.value = site.idSite;
+                        option.textContent = site.nom;
+                        siteSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Erreur:", error));
+            
+            // Initialiser l'affichage
+            updateFormFields();
+            
+            // Écouter les changements
+            document.getElementById("fonction-select").addEventListener("change", function() {
+                console.log("Fonction changée:", this.value);
+                updateFormFields();
+            });
+            
+            // Validation avant soumission
+            document.getElementById("user-form").addEventListener("submit", function(event) {
+                console.log("=== Validation formulaire ===");
+                
+                const fonctionSelect = document.getElementById("fonction-select");
+                const selectedText = fonctionSelect.value ? fonctionSelect.options[fonctionSelect.selectedIndex].text : "";
+                const isResponsable = selectedText === "Responsable";
+                
+                // Validation de base
+                const nom = document.getElementById("name-input").value.trim();
+                const telephone = document.getElementById("phone-input").value.trim();
+                const email = document.getElementById("email-input").value.trim();
+                const adresse = document.getElementById("address-input").value.trim();
+                const fonction = document.getElementById("fonction-select").value;
+                
+                if (!nom || !telephone || !email || !adresse || !fonction) {
+                    alert("Tous les champs sont obligatoires");
+                    event.preventDefault();
+                    return false;
+                }
+                
+                if (isResponsable) {
+                    // Validation pour Responsable
+                    const siteSelect = document.getElementById("site-select");
+                    if (!siteSelect.value) {
+                        alert("Le site est obligatoire pour un Responsable");
+                        event.preventDefault();
+                        return false;
+                    }
+                } else {
+                    // Validation pour utilisateur normal
+                    const passwordInput = document.getElementById("password-input");
+                    if (!passwordInput.value.trim()) {
+                        alert("Le mot de passe est obligatoire");
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+                
+                console.log("Validation réussie");
+                return true;
+            });
+        });
+    </script>
+        
+
+</body>
+</html>
