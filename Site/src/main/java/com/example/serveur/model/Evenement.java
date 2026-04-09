@@ -1,5 +1,6 @@
 package com.example.serveur.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ public class Evenement {
     private String description;
 
     @OneToMany(mappedBy = "evenement")
+    @JsonIgnore
     private List<Message> messages;
 
     public int getIdEvenement() {
