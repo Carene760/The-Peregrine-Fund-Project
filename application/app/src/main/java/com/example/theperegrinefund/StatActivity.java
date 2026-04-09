@@ -325,13 +325,14 @@ public class StatActivity extends AppCompatActivity {
         barChart.getAxisLeft().setAxisMinimum(0f);
         barChart.getAxisRight().setEnabled(false);
 
-        // Légende verticale à gauche
+        // Légende désactivée: les noms des sites sont déjà affichés sur l'axe X
         Legend legend2 = barChart.getLegend();
-        legend2.setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
-        legend2.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-        legend2.setOrientation(Legend.LegendOrientation.VERTICAL);
-        legend2.setDrawInside(false);
-        legend2.setTextSize(12f);
+        legend2.setEnabled(false);
+
+        // Éviter que les noms de sites se chevauchent en bas
+        xAxis.setLabelRotationAngle(-45f);
+        xAxis.setTextSize(10f);
+        barChart.setExtraBottomOffset(24f);
 
         // Animation et rafraîchissement
         barChart.animateY(1500);
