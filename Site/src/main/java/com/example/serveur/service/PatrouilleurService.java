@@ -24,6 +24,10 @@ public class PatrouilleurService {
         return patrouilleursRepository.findAll();
     }
 
+    public List<Patrouilleurs> findWithoutUserApp() {
+        return patrouilleursRepository.findPatrouilleursWithoutUserApp();
+    }
+
     public Optional<Patrouilleurs> findById(int id) {
         return patrouilleursRepository.findById(id);
     }

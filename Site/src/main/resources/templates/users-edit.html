@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta name="description" content="Formulaire de création d'un nouvel utilisateur pour l'application." />
+    <meta name="description" content="Formulaire de modification d'un utilisateur existant." />
     <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/css/user.css">
-    <title>Formulaire Utilisateur</title>
+    <title>Modification Utilisateur</title>
     <style>
         /* Styles pour les messages */
         .error-message {
@@ -121,14 +121,13 @@
         .shortcut-buttons {
             max-width: 980px;
             margin: 8px auto 26px auto;
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 14px;
         }
 
         .shortcut-buttons .form-container {
             margin: 0;
-            flex: 1 1 180px;
         }
 
         .shortcut-buttons .agent-form {
@@ -168,9 +167,11 @@
                 <div class="nav-tabs">
                     <div class="nav-tab active"><a href="/history">Historique</a></div>
                     <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
-                    <div class="nav-tab"><a href="/evenements">Événements</a></div>
                     <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
                         <a href="/users">Admin</a>
+                    </div>
+                    <div class="nav-tab active" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                        <a href="/gateway">Gateway</a>
                     </div>
                 </div>
             </div>
@@ -196,127 +197,105 @@
         </div>
 
         <section class="shortcut-buttons">
-            <div class="form-container">
-                <!-- Formulaire -->
-                <form class="agent-form" action="/users" id="user-form-nav" role="form" novalidate>
-                </form>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/users" id="user-form-nav" role="form" novalidate>
+            </form>
 
-                <!-- Bouton de soumission -->
-                <button type="submit" form="user-form-nav" class="submit-redirect" aria-describedby="signin-description">
-                    <span class="submit-text-redirect">User Form</span>
-                </button>
-            </div>
-            <div class="form-container">
-                <!-- Formulaire -->
-                <form class="agent-form" action="/userslist" id="users-list-form" role="form" novalidate>
-                </form>
+            <!-- Bouton de soumission -->
+            <button type="submit" form="user-form-nav" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">User Form</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/userslist" id="users-list-form" role="form" novalidate>
+            </form>
 
-                <!-- Bouton de soumission -->
-                <button type="submit" form="users-list-form" class="submit-redirect" aria-describedby="signin-description">
-                    <span class="submit-text-redirect">Liste des utilisateurs</span>
-                </button>
-            </div>
-            <div class="form-container">
-                <!-- Formulaire -->
-                <form class="agent-form" action="/users-app" method="get" id="agent-form" role="form" novalidate>
-                </form>
+            <!-- Bouton de soumission -->
+            <button type="submit" form="users-list-form" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Liste des utilisateurs</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/users-app" method="get" id="agent-form" role="form" novalidate>
+            </form>
 
-                <!-- Bouton de soumission -->
-                <button type="submit" form="agent-form" class="submit-redirect" aria-describedby="signin-description">
-                    <span class="submit-text-redirect">Agent Form</span>
-                </button>
-            </div>
-            <div class="form-container">
-                <!-- Formulaire -->
-                <form class="agent-form" action="/agentslist" id="agents-list-form" role="form" novalidate>
-                </form>
+            <!-- Bouton de soumission -->
+            <button type="submit" form="agent-form" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Agent Form</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/patrouilleurs/form" id="patrouilleur-form-nav" role="form" novalidate>
+            </form>
 
-                <!-- Bouton de soumission -->
-                <button type="submit" form="agents-list-form" class="submit-redirect" aria-describedby="signin-description">
-                    <span class="submit-text-redirect">Liste des agents</span>
-                </button>
-            </div>
-            <div class="form-container">
-                <form class="agent-form" action="/patrouilleurs/form" id="patrouilleur-form-nav" role="form" novalidate>
-                </form>
-                <button type="submit" form="patrouilleur-form-nav" class="submit-redirect" aria-describedby="signin-description">
-                    <span class="submit-text-redirect">Patrouilleur Form</span>
-                </button>
-            </div>
+            <!-- Bouton de soumission -->
+            <button type="submit" form="patrouilleur-form-nav" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Patrouilleur Form</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/agentslist" id="agents-list-form" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="agents-list-form" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Liste des agents</span>
+            </button>
+        </div>
         </section>
 
         <!-- Titre du formulaire -->
         <section class="form-header">
-            <h1 class="form-title">FORMULAIRE UTILISATEUR</h1>
+            <h1 class="form-title">FORMULAIRE MODIFICATION UTILISATEUR</h1>
             <div class="raptor-icon"></div>
         </section>
 
         <!-- Container du formulaire -->
         <div class="form-container">
             <!-- Formulaire -->
-            <form class="user-form" th:action="@{/users/save}" th:object="${user}" method="post" id="user-form" role="form" novalidate>
+            <form class="user-form" th:action="@{'/users/edit/' + ${user.idUser}}" th:object="${user}" method="post" id="user-edit-form" novalidate>
                 <div class="form-grid">
-                    <!-- Ligne 1: Name + Phone -->
                     <div class="input-group">
                         <label for="name-input" class="visually-hidden">Name</label>
-                        <input type="text" th:field="*{nom}" id="name-input" class="input-field" placeholder="Name" autocomplete="given-name"/>
+                        <input type="text" th:field="*{nom}" id="name-input" class="input-field" placeholder="Name" required />
                     </div>
                     <div class="input-group">
                         <label for="phone-input" class="visually-hidden">Phone</label>
-                        <input type="tel" th:field="*{telephone}" id="phone-input" class="input-field" placeholder="Phone" autocomplete="tel"/>
+                        <input type="tel" th:field="*{telephone}" id="phone-input" class="input-field" placeholder="Phone" required />
                     </div>
-
-                    <!-- Ligne 2: Email + Address -->
                     <div class="input-group">
                         <label for="email-input" class="visually-hidden">Email</label>
-                        <input type="email" th:field="*{email}" id="email-input" class="input-field" placeholder="Email" autocomplete="email"/>
+                        <input type="email" th:field="*{email}" id="email-input" class="input-field" placeholder="Email" required />
                     </div>
                     <div class="input-group">
                         <label for="address-input" class="visually-hidden">Address</label>
-                        <input type="text" th:field="*{adresse}" id="address-input" class="input-field" placeholder="Address" autocomplete="street-address"/>
+                        <input type="text" th:field="*{adresse}" id="address-input" class="input-field" placeholder="Address" required />
                     </div>
-
-                    <!-- Ligne 3: Fonction + Password -->
                     <div class="input-group">
                         <label for="fonction-select" class="visually-hidden">Fonction</label>
-                        <select name="fonction.idFonction" id="fonction-select" class="input-field">
+                        <select name="fonction.idFonction" id="fonction-select" class="input-field" required>
                             <option value="">-- Sélectionnez une fonction --</option>
-                            <option th:each="fonction : ${fonctions}" 
-                                    th:value="${fonction.idFonction}" 
+                            <option th:each="fonction : ${fonctions}"
+                                    th:value="${fonction.idFonction}"
                                     th:text="${fonction.fonction}"
                                     th:selected="${user.fonction != null and user.fonction.idFonction == fonction.idFonction}">
                             </option>
                         </select>
                     </div>
-
-                    <div class="input-group" id="password-group">
+                    <div class="input-group">
                         <label for="password-input" class="visually-hidden">Password</label>
-                        <input type="password"
-                               name="motDePasse"
-                               id="password-input"
-                               class="input-field"
-                               placeholder="Password"
-                               autocomplete="new-password"/>
-                        <small class="password-hint" id="password-hint" style="display: none; color: #666; font-size: 12px; margin-top: 5px;">
-                            Obligatoire pour tous les utilisateurs
-                        </small>
+                        <input type="password" name="motDePasse" id="password-input" class="input-field" placeholder="Nouveau mot de passe (optionnel)" />
                     </div>
-
-                    <div class="input-group" id="site-group" style="display:none;">
-                        <label for="site-select" class="visually-hidden">Site</label>
-                        <select name="siteId" id="site-select" class="input-field">
-                            <option value="" selected>-- Sélectionnez un site --</option>
-                            <!-- Les options seront ajoutées dynamiquement par JavaScript -->
-                        </select>
-                        <small class="site-hint" style="color: #666; font-size: 12px; margin-top: 5px;">
-                            Obligatoire pour les Responsables
-                        </small>
-                    </div> 
                 </div>
             </form>
-            <button type="submit" form="user-form" class="submit-btn" aria-describedby="signin-description">
-                <span class="submit-text">Add User</span>
-            </button>
+                <button type="submit" form="user-edit-form" class="submit-btn">
+                    <span class="submit-text">Mettre à jour</span>
+                </button>
         </div>
     </div>
 
@@ -352,9 +331,13 @@
             if (isResponsable) {
                 // Afficher le champ site
                 siteGroup.style.display = "block";
-                passwordGroup.style.display = "block";
-                passwordHint.style.display = "block";
-                passwordInput.placeholder = "Password (obligatoire)";
+                
+                // Cacher le champ mot de passe
+                passwordGroup.style.display = "none";
+                passwordHint.style.display = "none";
+                
+                // Définir un mot de passe par défaut pour les Responsables
+                passwordInput.value = "defaultPassword123";
                 
             } else {
                 // Cacher le champ site
@@ -364,6 +347,9 @@
                 passwordGroup.style.display = "block";
                 passwordHint.style.display = "block";
                 
+                // Vider le champ mot de passe pour les autres utilisateurs
+                // L'utilisateur devra entrer son propre mot de passe
+                passwordInput.value = "";
                 passwordInput.placeholder = "Password (obligatoire)";
             }
         }
@@ -389,11 +375,6 @@
             
             // Initialiser l'affichage
             updateFormFields();
-
-            const phoneInput = document.getElementById("phone-input");
-            if (phoneInput && !phoneInput.value.trim()) {
-                phoneInput.value = "+261";
-            }
             
             // Écouter les changements
             document.getElementById("fonction-select").addEventListener("change", function() {
@@ -411,11 +392,7 @@
                 
                 // Validation de base
                 const nom = document.getElementById("name-input").value.trim();
-                const telephoneInput = document.getElementById("phone-input");
-                if (telephoneInput && !telephoneInput.value.trim()) {
-                    telephoneInput.value = "+261";
-                }
-                const telephone = telephoneInput ? telephoneInput.value.trim() : "";
+                const telephone = document.getElementById("phone-input").value.trim();
                 const email = document.getElementById("email-input").value.trim();
                 const adresse = document.getElementById("address-input").value.trim();
                 const fonction = document.getElementById("fonction-select").value;
@@ -434,13 +411,14 @@
                         event.preventDefault();
                         return false;
                     }
-                }
-
-                const passwordInput = document.getElementById("password-input");
-                if (!passwordInput.value.trim()) {
-                    alert("Le mot de passe est obligatoire");
-                    event.preventDefault();
-                    return false;
+                } else {
+                    // Validation pour utilisateur normal
+                    const passwordInput = document.getElementById("password-input");
+                    if (!passwordInput.value.trim()) {
+                        alert("Le mot de passe est obligatoire");
+                        event.preventDefault();
+                        return false;
+                    }
                 }
                 
                 console.log("Validation réussie");

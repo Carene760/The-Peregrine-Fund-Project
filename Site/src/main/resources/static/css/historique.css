@@ -70,7 +70,7 @@ body {
 }
 .nav-tab a {
     text-decoration: none;
-    color: rgb(91, 117, 143);
+    color: #ffffff;
 }       
 
 .nav-tab.active a{
@@ -418,6 +418,90 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+.pagination-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.92);
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+.pagination-info {
+    font-family: 'Imprima', sans-serif;
+    font-size: 14px;
+    color: #222;
+}
+
+.page-size-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Imprima', sans-serif;
+    font-size: 14px;
+    color: #222;
+}
+
+.page-size-select {
+    min-width: 90px;
+}
+
+.pagination-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0 6px 0;
+}
+
+.pagination-btn {
+    border: 1px solid rgba(0,0,0,0.12);
+    background: #fff;
+    color: #222;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-family: 'Imprima', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #222;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.pagination-btn.active {
+    background: rgba(225,22,22,1);
+    color: #fff;
+    border-color: rgba(225,22,22,1);
+}
+
+.pagination-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.pagination-ellipsis {
+    font-family: 'Imprima', sans-serif;
+    font-size: 16px;
+    color: #555;
+    padding: 0 4px;
+}
+
+.empty-state {
+    padding: 18px;
+    text-align: center;
+    font-family: 'Imprima', sans-serif;
+    font-size: 15px;
+    color: #222;
+    background: rgba(255,255,255,0.92);
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+
 .data-table {
     width: 100%;
     min-width: 1400px;
@@ -735,6 +819,18 @@ select.edit-input {
 
     .nav-tabs {
         margin-left: 0;
+    }
+
+    .filters-section,
+    .pagination-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pagination-controls {
+        justify-content: flex-start;
+        padding-left: 18px;
+        padding-right: 18px;
     }
 
     .user-form {

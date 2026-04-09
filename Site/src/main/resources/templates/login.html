@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
+    <meta name="description" content="Page de connexion du système The Peregrine Fund pour accéder aux tableaux de bord et aux outils de gestion." />
     <title>The Peregrine Fund - Login</title>
     <link rel="stylesheet" th:href="@{/css/globals.css}" />
     <link rel="stylesheet" th:href="@{/css/style.css}" />
   </head>
   <body>
     <div class="desktop">
-      <main class="div">
+      <main class="div" role="main" aria-label="Connexion">
         <header class="frame">
           <img
             class="frame-2"
@@ -28,7 +29,7 @@
         
         <section class="frame-3">
           <img class="frame-4" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-56.png" alt="Raptor icon" />
-          <h1 class="text-wrapper">LOG IN</h1>
+          <h1 class="text-wrapper" id="login-heading">LOG IN</h1>
         </section>
         <form class="frame-5" action="/login" method="post" id="login-form" role="form" aria-labelledby="login-heading" novalidate>
           <div class="div-wrapper">
@@ -45,7 +46,7 @@
               autocomplete="email"
             />
           </div>
-          <div class="div-wrapper">
+          <div class="div-wrapper password-wrapper">
             <label for="password-input" class="visually-hidden">Password</label>
             <input
               type="password"
@@ -58,6 +59,15 @@
               aria-required="true"
               autocomplete="current-password"
             />
+            <button
+              type="button"
+              class="password-toggle"
+              id="password-toggle"
+              aria-label="Afficher le mot de passe"
+              aria-pressed="false"
+            >
+              Afficher
+            </button>
           </div>
         </form>
         <div style="position:absolute; top:530px; left:220px; z-index:20; display:flex; align-items:center; gap:8px; color:#ffffff; font-size:14px; background:#333333; padding:8px 10px; border-radius:8px;">
@@ -71,22 +81,21 @@
       </main>
     </div>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const showPasswordToggle = document.getElementById("show-password-toggle");
+      document.addEventListener("DOMContentLoaded", () => {
         const passwordInput = document.getElementById("password-input");
-        const emailInput = document.getElementById("name-input");
+        const passwordToggle = document.getElementById("password-toggle");
 
-        if (showPasswordToggle && passwordInput) {
-          showPasswordToggle.addEventListener("change", function () {
-            passwordInput.type = this.checked ? "text" : "password";
-          });
+        if (!passwordInput || !passwordToggle) {
+          return;
         }
 
-        if (emailInput) {
-          emailInput.addEventListener("blur", function () {
-            this.value = this.value.replace(/\s+/g, "");
-          });
-        }
+        passwordToggle.addEventListener("click", () => {
+          const isHidden = passwordInput.type === "password";
+          passwordInput.type = isHidden ? "text" : "password";
+          passwordToggle.textContent = isHidden ? "Masquer" : "Afficher";
+          passwordToggle.setAttribute("aria-label", isHidden ? "Masquer le mot de passe" : "Afficher le mot de passe");
+          passwordToggle.setAttribute("aria-pressed", String(isHidden));
+        });
       });
     </script>
   </body>
