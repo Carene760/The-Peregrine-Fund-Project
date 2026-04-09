@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta name="description" content="Formulaire de création d'un compte agent lié à un patrouilleur." />
+    <meta name="description" content="Formulaire de modification d'un agent ou patrouilleur." />
     <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/css/user.css">
-    <title>Formulaire Agent</title>
+    <title>Modification Agent</title>
     <style>
         .agent-form-in {
             display: flex;
@@ -147,14 +147,13 @@
         .shortcut-buttons {
             max-width: 980px;
             margin: 8px auto 26px auto;
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 14px;
         }
 
         .shortcut-buttons .form-container {
             margin: 0;
-            flex: 1 1 180px;
         }
 
         .shortcut-buttons .agent-form {
@@ -253,6 +252,16 @@
         </div>
         <div class="form-container">
             <!-- Formulaire -->
+            <form class="agent-form" action="/patrouilleurs/form" id="patrouilleur-form-nav" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="patrouilleur-form-nav" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Patrouilleur Form</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
             <form class="agent-form" action="/agentslist" id="agents-list-form" role="form" novalidate>
             </form>
 
@@ -261,69 +270,76 @@
                 <span class="submit-text-redirect">Liste des agents</span>
             </button>
         </div>
-        <div class="form-container">
-            <form class="agent-form" action="/patrouilleurs/form" id="patrouilleur-form-nav" role="form" novalidate>
-            </form>
-            <button type="submit" form="patrouilleur-form-nav" class="submit-redirect" aria-describedby="signin-description">
-                <span class="submit-text-redirect">Patrouilleur Form</span>
-            </button>
-        </div>
         </section>
         
 
         <!-- Titre du formulaire -->
         <section class="form-header">
-            <h1 class="form-title">FORMULAIRE AGENT</h1>
+            <h1 class="form-title">FORMULAIRE MODIFICATION AGENT</h1>
             <div class="raptor-icon"></div>
         </section>
 
         <!-- Container du formulaire -->
         <div class="form-container">
             <!-- Formulaire -->
-            <form class="agent-form-in" action="/users-app/save" method="post" id="agent-form-in" role="form" novalidate>
-                    <div class="input-group" id="patrouilleur-group">
-                        <label for="patrouilleur-select" class="visually-hidden">Patrouilleur sans compte</label>
-                        <select name="patrouilleurId" id="patrouilleur-select" class="input-field" required>
-                            <option value="" selected>-- Patrouilleurs sans compte --</option>
-                            <option th:each="patrouilleur : ${availablePatrouilleurs}"
-                                    th:value="${patrouilleur.idPatrouilleur}"
-                                    th:text="${patrouilleur.nom + ' - ' + patrouilleur.telephone + ' (' + patrouilleur.site.nom + ')'}">
+            <form class="user-form" th:action="@{'/patrouilleurs/edit/' + ${patrouilleur.idPatrouilleur}}" th:object="${patrouilleur}" method="post" id="agent-edit-form" novalidate>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="nom-input" class="visually-hidden">Nom</label>
+                        <input type="text" th:field="*{nom}" id="nom-input" class="input-field" placeholder="Nom" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="role-input" class="visually-hidden">Rôle</label>
+                        <input type="text" th:field="*{role}" id="role-input" class="input-field" placeholder="Rôle" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="telephone-input" class="visually-hidden">Téléphone</label>
+                        <input type="tel" th:field="*{telephone}" id="telephone-input" class="input-field" placeholder="Téléphone" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="email-input" class="visually-hidden">Email</label>
+                        <input type="email" th:field="*{email}" id="email-input" class="input-field" placeholder="Email" />
+                    </div>
+                    <div class="input-group">
+                        <label for="login-input" class="visually-hidden">Login</label>
+                        <input type="text"
+                               name="login"
+                               id="login-input"
+                               class="input-field"
+                               placeholder="Login"
+                               th:value="${agentLogin}" />
+                    </div>
+                    <div class="input-group">
+                        <label for="date-input" class="visually-hidden">Date recrutement</label>
+                        <input type="datetime-local"
+                            th:value="${patrouilleur.dateRecrutement != null ? #temporals.format(patrouilleur.dateRecrutement, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                            name="dateRecrutement"
+                            id="date-input"
+                            class="input-field" />
+                    </div>
+                    <div class="input-group">
+                        <label for="site-select" class="visually-hidden">Site</label>
+                        <select name="site.id_Site" id="site-select" class="input-field" required>
+                            <option value="">-- Sélectionnez un site --</option>
+                            <option th:each="site : ${sites}"
+                                    th:value="${site.id_Site}"
+                                    th:text="${site.nom}"
+                                    th:selected="${patrouilleur.site != null and patrouilleur.site.id_Site == site.id_Site}">
                             </option>
                         </select>
-                        <small class="site-hint" style="color: #666; font-size: 12px; margin-top: 5px;">
-                            Seuls les patrouilleurs qui n'ont pas encore de compte apparaissent ici.
-                        </small>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="login" class="visually-hidden">Login</label>
-                        <input
-                            type="text"
-                            name="login"
-                            id="login"
-                            class="input-field"
-                            placeholder="Login"
-                            required
-                            autocomplete="username"
-                        />
                     </div>
                     <div class="input-group">
-                        <label for="name-input" class="visually-hidden">Mot de passe</label>
-                        <input
-                            type="password"
-                            name="motDePasse"
-                            id="name-input"
-                            class="input-field"
-                            placeholder="Mot de passe"
-                            required
-                            autocomplete="given-name"
-                        />
-                    </div> 
+                        <label for="new-password-input" class="visually-hidden">Nouveau mot de passe</label>
+                        <input type="password"
+                               name="nouveauMotDePasse"
+                               id="new-password-input"
+                               class="input-field"
+                               placeholder="Nouveau mot de passe (optionnel)" />
+                    </div>
+                </div>
             </form>
-
-            <!-- Bouton de soumission -->
-            <button type="submit" form="agent-form-in" class="submit-btn" aria-describedby="signin-description">
-                <span class="submit-text">Add agent</span>
+            <button type="submit" form="agent-edit-form" class="submit-btn">
+                <span class="submit-text">Mettre à jour</span>
             </button>
         </div>
     </div>
@@ -335,7 +351,7 @@
                 <div class="logout-icon">
                     <img
                         class="logout-icon"
-                        src="images/logout.png"
+                        th:src="@{/images/logout.png}"
                         alt="The Peregrine Fund Logo"
                     />
                 </div>

@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserAppRepository extends JpaRepository<UserApp, Integer> {
     Optional<UserApp> findByLogin(String login);
     Optional<UserApp> findByLoginAndMotDePasse(String login, String motDePasse);
+    @Query("select u from UserApp u where u.patrouilleur.idPatrouilleur = :patrouilleurId")
+    Optional<UserApp> findByPatrouilleurId(int patrouilleurId);
     @Query("select u.idUserApp from UserApp u where u.login = :login")
     Optional<Integer> findIdByLogin(String login);
 

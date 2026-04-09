@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta name="description" content="Liste des événements avec filtres et accès au détail." />
     <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" th:href="@{/css/historique.css}" />
+    <link rel="stylesheet" th:href="@{/css/user.css}" />
     <title>Événements</title>
 </head>
 <body>
@@ -15,9 +16,9 @@
                 <img class="frame-2" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png" alt="The Peregrine Fund Logo"/>
             </div>
             <div class="nav-tabs">
-                <div class="nav-tab"><a href="/history">Historique</a></div>
+                <div class="nav-tab active"><a href="/history">Historique</a></div>
                 <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
-                <div class="nav-tab active"><a href="/evenements">Événements</a></div>
+                <div class="nav-tab"><a href="/evenements">Événements</a></div>
                 <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
                     <a href="/users">Admin</a>
                 </div>
@@ -29,24 +30,17 @@
         </div>
     </header>
 
-    <section class="actions-section">
-        <div class="action-group">
-            <form method="get" action="/evenements" class="event-group-actions">
-                <div class="event-group-field" style="min-width: 220px;">
-                    <label for="filterNom">Nom</label>
-                    <input id="filterNom" name="nom" type="text" th:value="${filterNom}" placeholder="Rechercher un titre" />
-                </div>
-                <div class="event-group-field" style="min-width: 180px;">
-                    <label for="filterDate">Date</label>
-                    <input id="filterDate" name="date" type="date" th:value="${filterDate}" />
-                </div>
-                <button type="submit" class="action-btn export-btn">Filtrer</button>
-                <a href="/evenements" class="action-btn import-btn" style="text-decoration:none; display:inline-flex; align-items:center;">Réinitialiser</a>
-            </form>
-        </div>
-    </section>
-
     <section class="data-table-container">
+        <div class="table-filters">
+            <div class="table-filter-group table-search-group">
+                <label for="eventsSearch">Recherche</label>
+                <input id="eventsSearch" class="table-search-input" type="search" th:value="${filterNom}" placeholder="Rechercher un titre ou une description">
+            </div>
+            <div class="table-filter-group">
+                <label for="eventsDateFilter">Date</label>
+                <input id="eventsDateFilter" class="table-search-input" type="date" th:value="${filterDate}">
+            </div>
+        </div>
         <table class="data-table">
             <thead class="table-header">
             <tr>
@@ -57,8 +51,10 @@
                 <th></th>
             </tr>
             </thead>
-            <tbody class="table-body">
-            <tr class="table-row" th:each="evenement : ${evenements}">
+            <tbody class="table-body" id="eventsTable">
+            <tr class="table-row"
+                th:each="evenement : ${evenements}"
+                th:attr="data-search=${(evenement.nom + ' ' + (evenement.description != null ? evenement.description : ''))}, data-date=${#temporals.format(evenement.date, 'yyyy-MM-dd')}">
                 <td class="table-cell" data-column="site" th:text="${evenement.nom}"></td>
                 <td class="table-cell" data-column="dateCommencement" th:text="${#temporals.format(evenement.date, 'yyyy-MM-dd')}"></td>
                 <td class="table-cell" data-column="description" th:text="${evenement.description != null ? evenement.description : ''}"></td>
@@ -67,22 +63,142 @@
                     <a class="action-btn export-btn" th:href="@{/evenements/{id}(id=${evenement.idEvenement})}" style="text-decoration:none;">Voir</a>
                 </td>
             </tr>
-            <tr th:if="${#lists.isEmpty(evenements)}">
-                <td class="table-cell" colspan="5">Aucun événement trouvé.</td>
-            </tr>
             </tbody>
         </table>
+        <div class="pagination-toolbar">
+            <div class="pagination-info" id="eventsPaginationInfo">0 résultat</div>
+            <div class="page-size-group">
+                <label for="eventsPageSize">Lignes par page</label>
+                <select id="eventsPageSize" class="filter-select page-size-select">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+        <div class="pagination-controls" id="eventsPaginationControls"></div>
+        <div class="empty-state" id="eventsEmptyState" hidden>Aucun événement à afficher.</div>
     </section>
 </div>
 <footer class="footer">
     <div class="main-container">
         <a href="/logout" class="logout-btn">
             <div class="logout-icon">
-                <img class="logout-icon" src="images/logout.png" alt="The Peregrine Fund Logo"/>
+                <img class="logout-icon" th:src="@{/images/logout.png}" alt="The Peregrine Fund Logo"/>
             </div>
             Déconnexion
         </a>
     </div>
 </footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("eventsSearch");
+    const dateFilter = document.getElementById("eventsDateFilter");
+    const pageSize = document.getElementById("eventsPageSize");
+    const paginationInfo = document.getElementById("eventsPaginationInfo");
+    const paginationControls = document.getElementById("eventsPaginationControls");
+    const emptyState = document.getElementById("eventsEmptyState");
+    const rows = Array.from(document.querySelectorAll("#eventsTable tr.table-row"));
+
+    let currentPage = 1;
+
+    function getFilteredRows() {
+        const search = (searchInput.value || "").trim().toLowerCase();
+        const date = (dateFilter.value || "").trim();
+
+        return rows.filter(row => {
+            const rowSearch = (row.dataset.search || "").toLowerCase();
+            const rowDate = (row.dataset.date || "").trim();
+
+            if (search && !rowSearch.includes(search)) return false;
+            if (date && rowDate !== date) return false;
+            return true;
+        });
+    }
+
+    function createPageButton(label, pageNumber, isActive = false, isDisabled = false) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `pagination-btn${isActive ? " active" : ""}`;
+        button.textContent = label;
+        button.disabled = isDisabled;
+        button.addEventListener("click", () => {
+            currentPage = pageNumber;
+            renderTable();
+        });
+        return button;
+    }
+
+    function renderPagination(totalPages) {
+        paginationControls.innerHTML = "";
+
+        if (totalPages <= 1) {
+            return;
+        }
+
+        paginationControls.appendChild(createPageButton("Précédent", currentPage - 1, false, currentPage === 1));
+
+        const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+        const visiblePages = Array.from(pages)
+            .filter(page => page >= 1 && page <= totalPages)
+            .sort((a, b) => a - b);
+
+        let previousPage = 0;
+        visiblePages.forEach(page => {
+            if (page - previousPage > 1) {
+                const ellipsis = document.createElement("span");
+                ellipsis.className = "pagination-ellipsis";
+                ellipsis.textContent = "...";
+                paginationControls.appendChild(ellipsis);
+            }
+
+            paginationControls.appendChild(createPageButton(String(page), page, page === currentPage));
+            previousPage = page;
+        });
+
+        paginationControls.appendChild(createPageButton("Suivant", currentPage + 1, false, currentPage === totalPages));
+    }
+
+    function renderTable() {
+        const filteredRows = getFilteredRows();
+        const selectedPageSize = Number(pageSize.value) || 10;
+        const totalPages = Math.max(1, Math.ceil(filteredRows.length / selectedPageSize));
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        const startIndex = (currentPage - 1) * selectedPageSize;
+        const visibleRows = filteredRows.slice(startIndex, startIndex + selectedPageSize);
+
+        rows.forEach(row => {
+            row.style.display = "none";
+        });
+
+        visibleRows.forEach(row => {
+            row.style.display = "";
+        });
+
+        paginationInfo.textContent = `${filteredRows.length} résultat(s) - page ${filteredRows.length === 0 ? 0 : currentPage}/${totalPages}`;
+        emptyState.hidden = filteredRows.length !== 0;
+        renderPagination(totalPages);
+    }
+
+    [searchInput, dateFilter].forEach(el => {
+        el.addEventListener(el.type === "search" ? "input" : "change", () => {
+            currentPage = 1;
+            renderTable();
+        });
+    });
+
+    pageSize.addEventListener("change", () => {
+        currentPage = 1;
+        renderTable();
+    });
+
+    renderTable();
+});
+</script>
 </body>
 </html>

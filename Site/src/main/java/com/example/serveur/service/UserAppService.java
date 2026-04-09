@@ -29,22 +29,36 @@ public class UserAppService {
         return userAppRepository.findById(id);
     }
 
+    public Optional<UserApp> findByPatrouilleurId(int patrouilleurId) {
+        return userAppRepository.findByPatrouilleurId(patrouilleurId);
+    }
+
     public void deleteById(int id) {
         userAppRepository.deleteById(id);
     }
 
+    public UserApp createForPatrouilleur(Patrouilleurs patrouilleur, String login, String motDePasse) {
+        boolean alreadyExists = userAppRepository.findAll().stream()
+                .anyMatch(userApp -> userApp.getPatrouilleur() != null
+                        && userApp.getPatrouilleur().getIdPatrouilleur() == patrouilleur.getIdPatrouilleur());
+
+        if (alreadyExists) {
+            throw new IllegalStateException("Ce patrouilleur a déjà un compte.");
+        }
+
+        UserApp userApp = new UserApp();
+        userApp.setLogin(login);
+        userApp.setMotDePasse(motDePasse);
+        userApp.setPatrouilleur(patrouilleur);
+        return userApp;
+    }
+
     public List<UserApp> GenererUser(int nombreAgent, PatrouilleurService patrouilleurService) {
         List<UserApp> usersapp = new ArrayList<>();
-        List<Patrouilleurs> patrouilleurs = patrouilleurService.findAll();
-        List<UserApp> existingUsers = userAppRepository.findAll();
+        List<Patrouilleurs> patrouilleurs = patrouilleurService.findWithoutUserApp();
 
         for( int i= 0, created = 0; i < patrouilleurs.size() && created < nombreAgent; i++) {
             Patrouilleurs patrouilleur = patrouilleurs.get(i);
-            boolean alreadyExists = existingUsers.stream()
-                    .anyMatch(u -> u.getPatrouilleur().getIdPatrouilleur() == patrouilleur.getIdPatrouilleur());
-            if (alreadyExists) {
-                continue;
-            }
             UserApp userApp = new UserApp();
             userApp.setLogin("agent" + patrouilleur.getIdPatrouilleur());
             userApp.setMotDePasse("password" + i + patrouilleur.getTelephone() + "" + i ); // Vous devriez hasher les mots de passe dans une vraie application

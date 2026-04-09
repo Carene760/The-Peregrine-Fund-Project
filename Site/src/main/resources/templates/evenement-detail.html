@@ -1,10 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta name="description" content="Détail d'un événement et messages associés avec filtres." />
     <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" th:href="@{/css/historique.css}" />
+    <link rel="stylesheet" th:href="@{/css/user.css}" />
+    <style>
+        .event-group-section {
+            margin-top: 14px;
+            margin-bottom: 18px;
+            background: rgba(51, 51, 51, 0.38);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .event-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .event-group-header h4 {
+            margin: 0;
+            font-family: "Inknut Antiqua", serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: #000;
+            line-height: 1.2;
+        }
+
+        .event-group-header p {
+            margin: 6px 0 0 0;
+            font-family: "Imprima", sans-serif;
+            font-size: 14px;
+            color: #222;
+            line-height: 1.45;
+        }
+
+        .event-group-counter {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(225, 22, 22, 0.12);
+            border: 1px solid rgba(225, 22, 22, 0.35);
+            color: rgba(225, 22, 22, 1);
+            font-family: "Imprima", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .event-group-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .event-group-counter {
+                white-space: normal;
+            }
+        }
+    </style>
     <title>Détail événement</title>
 </head>
 <body>
@@ -15,9 +76,9 @@
                 <img class="frame-2" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png" alt="The Peregrine Fund Logo"/>
             </div>
             <div class="nav-tabs">
-                <div class="nav-tab"><a href="/history">Historique</a></div>
+                <div class="nav-tab active"><a href="/history">Historique</a></div>
                 <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
-                <div class="nav-tab active"><a href="/evenements">Événements</a></div>
+                <div class="nav-tab"><a href="/evenements">Événements</a></div>
                 <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
                     <a href="/users">Admin</a>
                 </div>
@@ -29,7 +90,7 @@
         </div>
     </header>
 
-    <section class="event-group-section" style="margin-top: 10px;">
+    <section class="event-group-section">
         <div class="event-group-header">
             <div>
                 <h4 th:text="${evenement.nom}"></h4>
@@ -44,6 +105,28 @@
     </section>
 
     <section class="data-table-container">
+        <div class="table-filters">
+            <div class="table-filter-group table-search-group">
+                <label for="detailSearch">Recherche</label>
+                <input id="detailSearch" class="table-search-input" type="search" placeholder="Site, intervention, agent...">
+            </div>
+            <div class="table-filter-group">
+                <label for="detailDateFilter">Date début</label>
+                <input id="detailDateFilter" class="table-search-input" type="date">
+            </div>
+            <div class="table-filter-group">
+                <label for="detailStatusFilter">Status</label>
+                <select id="detailStatusFilter" class="filter-select table-filter-select">
+                    <option value="">Tous</option>
+                </select>
+            </div>
+            <div class="table-filter-group">
+                <label for="detailAlerteFilter">Alerte</label>
+                <select id="detailAlerteFilter" class="filter-select table-filter-select">
+                    <option value="">Toutes</option>
+                </select>
+            </div>
+        </div>
         <table class="data-table">
             <thead class="table-header">
             <tr>
@@ -56,8 +139,10 @@
                 <th>Agent</th>
             </tr>
             </thead>
-            <tbody class="table-body">
-            <tr class="table-row" th:each="msg : ${messages}">
+            <tbody class="table-body" id="detailTable">
+            <tr class="table-row"
+                th:each="msg : ${messages}"
+                th:attr="data-search=${((msg.userApp != null && msg.userApp.patrouilleur != null && msg.userApp.patrouilleur.site != null ? msg.userApp.patrouilleur.site.nom : '') + ' ' + (msg.intervention != null ? msg.intervention.intervention : '') + ' ' + (msg.userApp != null && msg.userApp.patrouilleur != null ? msg.userApp.patrouilleur.nom : ''))}, data-date=${#temporals.format(msg.dateCommencement, 'yyyy-MM-dd')}, data-status=${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}, data-alerte=${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}">
                 <td class="table-cell" th:text="${msg.userApp != null && msg.userApp.patrouilleur != null && msg.userApp.patrouilleur.site != null ? msg.userApp.patrouilleur.site.nom : ''}"></td>
                 <td class="table-cell" th:text="${#temporals.format(msg.dateCommencement, 'yyyy-MM-dd HH:mm')}"></td>
                 <td class="table-cell" th:text="${#temporals.format(msg.dateSignalement, 'yyyy-MM-dd HH:mm')}"></td>
@@ -66,22 +151,177 @@
                 <td class="table-cell" th:text="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}"></td>
                 <td class="table-cell" th:text="${msg.userApp != null && msg.userApp.patrouilleur != null ? msg.userApp.patrouilleur.nom : ''}"></td>
             </tr>
-            <tr th:if="${#lists.isEmpty(messages)}">
-                <td class="table-cell" colspan="7">Aucun message rattaché à cet événement.</td>
-            </tr>
             </tbody>
         </table>
+        <div class="pagination-toolbar">
+            <div class="pagination-info" id="detailPaginationInfo">0 résultat</div>
+            <div class="page-size-group">
+                <label for="detailPageSize">Lignes par page</label>
+                <select id="detailPageSize" class="filter-select page-size-select">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+        <div class="pagination-controls" id="detailPaginationControls"></div>
+        <div class="empty-state" id="detailEmptyState" hidden>Aucun message rattaché à cet événement.</div>
     </section>
 </div>
 <footer class="footer">
     <div class="main-container">
         <a href="/logout" class="logout-btn">
             <div class="logout-icon">
-                <img class="logout-icon" src="images/logout.png" alt="The Peregrine Fund Logo"/>
+                <img class="logout-icon" th:src="@{/images/logout.png}" alt="The Peregrine Fund Logo"/>
             </div>
             Déconnexion
         </a>
     </div>
 </footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("detailSearch");
+    const dateFilter = document.getElementById("detailDateFilter");
+    const statusFilter = document.getElementById("detailStatusFilter");
+    const alerteFilter = document.getElementById("detailAlerteFilter");
+    const pageSize = document.getElementById("detailPageSize");
+    const paginationInfo = document.getElementById("detailPaginationInfo");
+    const paginationControls = document.getElementById("detailPaginationControls");
+    const emptyState = document.getElementById("detailEmptyState");
+    const rows = Array.from(document.querySelectorAll("#detailTable tr.table-row"));
+
+    let currentPage = 1;
+
+    function fillFilterOptions() {
+        const statuses = new Set();
+        const alertes = new Set();
+
+        rows.forEach(row => {
+            const status = (row.dataset.status || "").trim();
+            const alerte = (row.dataset.alerte || "").trim();
+            if (status) statuses.add(status);
+            if (alerte) alertes.add(alerte);
+        });
+
+        Array.from(statuses).sort((a, b) => a.localeCompare(b)).forEach(value => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            statusFilter.appendChild(option);
+        });
+
+        Array.from(alertes).sort((a, b) => a.localeCompare(b)).forEach(value => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            alerteFilter.appendChild(option);
+        });
+    }
+
+    function getFilteredRows() {
+        const search = (searchInput.value || "").trim().toLowerCase();
+        const date = (dateFilter.value || "").trim();
+        const status = (statusFilter.value || "").trim().toLowerCase();
+        const alerte = (alerteFilter.value || "").trim().toLowerCase();
+
+        return rows.filter(row => {
+            const rowSearch = (row.dataset.search || "").toLowerCase();
+            const rowDate = (row.dataset.date || "").trim();
+            const rowStatus = (row.dataset.status || "").trim().toLowerCase();
+            const rowAlerte = (row.dataset.alerte || "").trim().toLowerCase();
+
+            if (search && !rowSearch.includes(search)) return false;
+            if (date && rowDate !== date) return false;
+            if (status && rowStatus !== status) return false;
+            if (alerte && rowAlerte !== alerte) return false;
+            return true;
+        });
+    }
+
+    function createPageButton(label, pageNumber, isActive = false, isDisabled = false) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `pagination-btn${isActive ? " active" : ""}`;
+        button.textContent = label;
+        button.disabled = isDisabled;
+        button.addEventListener("click", () => {
+            currentPage = pageNumber;
+            renderTable();
+        });
+        return button;
+    }
+
+    function renderPagination(totalPages) {
+        paginationControls.innerHTML = "";
+
+        if (totalPages <= 1) {
+            return;
+        }
+
+        paginationControls.appendChild(createPageButton("Précédent", currentPage - 1, false, currentPage === 1));
+
+        const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+        const visiblePages = Array.from(pages)
+            .filter(page => page >= 1 && page <= totalPages)
+            .sort((a, b) => a - b);
+
+        let previousPage = 0;
+        visiblePages.forEach(page => {
+            if (page - previousPage > 1) {
+                const ellipsis = document.createElement("span");
+                ellipsis.className = "pagination-ellipsis";
+                ellipsis.textContent = "...";
+                paginationControls.appendChild(ellipsis);
+            }
+
+            paginationControls.appendChild(createPageButton(String(page), page, page === currentPage));
+            previousPage = page;
+        });
+
+        paginationControls.appendChild(createPageButton("Suivant", currentPage + 1, false, currentPage === totalPages));
+    }
+
+    function renderTable() {
+        const filteredRows = getFilteredRows();
+        const selectedPageSize = Number(pageSize.value) || 10;
+        const totalPages = Math.max(1, Math.ceil(filteredRows.length / selectedPageSize));
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        const startIndex = (currentPage - 1) * selectedPageSize;
+        const visibleRows = filteredRows.slice(startIndex, startIndex + selectedPageSize);
+
+        rows.forEach(row => {
+            row.style.display = "none";
+        });
+
+        visibleRows.forEach(row => {
+            row.style.display = "";
+        });
+
+        paginationInfo.textContent = `${filteredRows.length} résultat(s) - page ${filteredRows.length === 0 ? 0 : currentPage}/${totalPages}`;
+        emptyState.hidden = filteredRows.length !== 0;
+        renderPagination(totalPages);
+    }
+
+    [searchInput, dateFilter, statusFilter, alerteFilter].forEach(el => {
+        el.addEventListener(el.type === "search" ? "input" : "change", () => {
+            currentPage = 1;
+            renderTable();
+        });
+    });
+
+    pageSize.addEventListener("change", () => {
+        currentPage = 1;
+        renderTable();
+    });
+
+    fillFilterOptions();
+    renderTable();
+});
+</script>
 </body>
 </html>

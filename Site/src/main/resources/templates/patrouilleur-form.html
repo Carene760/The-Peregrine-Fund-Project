@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta name="description" content="Formulaire de création d'un compte agent lié à un patrouilleur." />
+    <meta name="description" content="Formulaire de création d'un patrouilleur." />
     <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
@@ -273,57 +273,45 @@
 
         <!-- Titre du formulaire -->
         <section class="form-header">
-            <h1 class="form-title">FORMULAIRE AGENT</h1>
+            <h1 class="form-title">FORMULAIRE PATROUILLEUR</h1>
             <div class="raptor-icon"></div>
         </section>
 
         <!-- Container du formulaire -->
         <div class="form-container">
-            <!-- Formulaire -->
-            <form class="agent-form-in" action="/users-app/save" method="post" id="agent-form-in" role="form" novalidate>
-                    <div class="input-group" id="patrouilleur-group">
-                        <label for="patrouilleur-select" class="visually-hidden">Patrouilleur sans compte</label>
-                        <select name="patrouilleurId" id="patrouilleur-select" class="input-field" required>
-                            <option value="" selected>-- Patrouilleurs sans compte --</option>
-                            <option th:each="patrouilleur : ${availablePatrouilleurs}"
-                                    th:value="${patrouilleur.idPatrouilleur}"
-                                    th:text="${patrouilleur.nom + ' - ' + patrouilleur.telephone + ' (' + patrouilleur.site.nom + ')'}">
-                            </option>
+            <form class="user-form" th:action="@{/patrouilleurs/save}" th:object="${patrouilleur}" method="post" id="patrouilleur-form" novalidate>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="nom-input" class="visually-hidden">Nom</label>
+                        <input type="text" th:field="*{nom}" id="nom-input" class="input-field" placeholder="Nom" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="role-input" class="visually-hidden">Rôle</label>
+                        <input type="text" th:field="*{role}" id="role-input" class="input-field" placeholder="Rôle" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="telephone-input" class="visually-hidden">Téléphone</label>
+                        <input type="tel" th:field="*{telephone}" id="telephone-input" class="input-field" placeholder="Téléphone" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="email-input" class="visually-hidden">Email</label>
+                        <input type="email" th:field="*{email}" id="email-input" class="input-field" placeholder="Email" />
+                    </div>
+                    <div class="input-group">
+                        <label for="date-input" class="visually-hidden">Date recrutement</label>
+                        <input type="datetime-local" th:field="*{dateRecrutement}" id="date-input" class="input-field" />
+                    </div>
+                    <div class="input-group">
+                        <label for="site-select" class="visually-hidden">Site</label>
+                        <select name="site.id_Site" id="site-select" class="input-field" required>
+                            <option value="">-- Sélectionnez un site --</option>
+                            <option th:each="site : ${sites}" th:value="${site.id_Site}" th:text="${site.nom}"></option>
                         </select>
-                        <small class="site-hint" style="color: #666; font-size: 12px; margin-top: 5px;">
-                            Seuls les patrouilleurs qui n'ont pas encore de compte apparaissent ici.
-                        </small>
                     </div>
-
-                    <div class="input-group">
-                        <label for="login" class="visually-hidden">Login</label>
-                        <input
-                            type="text"
-                            name="login"
-                            id="login"
-                            class="input-field"
-                            placeholder="Login"
-                            required
-                            autocomplete="username"
-                        />
-                    </div>
-                    <div class="input-group">
-                        <label for="name-input" class="visually-hidden">Mot de passe</label>
-                        <input
-                            type="password"
-                            name="motDePasse"
-                            id="name-input"
-                            class="input-field"
-                            placeholder="Mot de passe"
-                            required
-                            autocomplete="given-name"
-                        />
-                    </div> 
+                </div>
             </form>
-
-            <!-- Bouton de soumission -->
-            <button type="submit" form="agent-form-in" class="submit-btn" aria-describedby="signin-description">
-                <span class="submit-text">Add agent</span>
+            <button type="submit" form="patrouilleur-form" class="submit-btn">
+                <span class="submit-text">Ajouter patrouilleur</span>
             </button>
         </div>
     </div>
