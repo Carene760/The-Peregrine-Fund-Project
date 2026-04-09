@@ -1,13 +1,19 @@
 package com.example.theperegrinefund;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -44,9 +50,11 @@ import com.example.theperegrinefund.security.ConfigLoader;
 import com.example.theperegrinefund.SmsSender;
 import com.example.theperegrinefund.ServerSender;
 import com.example.theperegrinefund.ApiService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Calendar;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -57,8 +65,14 @@ public class DashboardActivity extends AppCompatActivity {
     private List<HistoryItemD> historyItems;
     private ImageView menuIcon;
     private ImageView newIcon;
+    private ImageView filterIcon;
     private ImageView infoIcon;
     private int FIXED_USER_ID;
+    private int selectedMessageId = -1;
+    private String currentKeywordFilter = "";
+    private LocalDate currentStartDateFilter = null;
+    private String currentStatusFilter = "Tous";
+    private List<Message> allMessages = new ArrayList<>();
     
     private ServerSender serverSender;
     private String SERVER_URL;
@@ -108,16 +122,18 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
         newIcon = findViewById(R.id.new_icon);
+        filterIcon = findViewById(R.id.filter_icon);
         infoIcon = findViewById(R.id.info_icon);
         ImageView logoutIcon = findViewById(R.id.logout_icon);
         logoutIcon.setOnClickListener(v -> logout());
+        filterIcon.setOnClickListener(v -> showFilterDialog());
         
         MessageDao messageDao = new MessageDao(this);
         SyncService syncService = new SyncService(this);
         AppData appData = new AppData();
         int userId = appData.getCurrentUserId();
-         FIXED_USER_ID = userId;
-       // FIXED_USER_ID = 1;
+        //  FIXED_USER_ID = userId;
+       FIXED_USER_ID = 1;
         syncService.downloadStatus(new SyncService.StatusCallback() {
             @Override
             public void onComplete(List<StatusMessage> statusMessages) {
@@ -132,7 +148,7 @@ public class DashboardActivity extends AppCompatActivity {
                                     public void onComplete(List<HistoriqueMessageStatus> historiques) {
                                         runOnUiThread(() -> {
                                           //  Toast.makeText(DashboardActivity.this, "Synchronisation terminée", Toast.LENGTH_SHORT).show();
-                                            loadSampleData();
+                                                                                        loadMessagesAndApplyFilters();
                                         });
                                     }
 
@@ -174,26 +190,160 @@ public class DashboardActivity extends AppCompatActivity {
         historyAdapter = new HistoryAdapter(historyItems, this::onHistoryItemClick);
         historyRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         historyRecyclerView.setAdapter(historyAdapter);
-        loadSampleData();
+        loadMessagesAndApplyFilters();
+    }
+
+    private void loadMessagesAndApplyFilters() {
+        MessageDao messageDao = new MessageDao(this);
+        allMessages = messageDao.getAllMessages();
+        applyHistoryFilters();
     }
 
     private void loadSampleData() {
+        loadMessagesAndApplyFilters();
+    }
+
+    private void applyHistoryFilters() {
         historyItems.clear();
 
-        MessageDao messageDao = new MessageDao(this);
-        List<Message> messages = messageDao.getAllMessages();
-
-        // Toast.makeText(this, "Nombre de messages en local: " + messages.size(), Toast.LENGTH_SHORT).show();
-
-        for (Message msg : messages) {
-            historyItems.add(new HistoryItemD(
-                    msg.getDescription() + " (" + msg.getDateCommencement() + ")",
-                    false,
-                    msg.getIdMessage()
-            ));
+        for (Message msg : allMessages) {
+            if (matchesHistoryFilters(msg)) {
+                historyItems.add(new HistoryItemD(
+                        buildHistoryTitle(msg),
+                        msg.getIdMessage() == selectedMessageId,
+                        msg.getIdMessage()
+                ));
+            }
         }
 
         historyAdapter.notifyDataSetChanged();
+    }
+
+    private boolean matchesHistoryFilters(Message message) {
+        if (message == null) {
+            return false;
+        }
+
+        if (currentStartDateFilter != null) {
+            if (message.getDateCommencement() == null || !currentStartDateFilter.equals(message.getDateCommencement().toLocalDate())) {
+                return false;
+            }
+        }
+
+        String keyword = currentKeywordFilter == null ? "" : currentKeywordFilter.trim().toLowerCase(Locale.getDefault());
+        if (!keyword.isEmpty()) {
+            String searchableText = safeLower(message.getDescription()) + " "
+                    + safeLower(message.getPointRepere()) + " "
+                    + safeLower(message.getDirection()) + " "
+                    + safeLower(message.getPhoneNumber());
+            if (!searchableText.contains(keyword)) {
+                return false;
+            }
+        }
+
+        if (currentStatusFilter != null && !"Tous".equals(currentStatusFilter)) {
+            HistoriqueMessageStatusDao historiqueDao = new HistoriqueMessageStatusDao(this);
+            int lastStatusId = historiqueDao.getLastStatusForMessage(message.getIdMessage());
+            if (lastStatusId != getStatusIdFromName(currentStatusFilter)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private String buildHistoryTitle(Message message) {
+        if (message == null) {
+            return "";
+        }
+
+        StringBuilder title = new StringBuilder();
+        if (message.getDescription() != null && !message.getDescription().trim().isEmpty()) {
+            title.append(message.getDescription().trim());
+        } else {
+            title.append("Message ").append(message.getIdMessage());
+        }
+
+        if (message.getDateCommencement() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault());
+            title.append(" (").append(message.getDateCommencement().format(formatter)).append(")");
+        }
+
+        return title.toString();
+    }
+
+    private String safeLower(String value) {
+        return value == null ? "" : value.toLowerCase(Locale.getDefault());
+    }
+
+    private void showFilterDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Filtrer l'historique");
+
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(48, 32, 48, 0);
+
+        EditText keywordInput = new EditText(this);
+        keywordInput.setHint("Mot-clé");
+        keywordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        keywordInput.setText(currentKeywordFilter);
+        container.addView(keywordInput);
+
+        EditText dateInput = new EditText(this);
+        dateInput.setHint("Date de commencement");
+        dateInput.setFocusable(false);
+        dateInput.setClickable(true);
+        dateInput.setInputType(InputType.TYPE_CLASS_DATETIME);
+        if (currentStartDateFilter != null) {
+            dateInput.setText(currentStartDateFilter.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())));
+        }
+        dateInput.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            if (currentStartDateFilter != null) {
+                calendar.set(currentStartDateFilter.getYear(), currentStartDateFilter.getMonthValue() - 1, currentStartDateFilter.getDayOfMonth());
+            }
+
+            DatePickerDialog dialog = new DatePickerDialog(
+                    this,
+                    (view, year, month, dayOfMonth) -> {
+                        currentStartDateFilter = LocalDate.of(year, month + 1, dayOfMonth);
+                        dateInput.setText(currentStartDateFilter.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())));
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            dialog.show();
+        });
+        container.addView(dateInput);
+
+        Spinner statusSpinner = new Spinner(this);
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                new String[]{"Tous", "Debut de feu", "En Cours", "Maitrise"}
+        );
+        statusSpinner.setAdapter(statusAdapter);
+        int selectedIndex = statusAdapter.getPosition(currentStatusFilter == null ? "Tous" : currentStatusFilter);
+        statusSpinner.setSelection(Math.max(selectedIndex, 0));
+        container.addView(statusSpinner);
+
+        builder.setView(container);
+        builder.setPositiveButton("Appliquer", (dialog, which) -> {
+            currentKeywordFilter = keywordInput.getText() != null ? keywordInput.getText().toString() : "";
+            currentStatusFilter = statusSpinner.getSelectedItem() != null ? statusSpinner.getSelectedItem().toString() : "Tous";
+            applyHistoryFilters();
+        });
+        builder.setNeutralButton("Réinitialiser", (dialog, which) -> {
+            currentKeywordFilter = "";
+            currentStartDateFilter = null;
+            currentStatusFilter = "Tous";
+            selectedMessageId = -1;
+            loadMessagesAndApplyFilters();
+        });
+        builder.setNegativeButton("Annuler", null);
+        builder.show();
     }
 
     private void showMessageDetails(int messageId) {
@@ -226,7 +376,7 @@ public class DashboardActivity extends AppCompatActivity {
                 tvSignalement.setText("Date inconnue");
             }
             
-            tvSurface.setText(message.getSurfaceApproximative() + " ha");
+            tvSurface.setText(message.getSurfaceApproximative() + " m2");
             tvDescription.setText(message.getDescription());
 
             int lastStatusId = historiqueDao.getLastStatusForMessage(messageId);
@@ -297,6 +447,8 @@ public class DashboardActivity extends AppCompatActivity {
 
     private int getStatusIdFromName(String statusName) {
         switch (statusName) {
+            case "Debut de feu":
+                return 1;
             case "En Cours":
                 return 2;
             case "Maitrise":
@@ -314,6 +466,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void onHistoryItemClick(HistoryItemD item, int position) {
+        selectedMessageId = item.getMessageId();
         for (HistoryItemD historyItem : historyItems) {
             historyItem.setSelected(false);
         }
@@ -349,7 +502,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void refreshData() {
-        loadSampleData();
+        loadMessagesAndApplyFilters();
     }
 
     private void logout() {

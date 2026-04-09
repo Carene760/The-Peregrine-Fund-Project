@@ -101,8 +101,8 @@
         <item>Ouest</item>
     </string-array>
 
-    <string name="surface_label">Surface</string>
-    <string name="surface_hint">Surface approximative</string>
+    <string name="surface_label">Surface (m2)</string>
+    <string name="surface_hint">Surface approximative en m2</string>
 
     <string name="pointR_label">Point Repere</string>
     <string name="pointR_hint">Point de repere</string>
