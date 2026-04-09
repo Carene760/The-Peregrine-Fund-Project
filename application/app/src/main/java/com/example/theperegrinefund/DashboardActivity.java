@@ -35,9 +35,11 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import com.example.theperegrinefund.HistoryAdapter;
 import com.example.theperegrinefund.Intervention;
+import com.example.theperegrinefund.dao.EvenementDao;
 import com.example.theperegrinefund.dao.InterventionDao;
 import com.example.theperegrinefund.StatusMessage;
 import com.example.theperegrinefund.dao.StatusMessageDao;
+import com.example.theperegrinefund.Evenement;
 import com.example.theperegrinefund.HistoriqueMessageStatus;
 import com.example.theperegrinefund.dao.HistoriqueMessageStatusDao;
 import com.example.theperegrinefund.AppData;
@@ -67,12 +69,19 @@ public class DashboardActivity extends AppCompatActivity {
     private ImageView newIcon;
     private ImageView filterIcon;
     private ImageView infoIcon;
+    private Button syncTopButton;
     private int FIXED_USER_ID;
     private int selectedMessageId = -1;
     private String currentKeywordFilter = "";
     private LocalDate currentStartDateFilter = null;
     private String currentStatusFilter = "Tous";
     private List<Message> allMessages = new ArrayList<>();
+    private int syncedStatusCount = 0;
+    private int syncedEvenementCount = 0;
+    private int syncedInterventionCount = 0;
+    private int syncedMessageCount = 0;
+    private int syncedHistoriqueCount = 0;
+    private boolean isSyncInProgress = false;
     
     private ServerSender serverSender;
     private String SERVER_URL;
@@ -128,56 +137,15 @@ public class DashboardActivity extends AppCompatActivity {
         logoutIcon.setOnClickListener(v -> logout());
         filterIcon.setOnClickListener(v -> showFilterDialog());
         
-        MessageDao messageDao = new MessageDao(this);
-        SyncService syncService = new SyncService(this);
         AppData appData = new AppData();
         int userId = appData.getCurrentUserId();
         //  FIXED_USER_ID = userId;
-       FIXED_USER_ID = 1;
-        syncService.downloadStatus(new SyncService.StatusCallback() {
-            @Override
-            public void onComplete(List<StatusMessage> statusMessages) {
-                syncService.downloadIntervention(new SyncService.InterventionCallback() {
-                    @Override
-                    public void onComplete(List<Intervention> interventions) {
-                        syncService.downloadMessages(FIXED_USER_ID, new SyncService.MessageCallback() {
-                            @Override
-                            public void onComplete(List<Message> messages) {
-                                syncService.downloadHistorique(FIXED_USER_ID, new SyncService.HistoriqueCallback() {
-                                    @Override
-                                    public void onComplete(List<HistoriqueMessageStatus> historiques) {
-                                        runOnUiThread(() -> {
-                                          //  Toast.makeText(DashboardActivity.this, "Synchronisation terminée", Toast.LENGTH_SHORT).show();
-                                                                                        loadMessagesAndApplyFilters();
-                                        });
-                                    }
+        FIXED_USER_ID = 4;
 
-                                    @Override
-                                    public void onError(Exception e) {
-                                        Log.e("SYNC", "Erreur de synchronisation historique", e);
-                                    }
-                                });
-                            }
+        syncTopButton = findViewById(R.id.btn_sync_top);
+        syncTopButton.setOnClickListener(v -> startSynchronization());
 
-                            @Override
-                            public void onError(Exception e) {
-                                Log.e("SYNC", "Erreur de synchronisation messages", e);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        Log.e("SYNC", "Erreur de synchronisation interventions", e);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.e("SYNC", "Erreur de synchronisation statuts", e);
-            }
-        });
+        startSynchronization();
 
         newIcon.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, BaseActivity.class);
@@ -191,6 +159,108 @@ public class DashboardActivity extends AppCompatActivity {
         historyRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         historyRecyclerView.setAdapter(historyAdapter);
         loadMessagesAndApplyFilters();
+    }
+
+    private void startSynchronization() {
+        if (isSyncInProgress) {
+            Toast.makeText(this, "Synchronisation déjà en cours...", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        setSyncInProgress(true);
+        SyncService syncService = new SyncService(this);
+        syncService.downloadStatus(new SyncService.StatusCallback() {
+            @Override
+            public void onComplete(List<StatusMessage> statusMessages) {
+                syncedStatusCount = statusMessages != null ? statusMessages.size() : 0;
+                syncService.downloadEvenements(new SyncService.EvenementCallback() {
+                    @Override
+                    public void onComplete(List<Evenement> evenements) {
+                        syncedEvenementCount = evenements != null ? evenements.size() : 0;
+                        syncService.downloadIntervention(new SyncService.InterventionCallback() {
+                            @Override
+                            public void onComplete(List<Intervention> interventions) {
+                                syncedInterventionCount = interventions != null ? interventions.size() : 0;
+                                syncService.downloadMessages(FIXED_USER_ID, new SyncService.MessageCallback() {
+                                    @Override
+                                    public void onComplete(List<Message> messages) {
+                                        syncedMessageCount = messages != null ? messages.size() : 0;
+                                        syncService.downloadHistorique(FIXED_USER_ID, new SyncService.HistoriqueCallback() {
+                                            @Override
+                                            public void onComplete(List<HistoriqueMessageStatus> historiques) {
+                                                syncedHistoriqueCount = historiques != null ? historiques.size() : 0;
+                                                runOnUiThread(() -> {
+                                                    setSyncInProgress(false);
+                                                    Toast.makeText(DashboardActivity.this, "Synchronisation terminée", Toast.LENGTH_SHORT).show();
+                                                    loadMessagesAndApplyFilters();
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Log.e("SYNC", "Erreur de synchronisation historique", e);
+                                                runOnUiThread(() -> {
+                                                    setSyncInProgress(false);
+                                                    Toast.makeText(DashboardActivity.this, "Synchronisation partielle (historique en erreur)", Toast.LENGTH_LONG).show();
+                                                });
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("SYNC", "Erreur de synchronisation messages", e);
+                                        runOnUiThread(() -> {
+                                            setSyncInProgress(false);
+                                            Toast.makeText(DashboardActivity.this, "Synchronisation partielle (messages en erreur)", Toast.LENGTH_LONG).show();
+                                        });
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("SYNC", "Erreur de synchronisation interventions", e);
+                                runOnUiThread(() -> {
+                                    setSyncInProgress(false);
+                                    Toast.makeText(DashboardActivity.this, "Synchronisation partielle (interventions en erreur)", Toast.LENGTH_LONG).show();
+                                });
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("SYNC", "Erreur de synchronisation evenements", e);
+                        runOnUiThread(() -> {
+                            setSyncInProgress(false);
+                            Toast.makeText(DashboardActivity.this, "Synchronisation partielle (evenements en erreur)", Toast.LENGTH_LONG).show();
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("SYNC", "Erreur de synchronisation statuts", e);
+                runOnUiThread(() -> {
+                    setSyncInProgress(false);
+                    Toast.makeText(DashboardActivity.this, "Synchronisation échouée (statuts en erreur)", Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private void setSyncInProgress(boolean inProgress) {
+        isSyncInProgress = inProgress;
+
+        if (syncTopButton == null) {
+            return;
+        }
+
+        syncTopButton.setEnabled(!inProgress);
+        syncTopButton.setAlpha(inProgress ? 0.6f : 1f);
+        syncTopButton.setText(inProgress ? "Sync en cours..." : "Sync");
     }
 
     private void loadMessagesAndApplyFilters() {
@@ -235,7 +305,8 @@ public class DashboardActivity extends AppCompatActivity {
             String searchableText = safeLower(message.getDescription()) + " "
                     + safeLower(message.getPointRepere()) + " "
                     + safeLower(message.getDirection()) + " "
-                    + safeLower(message.getPhoneNumber());
+                    + safeLower(message.getPhoneNumber()) + " "
+                    + safeLower(getEventSearchText(message));
             if (!searchableText.contains(keyword)) {
                 return false;
             }
@@ -352,13 +423,14 @@ public class DashboardActivity extends AppCompatActivity {
         Message message = messageDao.getMessageById(messageId);
 
         if (message != null) {
-          //  Toast.makeText(this, "Message trouvé avec l'ID: " + messageId, Toast.LENGTH_SHORT).show();
+             Toast.makeText(this, "Message trouvé avec l'ID: " + messageId, Toast.LENGTH_SHORT).show();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault());
 
             TextView tvDateTime = findViewById(R.id.tv_datetime);
             TextView tvSignalement = findViewById(R.id.tv_signalement);
             TextView tvSurface = findViewById(R.id.tv_surface);
             TextView tvDescription = findViewById(R.id.tv_description);
+            TextView tvEvenement = findViewById(R.id.tv_evenement);
             TextView tvHistoryContent = findViewById(R.id.tv_history_content);
             Button btnEnCours = findViewById(R.id.btn_en_cours);
             Button btnMaitrise = findViewById(R.id.btn_maitrise);
@@ -378,6 +450,7 @@ public class DashboardActivity extends AppCompatActivity {
             
             tvSurface.setText(message.getSurfaceApproximative() + " m2");
             tvDescription.setText(message.getDescription());
+            tvEvenement.setText(formatEvenementForDisplay(message));
 
             int lastStatusId = historiqueDao.getLastStatusForMessage(messageId);
 
@@ -410,6 +483,55 @@ public class DashboardActivity extends AppCompatActivity {
 
             tvHistoryContent.setText(historyBuilder.toString());
         }
+    }
+
+    private String formatEvenementForDisplay(Message message) {
+        if (message == null) {
+            return "Non lié";
+        }
+
+        if (message.getEvenement() != null && message.getEvenement().getNom() != null
+                && !message.getEvenement().getNom().trim().isEmpty()) {
+            return message.getEvenement().getNom().trim();
+        }
+
+        if (message.getIdEvenement() != null) {
+            EvenementDao evenementDao = new EvenementDao(this);
+            Evenement evenement = evenementDao.getEvenementById(message.getIdEvenement());
+            if (evenement != null && evenement.getNom() != null && !evenement.getNom().trim().isEmpty()) {
+                return evenement.getNom().trim();
+            }
+            return "ID " + message.getIdEvenement();
+        }
+
+        return "Non lié";
+    }
+
+    private String getEventSearchText(Message message) {
+        if (message == null) {
+            return "";
+        }
+
+        if (message.getEvenement() != null && message.getEvenement().getNom() != null) {
+            return message.getEvenement().getNom();
+        }
+
+        if (message.getIdEvenement() != null) {
+            EvenementDao evenementDao = new EvenementDao(this);
+            Evenement evenement = evenementDao.getEvenementById(message.getIdEvenement());
+            if (evenement != null) {
+                StringBuilder builder = new StringBuilder();
+                if (evenement.getNom() != null) {
+                    builder.append(evenement.getNom()).append(' ');
+                }
+                if (evenement.getDescription() != null) {
+                    builder.append(evenement.getDescription());
+                }
+                return builder.toString();
+            }
+        }
+
+        return "";
     }
 
     private void updateStatus(int messageId, String newStatus, Button btnEnCours, Button btnMaitrise) {
