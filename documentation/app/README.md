@@ -7,6 +7,8 @@ Ce dossier regroupe la documentation technique de l application Android.
 ```text
 documentation/app/
 ├── README.md
+├── GUIDE_TECHNIQUE_UTILISATION.md
+├── captures/
 └── v1/
     ├── README.md
     ├── EXECUTION_v1.md
@@ -24,10 +26,11 @@ documentation/app/
 ## Ordre de lecture conseille
 
 1. v1/README.md
-2. v1/ARCHITECTURE_v1.md
-3. v1/FONCTIONNALITE_v1.md
-4. v1/EXECUTION_v1.md
-5. v1/CHANGELOG.md
+2. GUIDE_TECHNIQUE_UTILISATION.md
+3. v1/ARCHITECTURE_v1.md
+4. v1/FONCTIONNALITE_v1.md
+5. v1/EXECUTION_v1.md
+6. v1/CHANGELOG.md
 
 ## Cible
 

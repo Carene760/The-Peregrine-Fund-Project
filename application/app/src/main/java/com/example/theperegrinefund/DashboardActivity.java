@@ -139,8 +139,8 @@ public class DashboardActivity extends AppCompatActivity {
         
         AppData appData = new AppData();
         int userId = appData.getCurrentUserId();
-         FIXED_USER_ID = userId;
-        // FIXED_USER_ID = 4;
+        //  FIXED_USER_ID = userId;
+        FIXED_USER_ID = 4;
 
         syncTopButton = findViewById(R.id.btn_sync_top);
         syncTopButton.setOnClickListener(v -> startSynchronization());
