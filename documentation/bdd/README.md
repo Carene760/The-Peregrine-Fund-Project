@@ -15,8 +15,13 @@ Ce dossier contient la documentation technique de la base de données PostgreSQL
 ```
 documentation/bdd/
 ├── README.md                    # Ce fichier (index et guide)
-├── SCHEMA_v1.md                # Description complète du schéma et relations
-├── EXECUTION_v1.md             # Procédures d'installation et d'exécution  
+├── v1/
+│   ├── SCHEMA_v1.md             # Description complète du schéma et relations
+│   └── EXECUTION_v1.md          # Procédures d'installation et d'exécution
+└── v2/
+   ├── README.md
+   ├── SCHEMA_v2.md
+   └── EXECUTION_v2.md
 ```
 
 ---
@@ -25,8 +30,9 @@ documentation/bdd/
 
 ### Recommendé :
 
-1. **Lire d'abord** : [SCHEMA_v1.md](SCHEMA_v1.md) - Comprenez la structure
-2. **Puis consulter**: [EXECUTION_v1.md](EXECUTION_v1.md) - Étapes de mise en place
+1. **Lire d'abord** : [v2/SCHEMA_v2.md](v2/SCHEMA_v2.md) - Comprenez la structure V2
+2. **Puis consulter**: [v2/EXECUTION_v2.md](v2/EXECUTION_v2.md) - Étapes de mise en place V2
+3. **Référence historique** : [v1/SCHEMA_v1.md](v1/SCHEMA_v1.md) et [v1/EXECUTION_v1.md](v1/EXECUTION_v1.md)
 
 ---
 

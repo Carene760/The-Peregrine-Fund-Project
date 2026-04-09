@@ -8,7 +8,7 @@ import android.database.Cursor;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "MaBase.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     // ---------- TABLE USERS ----------
     public static final String TABLE_USERS = "users";
@@ -33,6 +33,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_INTERVENTION_FK = "id_intervention";
     public static final String COLUMN_USER_FK = "iduserapp";
+    public static final String COLUMN_EVENEMENT_FK = "id_evenement";
     public static final String COLUMN_PHONE_NUMBER = "phoneNumber";
 
 
@@ -51,8 +52,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_LATITUDE + " REAL, " +
                     COLUMN_INTERVENTION_FK + " INTEGER, " +
                     COLUMN_USER_FK + " INTEGER, " +
+                    COLUMN_EVENEMENT_FK + " INTEGER, " +
                     COLUMN_PHONE_NUMBER + " TEXT, " + 
-                    "FOREIGN KEY(" + COLUMN_USER_FK + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + "));";
+                    "FOREIGN KEY(" + COLUMN_USER_FK + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + "), " +
+                    "FOREIGN KEY(" + COLUMN_EVENEMENT_FK + ") REFERENCES evenement(id_evenement));";
   
 
   // ---------- TABLE INTERVENTION ----------
@@ -64,6 +67,20 @@ private static final String CREATE_TABLE_INTERVENTION =
         "CREATE TABLE " + TABLE_INTERVENTION + " (" +
                 COLUMN_INTERVENTION_ID + " INTEGER PRIMARY KEY, " + // Retirer AUTOINCREMENT
                 COLUMN_INTERVENTION_NAME + " TEXT NOT NULL);";
+
+  // ---------- TABLE EVENEMENT ----------
+public static final String TABLE_EVENEMENT = "evenement";
+public static final String COLUMN_EVENEMENT_ID = "id_evenement";
+public static final String COLUMN_EVENEMENT_NOM = "nom";
+public static final String COLUMN_EVENEMENT_DATE = "date";
+public static final String COLUMN_EVENEMENT_DESCRIPTION = "description";
+
+private static final String CREATE_TABLE_EVENEMENT =
+    "CREATE TABLE " + TABLE_EVENEMENT + " (" +
+        COLUMN_EVENEMENT_ID + " INTEGER PRIMARY KEY, " +
+        COLUMN_EVENEMENT_NOM + " TEXT NOT NULL, " +
+        COLUMN_EVENEMENT_DATE + " TEXT NOT NULL, " +
+        COLUMN_EVENEMENT_DESCRIPTION + " TEXT);";
 
   // ---------- TABLE STATUS MESSAGE ----------
 public static final String TABLE_STATUS = "status_message";
@@ -99,6 +116,7 @@ public static final String COLUMN_HISTORIQUE_MESSAGE_FK = "id_message";
         // Activer la gestion des clés étrangères
         db.execSQL("PRAGMA foreign_keys=ON;");
         db.execSQL(CREATE_TABLE_USERS);
+        db.execSQL(CREATE_TABLE_EVENEMENT);
         db.execSQL(CREATE_TABLE_MESSAGE);
         db.execSQL(CREATE_TABLE_STATUS);
         db.execSQL(CREATE_TABLE_HISTORIQUE);
@@ -110,6 +128,7 @@ public static final String COLUMN_HISTORIQUE_MESSAGE_FK = "id_message";
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
          db.execSQL("DROP TABLE IF EXISTS " + TABLE_INTERVENTION);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENEMENT);
           db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORIQUE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STATUS);
         onCreate(db);

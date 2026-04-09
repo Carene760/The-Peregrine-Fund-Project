@@ -5,9 +5,13 @@ import com.example.serveur.model.Message;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository
@@ -59,5 +63,16 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
            "GROUP BY s.id_Site, s.Nom " +
            "ORDER BY s.Nom")
     List<Object[]> countMessagesWithCoordinatesBySite();
+
+       @Query("SELECT m FROM Message m WHERE m.evenement.idEvenement = :evenementId ORDER BY m.dateSignalement DESC")
+       List<Message> findByEvenementId(@Param("evenementId") int evenementId);
+
+       @Query("SELECT m FROM Message m WHERE FUNCTION('DATE', m.dateSignalement) = :dateSignalement ORDER BY m.dateSignalement DESC")
+       List<Message> findByDateSignalementDate(@Param("dateSignalement") LocalDate dateSignalement);
+
+       @Modifying
+       @Transactional
+       @Query("UPDATE Message m SET m.description = :description WHERE m.idMessage = :messageId")
+       int updateDescriptionById(@Param("messageId") int messageId, @Param("description") String description);
 
 }

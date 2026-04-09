@@ -30,6 +30,8 @@ public class Message {
 
     // Champ utilisé côté mobile pour la synchro
     private int idUserApp;
+    private Integer idEvenement;
+    private Evenement evenement;
 
    public Message( LocalDateTime dateCommencement, LocalDateTime dateSignalement,int idIntervention,boolean renfort,String direction,
                 double surfaceApproximative,String pointRepere,String description, String phoneNumber,
@@ -97,6 +99,12 @@ public class Message {
     public int getIdUserApp() { return idUserApp; }
     public void setIdUserApp(int idUserApp) { this.idUserApp = idUserApp; }
 
+    public Integer getIdEvenement() { return idEvenement; }
+    public void setIdEvenement(Integer idEvenement) { this.idEvenement = idEvenement; }
+
+    public Evenement getEvenement() { return evenement; }
+    public void setEvenement(Evenement evenement) { this.evenement = evenement; }
+
     public String chiffrer(String cleSecrete, String mess) throws Exception {
         SecretKeySpec key = new SecretKeySpec(cleSecrete.getBytes("UTF-8"), "AES");
         Cipher cipher = Cipher.getInstance("AES");
@@ -144,6 +152,7 @@ public class Message {
 
     values.put(MyDatabaseHelper.COLUMN_INTERVENTION_FK, idIntervention);
     values.put(MyDatabaseHelper.COLUMN_USER_FK, idUserApp);
+    values.put(MyDatabaseHelper.COLUMN_EVENEMENT_FK, idEvenement);
 
     // Insert et récupération de l'ID inséré
     int newId = (int) db.insert(MyDatabaseHelper.TABLE_MESSAGE, null, values);

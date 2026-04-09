@@ -141,6 +141,7 @@ public class SyncService {
 
                     int insertedCount = 0;
                     for (Message msg : messages) {
+                        normalizeMessageEvenement(msg);
                         msg.setIdUserApp(idUser);
                         messageDao.insertMessage(msg);
                         insertedCount++;
@@ -174,6 +175,16 @@ public class SyncService {
                 if (callback != null) callback.onError(e);
             }
         }).start();
+    }
+
+    private void normalizeMessageEvenement(Message message) {
+        if (message == null) {
+            return;
+        }
+
+        if (message.getIdEvenement() == null && message.getEvenement() != null) {
+            message.setIdEvenement(message.getEvenement().getIdEvenement());
+        }
     }
 
     public void downloadIntervention(InterventionCallback callback) {

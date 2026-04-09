@@ -37,7 +37,7 @@ public class MessageDao {
            values.put(MyDatabaseHelper.COLUMN_DATE_COMMENCEMENT, message.getDateCommencement().format(dateTimeFormatter));
         }
         if (message.getDateSignalement() != null) {
-           values.put(MyDatabaseHelper.COLUMN_DATE_COMMENCEMENT, message.getDateCommencement().format(dateTimeFormatter));
+              values.put(MyDatabaseHelper.COLUMN_DATE_SIGNAL, message.getDateSignalement().format(dateTimeFormatter));
         }
         values.put(MyDatabaseHelper.COLUMN_POINT_REPERE, message.getPointRepere());
         values.put(MyDatabaseHelper.COLUMN_SURFACE, message.getSurfaceApproximative());
@@ -48,6 +48,7 @@ public class MessageDao {
         values.put(MyDatabaseHelper.COLUMN_LATITUDE, message.getLatitude());
         values.put(MyDatabaseHelper.COLUMN_INTERVENTION_FK, message.getIdIntervention());
         values.put(MyDatabaseHelper.COLUMN_USER_FK, message.getIdUserApp());
+        values.put(MyDatabaseHelper.COLUMN_EVENEMENT_FK, message.getIdEvenement());
         values.put(MyDatabaseHelper.COLUMN_PHONE_NUMBER, message.getPhoneNumber());
        
 
@@ -94,6 +95,7 @@ public class MessageDao {
         msg.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_LATITUDE)));
         msg.setIdIntervention(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_INTERVENTION_FK)));
         msg.setIdUserApp(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_USER_FK)));
+        msg.setIdEvenement(cursor.isNull(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)) ? null : cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)));
         msg.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_PHONE_NUMBER)));
 
         messages.add(msg);
@@ -146,6 +148,7 @@ public class MessageDao {
             msg.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_LATITUDE)));
             msg.setIdIntervention(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_INTERVENTION_FK)));
             msg.setIdUserApp(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_USER_FK)));
+            msg.setIdEvenement(cursor.isNull(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)) ? null : cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)));
             msg.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_PHONE_NUMBER)));
         
 
@@ -196,6 +199,7 @@ public class MessageDao {
             message.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_LATITUDE))); // Correction
             message.setIdIntervention(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_INTERVENTION_FK))); // Correction
             message.setIdUserApp(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_USER_FK))); // Correction
+            message.setIdEvenement(cursor.isNull(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)) ? null : cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)));
             message.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_PHONE_NUMBER))); // Correction
             cursor.close();
         }
