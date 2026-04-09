@@ -1,6 +1,8 @@
 package com.example.serveur.service;
 
 import com.example.serveur.model.Message;
+import com.example.serveur.model.HistoriqueMessageStatus;
+import com.example.serveur.repository.HistoriqueMessageStatusRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -26,6 +28,12 @@ import java.util.List;
 @Service
 public class MessageExportService {
 
+    private final HistoriqueMessageStatusRepository historiqueMessageStatusRepository;
+
+    public MessageExportService(HistoriqueMessageStatusRepository historiqueMessageStatusRepository) {
+        this.historiqueMessageStatusRepository = historiqueMessageStatusRepository;
+    }
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final String CSV_SEPARATOR = "\t";
     private static final List<String> HEADERS = List.of(
@@ -39,6 +47,7 @@ public class MessageExportService {
             "surface_m2",
             "description",
             "direction",
+            "status",
             "renfort",
             "longitude",
             "latitude"
@@ -54,6 +63,7 @@ public class MessageExportService {
                 "Surface",
                 "Description",
                 "Direction",
+                "Status",
                 "Renfort",
                 "Longitude",
                 "Latitude"
@@ -117,7 +127,7 @@ public class MessageExportService {
             float pageWidth = page.getMediaBox().getWidth();
             float pageHeight = page.getMediaBox().getHeight();
             float tableWidth = pageWidth - (2 * margin);
-            float[] columnRatios = new float[]{1.2f, 1.2f, 1.1f, 1.0f, 1.0f, 1.0f, 1.1f, 0.7f, 1.6f, 0.7f, 0.7f, 0.8f, 0.8f};
+            float[] columnRatios = new float[]{1.15f, 1.15f, 1.0f, 0.95f, 0.95f, 0.95f, 1.0f, 0.65f, 1.4f, 0.7f, 0.85f, 0.65f, 0.75f, 0.75f};
             float[] columnWidths = scaleColumnWidths(columnRatios, tableWidth);
 
             int rowIndex = 0;
@@ -178,10 +188,22 @@ public class MessageExportService {
         row.add(message.getSurfaceApproximative() != null ? trimTrailingZeros(message.getSurfaceApproximative()) : "");
         row.add(valueOrEmpty(message.getDescription()));
         row.add(valueOrEmpty(message.getDirection()));
+        row.add(valueOrEmpty(resolveLastStatus(message)));
         row.add(message.getRenfort() == null ? "" : (message.getRenfort() ? "oui" : "non"));
         row.add(message.getLongitude() != null ? trimTrailingZeros(message.getLongitude()) : "");
         row.add(message.getLatitude() != null ? trimTrailingZeros(message.getLatitude()) : "");
         return row;
+    }
+
+    private String resolveLastStatus(Message message) {
+        if (message == null || message.getIdMessage() <= 0) {
+            return "";
+        }
+        return historiqueMessageStatusRepository
+                .findTopByMessage_IdMessageOrderByDateChangementDesc(message.getIdMessage())
+                .map(HistoriqueMessageStatus::getStatus)
+                .map(status -> status != null ? status.getStatus() : "")
+                .orElse("");
     }
 
     private String formatDate(java.time.LocalDateTime value) {

@@ -4,10 +4,12 @@ import com.example.serveur.model.Evenement;
 import com.example.serveur.model.Intervention;
 import com.example.serveur.model.Message;
 import com.example.serveur.model.Patrouilleurs;
+import com.example.serveur.model.StatusMessage;
 import com.example.serveur.model.UserApp;
 import com.example.serveur.repository.EvenementRepository;
 import com.example.serveur.repository.InterventionRepository;
 import com.example.serveur.repository.PatrouilleursRepository;
+import com.example.serveur.repository.StatusMessageRepository;
 import com.example.serveur.repository.UserAppRepository;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -43,7 +45,8 @@ public class MessageImportService {
             "site",
             "agent",
             "intervention",
-            "direction"
+            "direction",
+            "status"
     );
     private static final List<String> EXPECTED_HEADERS = List.of(
             "date_commencement",
@@ -56,6 +59,7 @@ public class MessageImportService {
             "surface_m2",
             "description",
             "direction",
+                "status",
             "renfort",
             "longitude",
             "latitude"
@@ -71,17 +75,20 @@ public class MessageImportService {
     private final EvenementRepository evenementRepository;
     private final PatrouilleursRepository patrouilleursRepository;
     private final UserAppRepository userAppRepository;
+    private final StatusMessageRepository statusMessageRepository;
 
     public MessageImportService(MessageService messageService,
                                 InterventionRepository interventionRepository,
                                 EvenementRepository evenementRepository,
                                 PatrouilleursRepository patrouilleursRepository,
-                                UserAppRepository userAppRepository) {
+                                UserAppRepository userAppRepository,
+                                StatusMessageRepository statusMessageRepository) {
         this.messageService = messageService;
         this.interventionRepository = interventionRepository;
         this.evenementRepository = evenementRepository;
         this.patrouilleursRepository = patrouilleursRepository;
         this.userAppRepository = userAppRepository;
+        this.statusMessageRepository = statusMessageRepository;
     }
 
     public ImportResult parseAndValidateCsv(String csvContent) {
@@ -149,8 +156,8 @@ public class MessageImportService {
 
             MessageParseResult parseResult = parseRow(values, headerIndex, rowIndex + 1, sourceLabel);
             result.errors.addAll(parseResult.errors);
-            if (parseResult.message != null) {
-                result.validMessages.add(parseResult.message);
+            if (parseResult.message != null && parseResult.status != null) {
+                result.validEntries.add(new ImportMessageData(parseResult.message, parseResult.status));
             }
         }
 
@@ -191,6 +198,18 @@ public class MessageImportService {
             errors.add(new ValidationErrorMessage(lineNumber, "direction", "Champ obligatoire manquant", null));
         } else {
             message.setDirection(direction);
+        }
+
+        String statusText = trimToNull(getValue(values, headerIndex, "status"));
+        if (statusText == null) {
+            errors.add(new ValidationErrorMessage(lineNumber, "status", "Champ obligatoire manquant", null));
+        } else {
+            StatusMessage statusMessage = statusMessageRepository.findFirstByStatusIgnoreCase(statusText);
+            if (statusMessage == null) {
+                errors.add(new ValidationErrorMessage(lineNumber, "status", "Status introuvable", statusText));
+            } else {
+                result.status = statusMessage;
+            }
         }
 
         String siteName = trimToNull(firstNonBlank(
@@ -417,11 +436,15 @@ public class MessageImportService {
     }
 
     public static class ImportResult {
-        private final List<Message> validMessages = new ArrayList<>();
+        private final List<ImportMessageData> validEntries = new ArrayList<>();
         private final List<ValidationErrorMessage> errors = new ArrayList<>();
 
+        public List<ImportMessageData> getValidEntries() {
+            return validEntries;
+        }
+
         public List<Message> getValidMessages() {
-            return validMessages;
+            return validEntries.stream().map(ImportMessageData::getMessage).toList();
         }
 
         public List<ValidationErrorMessage> getErrors() {
@@ -433,7 +456,7 @@ public class MessageImportService {
         }
 
         public int getValidCount() {
-            return validMessages.size();
+            return validEntries.size();
         }
 
         public int getErrorCount() {
@@ -445,8 +468,27 @@ public class MessageImportService {
         }
     }
 
+    public static class ImportMessageData {
+        private final Message message;
+        private final StatusMessage status;
+
+        public ImportMessageData(Message message, StatusMessage status) {
+            this.message = message;
+            this.status = status;
+        }
+
+        public Message getMessage() {
+            return message;
+        }
+
+        public StatusMessage getStatus() {
+            return status;
+        }
+    }
+
     private static class MessageParseResult {
         private Message message;
+        private StatusMessage status;
         private List<ValidationErrorMessage> errors = new ArrayList<>();
     }
 

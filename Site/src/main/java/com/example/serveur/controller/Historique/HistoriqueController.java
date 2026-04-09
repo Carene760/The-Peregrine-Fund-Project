@@ -3,6 +3,8 @@ package com.example.serveur.controller.Historique;
 import com.example.serveur.model.*;
 import com.example.serveur.repository.InterventionRepository;
 import com.example.serveur.repository.EvenementRepository;
+import com.example.serveur.repository.StatusMessageRepository;
+import com.example.serveur.service.TypeAlerteService;
 import com.example.serveur.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +37,9 @@ public class HistoriqueController {
     private final MessageImportService messageImportService;
     private final InterventionRepository interventionRepository;
     private final EvenementRepository evenementRepository;
+    private final StatusMessageRepository statusMessageRepository;
+    private final TypeAlerteService typeAlerteService;
+    private final NiveauAlerteService niveauAlerteService;
 
     @Autowired
     public HistoriqueController(MessageService messageService,
@@ -45,7 +50,10 @@ public class HistoriqueController {
                                 MessageExportService messageExportService,
                                 MessageImportService messageImportService,
                                 InterventionRepository interventionRepository,
-                                EvenementRepository evenementRepository) {
+                                EvenementRepository evenementRepository,
+                                StatusMessageRepository statusMessageRepository,
+                                TypeAlerteService typeAlerteService,
+                                NiveauAlerteService niveauAlerteService) {
         this.messageService = messageService;
         this.alerteService = alerteService;
         this.historiqueMessageStatusService = historiqueMessageStatusService;
@@ -55,6 +63,9 @@ public class HistoriqueController {
         this.messageImportService = messageImportService;
         this.interventionRepository = interventionRepository;
         this.evenementRepository = evenementRepository;
+        this.statusMessageRepository = statusMessageRepository;
+        this.typeAlerteService = typeAlerteService;
+        this.niveauAlerteService = niveauAlerteService;
     }
 
     @GetMapping("/history")
@@ -68,6 +79,8 @@ public class HistoriqueController {
         List<Site> sites = siteService.findAll();
         List<Intervention> interventions = interventionRepository.findAll();
         List<Evenement> evenements = evenementRepository.findAll();
+        List<StatusMessage> statuses = statusMessageRepository.findAll();
+        List<TypeAlerte> typeAlertes = typeAlerteService.findAll();
 
         // Associer chaque message avec ses alertes
         Map<Integer, List<Alerte>> alerteMessage = new HashMap<>();
@@ -104,6 +117,8 @@ public class HistoriqueController {
         model.addAttribute("sites", sites);
         model.addAttribute("interventions", interventions);
         model.addAttribute("evenements", evenements);
+        model.addAttribute("statuses", statuses);
+        model.addAttribute("typeAlertes", typeAlertes);
         model.addAttribute("directions", new String[]{"N", "NE", "E", "SE", "S", "SO", "O", "NO"});
 
         return "historique";
@@ -207,6 +222,7 @@ public class HistoriqueController {
                         "surface_m2",
                         "description",
                         "direction",
+                        "status",
                         "renfort",
                         "longitude",
                         "latitude"
@@ -216,9 +232,18 @@ public class HistoriqueController {
 
             // Sauvegarder les messages valides
             int importedCount = 0;
-            for (Message msg : result.getValidMessages()) {
+            for (MessageImportService.ImportMessageData entry : result.getValidEntries()) {
                 try {
+                    Message msg = entry.getMessage();
                     messageService.saveMessage(msg);
+
+                    HistoriqueMessageStatus historique = new HistoriqueMessageStatus();
+                    historique.setMessage(msg);
+                    historique.setDateChangement(LocalDateTime.now());
+                    historique.setIdStatus(entry.getStatus());
+                    historiqueMessageStatusService.save(historique);
+
+                    niveauAlerteService.recalculerEtPersisterAlerteMessage(msg);
                     importedCount++;
                 } catch (Exception e) {
                     // Continuer même si un message échoue

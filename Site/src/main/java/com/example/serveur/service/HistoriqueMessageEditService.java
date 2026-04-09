@@ -4,8 +4,16 @@ import com.example.serveur.model.Message;
 import com.example.serveur.model.User;
 import com.example.serveur.model.Intervention;
 import com.example.serveur.model.Evenement;
+import com.example.serveur.model.HistoriqueMessageStatus;
+import com.example.serveur.model.Alerte;
+import com.example.serveur.model.TypeAlerte;
+import com.example.serveur.model.StatusMessage;
 import com.example.serveur.repository.InterventionRepository;
 import com.example.serveur.repository.EvenementRepository;
+import com.example.serveur.repository.HistoriqueMessageStatusRepository;
+import com.example.serveur.repository.StatusMessageRepository;
+import com.example.serveur.repository.AlerteRepository;
+import com.example.serveur.repository.TypeAlerteRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,14 +25,29 @@ public class HistoriqueMessageEditService {
     private final MessageService messageService;
     private final InterventionRepository interventionRepository;
     private final EvenementRepository evenementRepository;
+    private final HistoriqueMessageStatusRepository historiqueMessageStatusRepository;
+    private final StatusMessageRepository statusMessageRepository;
+    private final AlerteRepository alerteRepository;
+    private final TypeAlerteRepository typeAlerteRepository;
+    private final NiveauAlerteService niveauAlerteService;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public HistoriqueMessageEditService(MessageService messageService, 
                                        InterventionRepository interventionRepository,
-                                       EvenementRepository evenementRepository) {
+                                       EvenementRepository evenementRepository,
+                                       HistoriqueMessageStatusRepository historiqueMessageStatusRepository,
+                                       StatusMessageRepository statusMessageRepository,
+                                       AlerteRepository alerteRepository,
+                                       TypeAlerteRepository typeAlerteRepository,
+                                       NiveauAlerteService niveauAlerteService) {
         this.messageService = messageService;
         this.interventionRepository = interventionRepository;
         this.evenementRepository = evenementRepository;
+        this.historiqueMessageStatusRepository = historiqueMessageStatusRepository;
+        this.statusMessageRepository = statusMessageRepository;
+        this.alerteRepository = alerteRepository;
+        this.typeAlerteRepository = typeAlerteRepository;
+        this.niveauAlerteService = niveauAlerteService;
     }
 
     /**
@@ -39,6 +62,8 @@ public class HistoriqueMessageEditService {
         if (message == null) {
             return false;
         }
+
+        StatusMessage newStatus = null;
 
         // dateCommencement
         if (updateData.containsKey("dateCommencement") && updateData.get("dateCommencement") != null) {
@@ -131,7 +156,51 @@ public class HistoriqueMessageEditService {
             }
         }
 
-        messageService.saveMessage(message);
+        // idStatus (historique message status)
+        if (updateData.containsKey("idStatus") && updateData.get("idStatus") != null) {
+            try {
+                Integer statusId = Integer.parseInt(String.valueOf(updateData.get("idStatus")));
+                newStatus = statusMessageRepository.findById(statusId).orElse(null);
+            } catch (Exception e) {
+                // Ignorer si conversion échoue
+            }
+        }
+
+        // idTypeAlerte
+        boolean alertEditedManually = false;
+        if (updateData.containsKey("idTypeAlerte")) {
+            alertEditedManually = true;
+            try {
+                Integer typeAlerteId = Integer.parseInt(String.valueOf(updateData.get("idTypeAlerte")));
+                TypeAlerte typeAlerte = typeAlerteRepository.findById(typeAlerteId).orElse(null);
+                if (typeAlerte != null) {
+                    Alerte alerte = alerteRepository.findTopByMessage_IdMessageOrderByIdAlerteDesc(message.getIdMessage())
+                            .orElseGet(Alerte::new);
+                    alerte.setMessage(message);
+                    alerte.setTypeAlerte(typeAlerte);
+                    if (message.getUserApp() != null && message.getUserApp().getPatrouilleur() != null && message.getUserApp().getPatrouilleur().getSite() != null) {
+                        alerte.setSite(message.getUserApp().getPatrouilleur().getSite());
+                    }
+                    alerteRepository.save(alerte);
+                }
+            } catch (Exception e) {
+                // Ignorer si conversion échoue
+            }
+        }
+
+        Message savedMessage = messageService.saveMessage(message);
+
+        if (newStatus != null) {
+            HistoriqueMessageStatus historique = new HistoriqueMessageStatus();
+            historique.setMessage(savedMessage);
+            historique.setDateChangement(LocalDateTime.now());
+            historique.setIdStatus(newStatus);
+            historiqueMessageStatusRepository.save(historique);
+        }
+
+        if (!alertEditedManually) {
+            niveauAlerteService.recalculerEtPersisterAlerteMessage(savedMessage);
+        }
         return true;
     }
 

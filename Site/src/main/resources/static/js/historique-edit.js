@@ -170,7 +170,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "longitude",
             "latitude",
             "idIntervention",
-            "idEvenement"
+            "idEvenement",
+            "idTypeAlerte",
+            "idStatus"
         ];
         return fields[index] || null;
     }
@@ -188,7 +190,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 let displayValue = updateData[fieldName];
 
                 // Formater la valeur pour l'affichage
-                if (fieldName === "renfort") {
+                if (input.tagName === "SELECT") {
+                    displayValue = input.options[input.selectedIndex] ? input.options[input.selectedIndex].text : "";
+                } else if (fieldName === "renfort") {
                     displayValue = displayValue ? "Oui" : "Non";
                 } else if (input.type === "number" && displayValue !== null) {
                     displayValue = displayValue.toString();

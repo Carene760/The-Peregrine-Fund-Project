@@ -139,6 +139,7 @@
                     <li>agent</li>
                     <li>intervention</li>
                     <li>direction</li>
+                    <li>status</li>
                 </ul>
 
                 <p><strong>Colonnes optionnelles</strong></p>
@@ -149,7 +150,7 @@
             </div>
 
             <p><strong>Exemple d’en-tête</strong></p>
-            <div class="import-sample">date_commencement[TAB]date_signalement[TAB]site[TAB]agent[TAB]intervention[TAB]evenement[TAB]point_repere[TAB]surface_m2[TAB]description[TAB]direction[TAB]renfort[TAB]longitude[TAB]latitude</div>
+            <div class="import-sample">date_commencement[TAB]date_signalement[TAB]site[TAB]agent[TAB]intervention[TAB]evenement[TAB]point_repere[TAB]surface_m2[TAB]description[TAB]direction[TAB]status[TAB]renfort[TAB]longitude[TAB]latitude</div>
 
             <p class="import-note">Les identifiants numériques ne sont pas demandés. Les correspondances se font par nom (site, agent, intervention, événement).</p>
         </div>
@@ -278,13 +279,26 @@
 
                 <!-- Alerte -->
                 <td class="table-cell" data-column="alerte">
-                    <span th:each="a : ${alerteMessage[msg.idMessage]}"
-                          th:text="${a.typeAlerte.zone}"></span>
+                    <span class="display-value" th:text="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="ta : ${typeAlertes}"
+                                th:value="${ta.idTypeAlerte}"
+                                th:text="${ta.zone}"
+                                th:selected="${alerteMessage[msg.idMessage] != null && alerteMessage[msg.idMessage].get(0).typeAlerte.idTypeAlerte == ta.idTypeAlerte}"></option>
+                    </select>
                 </td>
 
                 <!-- Dernier statut -->
-                <td class="table-cell" data-column="status"
-                    th:text="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}">
+                <td class="table-cell" data-column="status">
+                    <span class="display-value" th:text="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="st : ${statuses}"
+                                th:value="${st.idStatusMessage}"
+                                th:text="${st.status}"
+                                th:selected="${statusMessage[msg.idMessage] != null && statusMessage[msg.idMessage].status.idStatusMessage == st.idStatusMessage}"></option>
+                    </select>
                 </td>
 
                 <!-- Agent -->
