@@ -44,9 +44,7 @@ public class UserController {
         
         // Si l'utilisateur n'est pas déjà dans le modèle, l'ajouter
         if (!model.containsAttribute("user")) {
-            User newUser = new User();
-            newUser.setTelephone("+261");
-            model.addAttribute("user", newUser);
+            model.addAttribute("user", new User());
         }
         
         model.addAttribute("fonctions", fonctions);
@@ -104,8 +102,14 @@ public class UserController {
                     redirectAttributes.addFlashAttribute("user", user);
                     return "redirect:/users";
                 }
+
+                if (user.getMotDePasse() == null || user.getMotDePasse().trim().isEmpty()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Le mot de passe est obligatoire.");
+                    redirectAttributes.addFlashAttribute("user", user);
+                    return "redirect:/users";
+                }
                 
-                // Sauvegarde de l'utilisateur (avec mot de passe par défaut déjà défini dans le formulaire)
+                // Sauvegarde de l'utilisateur
                 userService.save(user);
                 
                 // Création d'un Patrouilleur pour Responsable
@@ -214,11 +218,46 @@ public class UserController {
 
     // Formulaire d'édition
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
+    public String showEditForm(@PathVariable int id, Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
         User user = userService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("user", user);
-        return "users-app/edit"; // Vue Thymeleaf à créer
+        model.addAttribute("fonctions", fonctionService.findAll());
+        return "users-edit";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String editUser(@PathVariable int id,
+                           @ModelAttribute User user,
+                           RedirectAttributes redirectAttributes) {
+        try {
+            User existingUser = userService.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+            existingUser.setNom(user.getNom());
+            existingUser.setEmail(user.getEmail());
+            existingUser.setTelephone(user.getTelephone());
+            existingUser.setAdresse(user.getAdresse());
+
+            if (user.getFonction() != null) {
+                Fonction fonction = fonctionService.findById(user.getFonction().getIdFonction())
+                        .orElseThrow(() -> new RuntimeException("Fonction non trouvée"));
+                existingUser.setFonction(fonction);
+            }
+
+            if (user.getMotDePasse() != null && !user.getMotDePasse().trim().isEmpty()) {
+                existingUser.setMotDePasse(user.getMotDePasse().trim());
+            }
+
+            userService.save(existingUser);
+            redirectAttributes.addFlashAttribute("successMessage", "Utilisateur modifié avec succès");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la modification: " + e.getMessage());
+        }
+
+        return "redirect:/userslist";
     }
 
     // Supprimer un utilisateur

@@ -18,6 +18,9 @@ public class Patrouilleurs {
     @Column(name = "role", length = 50)
     private String role;
 
+    @Column(name = "email", length = 100)
+    private String email;
+
     @Column(name = "telephone", nullable = false, length = 20)
     private String telephone;
 
@@ -33,6 +36,7 @@ public class Patrouilleurs {
     public String getNom() { return nom; }
     public String getRole() { return role; }
     public String getTelephone() { return telephone; }
+    public String getEmail() { return email; }
     public LocalDateTime getDateRecrutement() { return dateRecrutement; }
     public Site getSite() { return site; }
 
@@ -41,6 +45,7 @@ public class Patrouilleurs {
     public void setNom(String nom) { this.nom = nom; }
     public void setRole(String role) { this.role = role; }
     public void setTelephone(String telephone) { this.telephone = telephone; }
+    public void setEmail(String email) { this.email = email; }
     public void setDateRecrutement(LocalDateTime dateRecrutement) { this.dateRecrutement = dateRecrutement; }
     public void setSite(Site site) { this.site = site; }
 }

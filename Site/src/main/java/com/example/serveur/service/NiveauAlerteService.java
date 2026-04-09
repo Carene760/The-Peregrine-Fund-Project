@@ -4,14 +4,12 @@ import com.example.serveur.model.Alerte;
 import com.example.serveur.model.TypeAlerte;
 import com.example.serveur.model.Site;
 import com.example.serveur.model.Message;
-import com.example.serveur.model.HistoriqueMessageStatus;
 import com.example.serveur.repository.AlerteRepository;
 import com.example.serveur.repository.TypeAlerteRepository;
 import com.example.serveur.repository.StatusMessageRepository;
 import com.example.serveur.repository.InterventionRepository;
 import com.example.serveur.repository.SiteRepository;
 import com.example.serveur.repository.MessageRepository;
-import com.example.serveur.repository.HistoriqueMessageStatusRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,22 +23,19 @@ public class NiveauAlerteService {
     private final InterventionRepository interventionRepository;
     private final SiteRepository siteRepository;
     private final MessageRepository messageRepository;
-    private final HistoriqueMessageStatusRepository historiqueMessageStatusRepository;
     
     public NiveauAlerteService(TypeAlerteRepository typeAlerteRepository,
                               AlerteRepository alerteRepository,
                               StatusMessageRepository statusMessageRepository,
                               InterventionRepository interventionRepository,
                               SiteRepository siteRepository,
-                              MessageRepository messageRepository,
-                              HistoriqueMessageStatusRepository historiqueMessageStatusRepository) {
+                              MessageRepository messageRepository) {
         this.typeAlerteRepository = typeAlerteRepository;
         this.alerteRepository = alerteRepository;
         this.statusMessageRepository = statusMessageRepository;     
         this.interventionRepository = interventionRepository;
         this.siteRepository = siteRepository;
         this.messageRepository = messageRepository;
-        this.historiqueMessageStatusRepository = historiqueMessageStatusRepository;
     }
 
     public String determinerNiveauAlerteParId(Integer idStatus, Integer idIntervention, Boolean renfort) {
@@ -97,9 +92,8 @@ public class NiveauAlerteService {
                     return;
                 }
                 
-                // Mettre à jour la dernière alerte de ce message si elle existe, sinon en créer une
-                Alerte alerte = alerteRepository.findTopByMessage_IdMessageOrderByIdAlerteDesc(idMessage)
-                    .orElseGet(Alerte::new);
+                // Créer l'alerte avec les objets complets
+                Alerte alerte = new Alerte();
                 alerte.setSite(siteOpt.get());
                 alerte.setMessage(messageOpt.get());
                 alerte.setTypeAlerte(typeAlerte);
@@ -116,32 +110,6 @@ public class NiveauAlerteService {
             System.err.println("❌ Erreur lors de la création de l'alerte: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Recalcule et persiste le niveau d'alerte à partir de l'état actuel d'un message.
-     */
-    public String recalculerEtPersisterAlerteMessage(Message message) {
-        if (message == null || message.getIdMessage() <= 0 || message.getIntervention() == null) {
-            return "Inconnu";
-        }
-
-        if (message.getUserApp() == null || message.getUserApp().getPatrouilleur() == null || message.getUserApp().getPatrouilleur().getSite() == null) {
-            return "Inconnu";
-        }
-
-        Optional<HistoriqueMessageStatus> lastStatus = historiqueMessageStatusRepository
-                .findTopByMessage_IdMessageOrderByDateChangementDesc(message.getIdMessage());
-        if (lastStatus.isEmpty() || lastStatus.get().getStatus() == null) {
-            return "Inconnu";
-        }
-
-        String status = lastStatus.get().getStatus().getStatus();
-        String intervention = message.getIntervention().getIntervention();
-        Boolean renfort = message.getRenfort() != null ? message.getRenfort() : false;
-        Integer idSite = message.getUserApp().getPatrouilleur().getSite().getId_Site();
-
-        return traiterAlerteComplete(status, intervention, renfort, idSite, message.getIdMessage());
     }
     
     /**

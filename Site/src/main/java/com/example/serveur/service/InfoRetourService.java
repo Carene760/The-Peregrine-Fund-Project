@@ -106,7 +106,7 @@ public class InfoRetourService {
     }
     
     /**
-     * 3. Nombre de messages par site (format: nomSite?10/autreSite?15/...)
+     * 3. Nombre de messages par site (format: site1?10/site2?15/...)
      */
     private String getMessagesParSite() {
         try {
@@ -119,24 +119,13 @@ public class InfoRetourService {
             
             // Formater les résultats
             return results.stream()
-                .map(result -> sanitizeSiteLabel((String) result[0]) + "?" + result[1])
+                .map(result -> "site" + result[0] + "?" + result[1])
                 .collect(Collectors.joining("/"));
             
         } catch (Exception e) {
             System.err.println("❌ Erreur comptage messages par site: " + e.getMessage());
             return "Erreur comptage";
         }
-    }
-
-    private String sanitizeSiteLabel(String siteName) {
-        if (siteName == null || siteName.isBlank()) {
-            return "Site inconnu";
-        }
-        return siteName
-            .replace("/", "-")
-            .replace("?", " ")
-            .replace("~", " ")
-            .trim();
     }
     
     /**

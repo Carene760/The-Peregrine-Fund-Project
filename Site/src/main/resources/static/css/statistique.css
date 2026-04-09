@@ -54,15 +54,15 @@
 
         .nav-tabs {
             display: flex;
-            background: rgba(51,51,51,0.56);
+            background: #2f2f2f;
             margin-left: 150px;
-            height: 44px;
+            min-height: 48px;
         }
 
         .nav-tab {
-            padding: 12px 25px;
+            padding: 8px 20px;
             font-family: 'Inknut Antiqua', serif;
-            font-size: 12px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -70,7 +70,12 @@
         }
         .nav-tab a {
             text-decoration: none;
-            color: rgb(91, 117, 143);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 0 6px;
         }       
 
         .nav-tab.active a{
@@ -149,7 +154,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 0 20px;
+            padding: 8px 20px;
+            min-height: 48px;
             font-family: 'Inter', sans-serif;
             font-size: 18px;
             color: black;

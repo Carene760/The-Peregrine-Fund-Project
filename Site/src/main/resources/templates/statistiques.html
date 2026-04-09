@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+    <meta name="description" content="Tableau de bord des statistiques, graphiques et cartes des sites de surveillance." />
     <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
@@ -87,6 +88,14 @@
             border-bottom: 3px solid #667eea;
             padding-bottom: 15px;
         }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            margin: 22px 0 26px 0;
+        }
         
         .maps-grid {
             display: grid;
@@ -128,7 +137,7 @@
     </style>
 </head>
 <body>
-    <div class="main-container">
+    <div class="main-container" role="main" aria-label="Contenu principal">
         <!-- Header -->
         <header class="header">
             <div class="logo-section">
@@ -142,9 +151,11 @@
                 <div class="nav-tabs">
                     <div class="nav-tab active"><a href="/history">Historique</a></div>
                     <div class="nav-tab"><a href="/stat">Statistiques</a></div>
-                    <div class="nav-tab"><a href="/evenements">Événements</a></div>
                     <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
                         <a href="/users">Admin</a>
+                    </div>
+                    <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
+                        <a href="/gateway">Gateway</a>
                     </div>
                 </div>
             </div>
@@ -153,12 +164,13 @@
                 <div class="admin-label"><span th:text="${user.fonction.fonction}">Administrateur</span></div>
             </div>
         </header>
+        <h1 class="page-title">Dashboard Statistiques</h1>
         <!-- Graphiques statistiques -->
         <div class="stats-container">
             
             <!-- Graphique en camembert -->
             <div class="chart-container">
-                <h3 class="chart-title">🎯 Répartition des Types d'Alertes</h3>
+                <h2 class="chart-title">🎯 Répartition des Types d'Alertes</h2>
                 <div class="chart-wrapper">
                     <canvas id="alertesChart"></canvas>
                 </div>
@@ -169,7 +181,7 @@
 
             <!-- Graphique en barres -->
             <div class="chart-container">
-                <h3 class="chart-title">📊 Messages par Site de Surveillance</h3>
+                <h2 class="chart-title">📊 Messages par Site de Surveillance</h2>
                 <div class="chart-wrapper">
                     <canvas id="messagesChart"></canvas>
                 </div>
@@ -586,7 +598,7 @@ function addMessageMarker(map, message, index) {
             
             <div style="text-align: center; margin-top: 10px;">
                 <button onclick="centerOnMessage(${message.latitude}, ${message.longitude})" 
-                        style="background: ${alertColor}; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+                        style="background: ${alertColor}; color: white; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; min-height: 44px;">
                     📍 Centrer sur ce point
                 </button>
             </div>
