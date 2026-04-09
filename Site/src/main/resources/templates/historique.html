@@ -93,6 +93,68 @@
         </div>
     </section>
 
+    <!-- Actions Export/Import -->
+    <section class="actions-section">
+        <div class="action-group">
+            <div class="export-control-group">
+                <label for="exportFormat">Format</label>
+                <select id="exportFormat" class="filter-select export-format-select">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                    <option value="pdf">PDF</option>
+                </select>
+            </div>
+
+            <!-- Bouton Export (accessible à tout le monde) -->
+            <button type="button" class="action-btn export-btn" id="exportBtn">
+                📥 Exporter
+            </button>
+
+            <!-- Section Import (réservée ADMIN) -->
+            <div th:if="${user.fonction.fonction == 'Administrateur'}" class="import-section">
+                <button type="button" class="action-btn import-btn" id="importBtn">
+                    📤 Importer
+                </button>
+                <form id="importForm" style="display:none;">
+                    <input type="file" id="csvFile" name="file" accept=".csv,.xlsx" style="display:none;" />
+                </form>
+                <!-- Zone de validation prévue pour l'import -->
+                <div id="importProgress" style="display:none;" class="import-progress">
+                    <p id="importStatus"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="import-help" th:if="${user.fonction.fonction == 'Administrateur'}">
+            <h4>Guide import (CSV/XLSX)</h4>
+            <p><strong>Séparateur CSV :</strong> <span class="import-inline-code">tabulation</span> (pas la virgule)</p>
+            <p><strong>Formats acceptés :</strong> <span class="import-inline-code">.csv</span> et <span class="import-inline-code">.xlsx</span></p>
+
+            <div class="import-columns">
+                <p><strong>Colonnes obligatoires</strong></p>
+                <ul>
+                    <li>date_commencement</li>
+                    <li>date_signalement</li>
+                    <li>site</li>
+                    <li>agent</li>
+                    <li>intervention</li>
+                    <li>direction</li>
+                </ul>
+
+                <p><strong>Colonnes optionnelles</strong></p>
+                <ul>
+                    <li>evenement, point_repere, surface_m2, description</li>
+                    <li>renfort, longitude, latitude</li>
+                </ul>
+            </div>
+
+            <p><strong>Exemple d’en-tête</strong></p>
+            <div class="import-sample">date_commencement[TAB]date_signalement[TAB]site[TAB]agent[TAB]intervention[TAB]evenement[TAB]point_repere[TAB]surface_m2[TAB]description[TAB]direction[TAB]renfort[TAB]longitude[TAB]latitude</div>
+
+            <p class="import-note">Les identifiants numériques ne sont pas demandés. Les correspondances se font par nom (site, agent, intervention, événement).</p>
+        </div>
+    </section>
+
     <!-- Table des données -->
     <section class="data-table-container">
         <table class="data-table">
@@ -293,5 +355,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 <script th:src="@{/js/historique-edit.js}"></script>
+<script th:src="@{/js/historique-export-import.js}"></script>
 </body>
 </html>
