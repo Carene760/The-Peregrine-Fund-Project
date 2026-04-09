@@ -7,11 +7,17 @@ Ce dossier centralise la documentation du serveur web du projet.
 ```text
 documentation/site/
 ├── README.md
-└── v1/
+├── v1/
     ├── README.md
     ├── EXECUTION_v1.md
     ├── ARCHITECTURE_v1.md
     ├── FONCTIONNALITE_v1.md
+    └── CHANGELOG.md
+└── v2/
+    ├── README.md
+    ├── EXECUTION_v2.md
+    ├── ARCHITECTURE_v2.md
+    ├── FONCTIONNALITE_v2.md
     └── CHANGELOG.md
 ```
 
@@ -24,11 +30,12 @@ documentation/site/
 
 ## Ordre de lecture recommande
 
-1. `v1/README.md`
-2. `v1/ARCHITECTURE_v1.md`
-3. `v1/FONCTIONNALITE_v1.md`
-4. `v1/EXECUTION_v1.md`
-5. `v1/CHANGELOG.md`
+1. `v2/README.md`
+2. `v2/ARCHITECTURE_v2.md`
+3. `v2/FONCTIONNALITE_v2.md`
+4. `v2/EXECUTION_v2.md`
+5. `v2/CHANGELOG.md`
+6. `v1/*` (reference historique)
 
 ## Public cible
 
@@ -45,4 +52,4 @@ Cette documentation couvre:
 - regles metier principales des services,
 - maintenance et pannes frequentes.
 
-Derniere mise a jour: 2026-04-09
+Derniere mise a jour: 2026-04-10
