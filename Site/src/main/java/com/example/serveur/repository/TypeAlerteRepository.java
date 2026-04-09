@@ -10,6 +10,4 @@ import org.springframework.stereotype.Repository;
 public interface TypeAlerteRepository extends JpaRepository<TypeAlerte, Integer> {
     @Query("SELECT t FROM TypeAlerte t WHERE t.zone = :zone")
     TypeAlerte findByZone(@Param("zone") String zone);
-
-    TypeAlerte findFirstByZoneIgnoreCase(String zone);
 }

@@ -3,7 +3,6 @@ import com.example.serveur.model.HistoriqueMessageStatus;
 import com.example.serveur.model.Intervention;
 import com.example.serveur.model.Message;
 import com.example.serveur.model.StatusMessage;
-import com.example.serveur.model.Evenement;
 import com.example.serveur.repository.MessageRepository;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.example.serveur.repository.HistoriqueMessageStatusRepository;
 import com.example.serveur.repository.InterventionRepository;
 import com.example.serveur.repository.StatusMessageRepository;
-import com.example.serveur.repository.EvenementRepository;
 
 
 import java.util.List;
@@ -36,9 +34,6 @@ public class SyncController {
 
     @Autowired
     private StatusMessageRepository statusMessageRepository;
-
-    @Autowired
-    private EvenementRepository evenementRepository;
 
     // 1. Upload : le téléphone envoie une liste de messages
     @PostMapping("/upload")
@@ -73,12 +68,6 @@ public class SyncController {
     @GetMapping("/status")
     public List<StatusMessage> getAllStatus() {
         return statusMessageRepository.findAll();
-    }
-
-    // === 4. Télécharger tous les evenements disponibles ===
-    @GetMapping("/evenements")
-    public List<Evenement> getAllEvenements() {
-        return evenementRepository.findAll();
     }
 
 }

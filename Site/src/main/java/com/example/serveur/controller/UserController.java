@@ -44,9 +44,7 @@ public class UserController {
         
         // Si l'utilisateur n'est pas déjà dans le modèle, l'ajouter
         if (!model.containsAttribute("user")) {
-            User newUser = new User();
-            newUser.setTelephone("+261");
-            model.addAttribute("user", newUser);
+            model.addAttribute("user", new User());
         }
         
         model.addAttribute("fonctions", fonctions);

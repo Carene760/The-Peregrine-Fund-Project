@@ -1,6 +1,5 @@
 package com.example.serveur.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -46,11 +45,6 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "iduserapp", nullable = false)
     private UserApp userApp;
-
-    @ManyToOne
-    @JoinColumn(name = "id_evenement")
-    @JsonIgnoreProperties({"messages"})
-    private Evenement evenement;
     
     // Getters et setters
     public int getIdMessage() { return idMessage; }
@@ -88,7 +82,4 @@ public class Message {
     
     public UserApp getUserApp() { return userApp; }
     public void setUserApp(UserApp userApp) { this.userApp = userApp; }
-
-    public Evenement getEvenement() { return evenement; }
-    public void setEvenement(Evenement evenement) { this.evenement = evenement; }
 }

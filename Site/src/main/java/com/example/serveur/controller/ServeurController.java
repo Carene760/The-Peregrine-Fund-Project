@@ -75,30 +75,6 @@ public class ServeurController {
         }
     }
 
-    @GetMapping("/test-dechiffrement")
-    public String testDeChiffrement(@RequestParam String message) {
-        EncryptionUtil encryptionUtil= new EncryptionUtil("0123456789abcdef");
-
-        try {
-            String chiffre = encryptionUtil.chiffrer(message);
-            String dechiffre = encryptionUtil.dechiffrer(chiffre);
-            
-            return String.format("""
-                Original: %s
-                Chiffré: %s
-                Déchiffré: %s
-                Match: %s
-                Longueur original: %d
-                Longueur chiffré: %d
-                """, 
-                message, chiffre, dechiffre, 
-                message.equals(dechiffre),
-                message.length(), chiffre.length());
-        } catch (Exception e) {
-            return "Erreur: " + e.getMessage();
-        }
-    }
-
     // ==================== ENDPOINT SMS WEBHOOK (EXISTANT) ====================
     @PostMapping("/webhook")
     public SmsResponse handleSmsWebhook(@RequestBody GatewayWebhookRequest webhookRequest) throws Exception {

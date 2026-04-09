@@ -28,11 +28,9 @@ public class SecurityConfig {
                     "/css/statistique.css",
                     "/css/style.css",
                     "/css/user.css",
-                    "/js/**",
                     "/images/**",
                     "/stat/**", 
                     "/history/**", 
-                    "/evenements/**",
                     "/login", 
                     "/alertes/**",
                     "/fonctions/**",
@@ -52,7 +50,6 @@ public class SecurityConfig {
                     "/sync/upload/**",
                     "/sync/interventions/**",
                     "/sync/status/**",
-                    "/sync/evenements/**",
                     "/sync/historique/**"
                 ).permitAll()
                 .anyRequest().authenticated()

@@ -1,7 +1,6 @@
 package com.example.serveur.repository;
 
 import com.example.serveur.model.UserApp;
-import com.example.serveur.model.Patrouilleurs;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,5 @@ public interface UserAppRepository extends JpaRepository<UserApp, Integer> {
     Optional<UserApp> findByLoginAndMotDePasse(String login, String motDePasse);
     @Query("select u.idUserApp from UserApp u where u.login = :login")
     Optional<Integer> findIdByLogin(String login);
-
-    Optional<UserApp> findFirstByPatrouilleur(Patrouilleurs patrouilleur);
 
 }

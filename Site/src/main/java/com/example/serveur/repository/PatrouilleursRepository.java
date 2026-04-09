@@ -22,8 +22,21 @@ public interface PatrouilleursRepository extends JpaRepository<Patrouilleurs, In
     @Query("SELECT p.site.id FROM Patrouilleurs p WHERE p.telephone = :telephone")
     Integer findIdSiteByTelephone(@Param("telephone") String telephone);
 
+<<<<<<< Updated upstream
     @Query("SELECT p FROM Patrouilleurs p WHERE LOWER(p.nom) = LOWER(:nom) AND LOWER(p.site.Nom) = LOWER(:siteNom)")
     Optional<Patrouilleurs> findFirstByNomAndSiteNomIgnoreCase(@Param("nom") String nom, @Param("siteNom") String siteNom);
+=======
+    @Query("""
+            SELECT p
+            FROM Patrouilleurs p
+            WHERE p.idPatrouilleur NOT IN (
+                SELECT u.patrouilleur.idPatrouilleur
+                FROM UserApp u
+                WHERE u.patrouilleur IS NOT NULL
+            )
+            """)
+    List<Patrouilleurs> findPatrouilleursWithoutUserApp();
+>>>>>>> Stashed changes
     
     // @Query("SELECT p FROM Patrouilleurs p WHERE p.telephone = :telephone")
     // Optional<Patrouilleurs> findByTelephone( String telephone);
