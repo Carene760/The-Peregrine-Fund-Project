@@ -138,6 +138,9 @@
                     <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
                         <a href="/users">Admin</a>
                     </div>
+                    <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                        <a href="/admin/gateway/webhooks/ui">Webhooks</a>
+                    </div>
                 </div>
             </div>
             <div class="tagline-admin">
