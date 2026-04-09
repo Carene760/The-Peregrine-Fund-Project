@@ -230,19 +230,24 @@ public class ServeurController {
             String messageClair = smsProcessingService.processMessage(request.getEncryptedMessage(), request.getPhoneNumber());
             
             System.out.println("🔄 Message de mise à jour statut déchiffré: " + messageClair);
-            
-            // Vérifier le format: date_changement/id_message/id_status (3 séparateurs)
-            String[] parties = messageClair.split("/", -1);
-            if (parties.length != 3) {
-                return new StatusUpdateResponse(false, 
-                    "Format invalide pour mise à jour statut. Format attendu: date_changement/id_message/id_status");
+
+            SmsProcessingService.TypeMessage typeMessage = smsProcessingService.determineMessageType(messageClair);
+            if (typeMessage != SmsProcessingService.TypeMessage.STATUS_UPDATE) {
+                return new StatusUpdateResponse(false,
+                    "Format invalide pour mise à jour statut. Format attendu: dateChangement/idMessage/idStatus ou date/id/id");
+            }
+
+            String[] statusParts = extractStatusFields(messageClair);
+            if (statusParts == null) {
+                return new StatusUpdateResponse(false,
+                    "Champs requis manquants pour la mise à jour statut");
             }
 
             // Traiter la mise à jour de statut
             String resultat = historiqueMessageStatusService.updateMessageStatus(
-                parties[0], // date_changement
-                parties[1], // id_message  
-                parties[2]  // id_status
+                statusParts[0],
+                statusParts[1],
+                statusParts[2]
             );
 
             // Si demandé, envoyer aussi par SMS
@@ -332,18 +337,6 @@ private ResponseEntity<?> handleDirectFormat(String phoneNumber, String message)
      * Méthode commune pour traiter tous les types de messages
      */
     private String traiterMessage(String messageClair, String phoneNumber, boolean viaSms) {
-
-        // ✅ PRIORITÉ : format date/id/status
-        String[] parties = messageClair.trim().split("/", -1);
-        if (parties.length == 3) {
-            System.out.println("🔄 Mise à jour de statut détectée (prioritaire)");
-            return historiqueMessageStatusService.updateMessageStatus(
-                    parties[0].trim(),
-                    parties[1].trim(),
-                    parties[2].trim()
-            );
-        }
-
         SmsProcessingService.TypeMessage typeMessage = smsProcessingService.determineMessageType(messageClair);
         System.out.println("📨 Type de message détecté: " + typeMessage);
 
@@ -352,6 +345,20 @@ private ResponseEntity<?> handleDirectFormat(String phoneNumber, String message)
         switch (typeMessage) {
             case MESSAGE_SIMPLE:
                 // reponseAccuse = null;
+                break;
+
+            case STATUS_UPDATE:
+                String[] statusParts = extractStatusFields(messageClair);
+                if (statusParts == null) {
+                    reponseAccuse = "❌ Champs requis manquants pour la mise à jour statut";
+                    break;
+                }
+                System.out.println("🔄 Mise à jour de statut détectée");
+                reponseAccuse = historiqueMessageStatusService.updateMessageStatus(
+                    statusParts[0],
+                    statusParts[1],
+                    statusParts[2]
+                );
                 break;
                 
             case LOGIN:
@@ -385,6 +392,33 @@ private ResponseEntity<?> handleDirectFormat(String phoneNumber, String message)
         }
 
         return reponseAccuse;
+    }
+
+    private String[] extractStatusFields(String messageClair) {
+        Map<String, String> v2Fields = smsProcessingService.parseV2Fields(messageClair);
+        if (!v2Fields.isEmpty()) {
+            String dateChangement = valueOrEmpty(v2Fields.get("dateChangement"));
+            String idMessage = valueOrEmpty(v2Fields.get("idMessage"));
+            String idStatus = valueOrEmpty(v2Fields.get("idStatus"));
+            if (dateChangement.isEmpty() || idMessage.isEmpty() || idStatus.isEmpty()) {
+                return null;
+            }
+            return new String[] { dateChangement, idMessage, idStatus };
+        }
+
+        String[] legacyParts = messageClair.trim().split("/", -1);
+        if (legacyParts.length != 3) {
+            return null;
+        }
+        return new String[] {
+            legacyParts[0].trim(),
+            legacyParts[1].trim(),
+            legacyParts[2].trim()
+        };
+    }
+
+    private String valueOrEmpty(String value) {
+        return value == null ? "" : value.trim();
     }
 
     // ==================== CLASSES DE REQUÊTE ET RÉPONSE ====================

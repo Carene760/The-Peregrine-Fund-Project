@@ -26,6 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -95,32 +99,76 @@ public class AlerteService {
     @Transactional
     public String processAlerte(String messageAlerte, Integer idSite, String phoneNumber) {
         try {
-            String[] parties = messageAlerte.split("/", -1);
-            
-            if (parties.length != 12) {
-                return "❌ Format invalide: " + (parties.length - 1) + 
-                       " séparateurs trouvés (12 attendus). Éléments manquants.";
+            boolean isV2Format = messageAlerte != null && messageAlerte.contains("=");
+
+            LocalDateTime dateCommencement;
+            LocalDateTime dateSignalement;
+            Integer idIntervention;
+            Boolean renfort;
+            String direction;
+            Double surfaceApproximative;
+            String pointRepere;
+            String description;
+            Integer idUserApp;
+            Double longitude;
+            Double latitude;
+            Integer idStatus;
+            LocalDateTime dateEnvoi;
+
+            if (isV2Format) {
+                System.out.println("🧭 Parser source: V2 key=value");
+                Map<String, String> fields = parseKeyValueMessage(messageAlerte);
+
+                dateSignalement = parseDateTime(fields.get("dateSignalement"));
+                dateCommencement = parseDateTime(fields.get("dateCommencement"));
+                if (dateCommencement == null) {
+                    dateCommencement = dateSignalement != null ? dateSignalement : LocalDateTime.now();
+                }
+
+                idIntervention = parseInt(fields.get("idIntervention"));
+                renfort = parseBoolean(fields.get("renfort"));
+                direction = emptyToNull(fields.get("direction"));
+                surfaceApproximative = parseDouble(fields.get("surfaceApproximative"));
+                pointRepere = emptyToNull(fields.get("pointRepere"));
+                description = emptyToNull(fields.get("description"));
+                idUserApp = parseInt(fields.get("idUserApp"));
+                longitude = parseDouble(fields.get("longitude"));
+                latitude = parseDouble(fields.get("latitude"));
+                idStatus = parseInt(fields.get("idStatus"));
+                dateEnvoi = parseDateTime(fields.get("dateEnvoi"));
+            } else {
+                System.out.println("🧭 Parser source: legacy séparateur");
+                String[] parties = messageAlerte.split("/", -1);
+
+                if (parties.length != 12) {
+                    return "❌ Format invalide: " + (parties.length - 1) +
+                           " séparateurs trouvés (12 attendus). Éléments manquants.";
+                }
+
+                // Debug: Afficher toutes les parties
+                System.out.println("🔍 Parties du message:");
+                for (int i = 0; i < parties.length; i++) {
+                    System.out.println("  [" + i + "]: '" + parties[i] + "'");
+                }
+
+                dateCommencement = parseDateTime(parties[0]);
+                dateSignalement = parseDateTime(parties[1]);
+                idIntervention = parseInt(parties[2]);
+                renfort = parseBoolean(parties[3]);
+                direction = emptyToNull(parties[4]);
+                surfaceApproximative = parseDouble(parties[5]);
+                pointRepere = emptyToNull(parties[6]);
+                description = emptyToNull(parties[7]);
+                idUserApp = parseInt(parties[8]);
+                longitude = parseDouble(parties[9]);
+                latitude = parseDouble(parties[10]);
+                idStatus = parseInt(parties[11]);
+                dateEnvoi = null;
             }
-            
-            // Debug: Afficher toutes les parties
-            System.out.println("🔍 Parties du message:");
-            for (int i = 0; i < parties.length; i++) {
-                System.out.println("  [" + i + "]: '" + parties[i] + "'");
+
+            if (dateEnvoi == null) {
+                dateEnvoi = LocalDateTime.now();
             }
-            
-            // Parser les données avec validation renforcée
-            LocalDateTime dateCommencement = parseDateTime(parties[0]);
-            LocalDateTime dateSignalement = parseDateTime(parties[1]);
-            Integer idIntervention = parseInt(parties[2]);
-            Boolean renfort = parseBoolean(parties[3]);
-            String direction = emptyToNull(parties[4]);
-            Double surfaceApproximative = parseDouble(parties[5]);
-            String pointRepere = emptyToNull(parties[6]);
-            String description = emptyToNull(parties[7]);
-            Integer idUserApp = parseInt(parties[8]);
-            Double longitude = parseDouble(parties[9]);
-            Double latitude = parseDouble(parties[10]);
-            Integer idStatus = parseInt(parties[11]);
             
             // Validation renforcée des champs obligatoires
             if (dateCommencement == null) {
@@ -132,11 +180,8 @@ public class AlerteService {
             if (idIntervention == null) {
                 return "❌ ID intervention manquant ou invalide";
             }
-            if (direction == null) {
-                return "❌ Direction manquante ou invalide";
-            }
             if (idUserApp == null) {
-                return "❌ ID UserApp manquant ou invalide: '" + parties[8] + "'";
+                return "❌ ID UserApp manquant ou invalide";
             }
             if (idStatus == null) {
                 return "❌ ID Status manquant ou invalide";
@@ -168,6 +213,7 @@ public class AlerteService {
             Message message = new Message();
             message.setDateCommencement(dateCommencement);
             message.setDateSignalement(dateSignalement);
+            message.setDateEnvoi(dateEnvoi);
             message.setIntervention(interventionOpt.get());
             message.setRenfort(renfort);
             message.setDirection(direction);
@@ -294,6 +340,42 @@ public class AlerteService {
         return value.trim();
     }
 
+    private Map<String, String> parseKeyValueMessage(String message) {
+        Map<String, String> fields = new HashMap<>();
+        if (message == null || message.isBlank()) {
+            return fields;
+        }
+
+        String[] segments = message.split("/");
+        for (String segment : segments) {
+            if (segment == null || segment.isBlank() || !segment.contains("=")) {
+                continue;
+            }
+
+            String[] keyValue = segment.split("=", 2);
+            if (keyValue.length != 2) {
+                continue;
+            }
+
+            String key = keyValue[0] == null ? "" : keyValue[0].trim();
+            if (key.isEmpty()) {
+                continue;
+            }
+
+            String rawValue = keyValue[1] == null ? "" : keyValue[1].trim();
+            fields.put(key, decodeValue(rawValue));
+        }
+        return fields;
+    }
+
+    private String decodeValue(String value) {
+        try {
+            return URLDecoder.decode(value, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return value;
+        }
+    }
+
     // Ajoutez cette nouvelle méthode
     private void envoyerAlerteAuxFonctionsConcernées(String niveauAlerte, Message message) {
         try {
@@ -348,13 +430,13 @@ public class AlerteService {
     private String genererMessageDetailleAlerte(Message message, String niveauAlerte) {
         return String.format("""
             🚨 ALERTE %s
-            📍 Localisation: %.6f, %.6f
-            🕒 Début: %s
-            🚒 Intervention: %s
-            📏 Surface: %s m²
-            🧭 Direction: %s
-            📝 Description: %s
-            🔧 Renfort: %s
+            Localisation: %.6f, %.6f
+            Début: %s
+            Intervention: %s
+            Surface: %s m²
+            Direction: %s
+            Description: %s
+            Renfort: %s
             """,
             niveauAlerte,
             message.getLatitude(),

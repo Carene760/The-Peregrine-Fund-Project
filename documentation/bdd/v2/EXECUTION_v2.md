@@ -24,6 +24,7 @@
 ```sql
 SELECT * FROM evenement;
 SELECT id_message, id_evenement FROM message ORDER BY id_message DESC LIMIT 20;
+SELECT id_message, date_signalement, date_envoi FROM message ORDER BY id_message DESC LIMIT 20;
 ```
 
 ## Rollback simple (si environnement de test)
@@ -31,5 +32,6 @@ SELECT id_message, id_evenement FROM message ORDER BY id_message DESC LIMIT 20;
 ```sql
 ALTER TABLE message DROP CONSTRAINT IF EXISTS message_id_evenement_fkey;
 ALTER TABLE message DROP COLUMN IF EXISTS id_evenement;
+ALTER TABLE message DROP COLUMN IF EXISTS date_envoi;
 DROP TABLE IF EXISTS evenement;
 ```
