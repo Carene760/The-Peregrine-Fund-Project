@@ -151,8 +151,9 @@ public class HistoriqueController {
                                                  @RequestParam(value = "month", required = false) String month,
                                                  @RequestParam(value = "alerte", required = false) String alerte,
                                                  @RequestParam(value = "site", required = false) String site,
+                                                 @RequestParam(value = "eventId", required = false) String eventId,
                                                  @RequestParam(value = "status", required = false) String status) {
-        List<Message> messages = filterMessagesForExport(year, month, alerte, site, status);
+        List<Message> messages = filterMessagesForExport(year, month, alerte, site, eventId, status);
         byte[] payload = messageExportService.exportMessages(messages, format);
 
         String normalizedFormat = format == null ? "csv" : format.trim().toLowerCase();
@@ -266,6 +267,7 @@ public class HistoriqueController {
                                                   String month,
                                                   String alerte,
                                                   String site,
+                                                  String eventId,
                                                   String status) {
         List<Message> messages = messageService.findAll();
         List<Alerte> alertes = alerteService.findAll();
@@ -293,7 +295,7 @@ public class HistoriqueController {
 
         List<Message> filteredMessages = new ArrayList<>();
         for (Message message : messages) {
-            if (matchesExportFilters(message, year, month, alerte, site, status, alerteMessage, dernierStatusMessage)) {
+            if (matchesExportFilters(message, year, month, alerte, site, eventId, status, alerteMessage, dernierStatusMessage)) {
                 filteredMessages.add(message);
             }
         }
@@ -305,6 +307,7 @@ public class HistoriqueController {
                                          String month,
                                          String alerte,
                                          String site,
+                                         String eventId,
                                          String status,
                                          Map<Integer, List<Alerte>> alerteMessage,
                                          Map<Integer, HistoriqueMessageStatus> dernierStatusMessage) {
@@ -318,6 +321,7 @@ public class HistoriqueController {
         String messageSite = message.getUserApp() != null && message.getUserApp().getPatrouilleur() != null && message.getUserApp().getPatrouilleur().getSite() != null
                 ? message.getUserApp().getPatrouilleur().getSite().getNom()
                 : "";
+        String messageEventId = message.getEvenement() != null ? String.valueOf(message.getEvenement().getIdEvenement()) : "";
         String messageStatus = dernierStatusMessage.get(message.getIdMessage()) != null && dernierStatusMessage.get(message.getIdMessage()).getStatus() != null
                 ? dernierStatusMessage.get(message.getIdMessage()).getStatus().getStatus()
                 : "";
@@ -332,6 +336,9 @@ public class HistoriqueController {
             return false;
         }
         if (site != null && !site.isBlank() && !messageSite.equalsIgnoreCase(site)) {
+            return false;
+        }
+        if (eventId != null && !eventId.isBlank() && !messageEventId.equals(eventId)) {
             return false;
         }
         if (status != null && !status.isBlank() && !messageStatus.equalsIgnoreCase(status)) {

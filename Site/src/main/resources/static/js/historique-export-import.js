@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterAlerte = document.getElementById("filterAlerte");
     const filterSite = document.getElementById("filterSite");
     const filterStatus = document.getElementById("filterStatus");
+    const filterEvenement = document.getElementById("filterEvenement");
     const importForm = document.getElementById("importForm");
     const importProgress = document.getElementById("importProgress");
     const importStatus = document.getElementById("importStatus");
@@ -48,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (filterMonth && filterMonth.value) params.set("month", filterMonth.value);
         if (filterAlerte && filterAlerte.value) params.set("alerte", filterAlerte.value);
         if (filterSite && filterSite.value) params.set("site", filterSite.value);
+        if (filterEvenement && filterEvenement.value) params.set("eventId", filterEvenement.value);
         if (filterStatus && filterStatus.value) params.set("status", filterStatus.value);
         params.set("format", selectedFormat);
 

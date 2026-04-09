@@ -150,6 +150,100 @@ body {
     border-left: 4px solid #2f4858;
 }
 
+.event-group-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(18, 52, 77, 0.92), rgba(47, 72, 88, 0.84));
+    margin: 20px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    color: #ffffff;
+}
+
+.event-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.event-group-header h4 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+}
+
+.event-group-header p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.event-group-counter {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.event-group-form {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.event-group-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.event-group-field-wide {
+    grid-column: span 2;
+}
+
+.event-group-field label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.event-group-field input,
+.event-group-field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.96);
+    color: #0f172a;
+    font-family: 'Imprima', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.event-group-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.event-group-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.action-btn.is-disabled {
+    opacity: 0.6;
+}
+
 .action-group {
     display: flex;
     gap: 15px;
@@ -350,6 +444,10 @@ body {
     min-width: 80px;
 }
 
+.table-header th:first-child {
+    min-width: 80px;
+}
+
 .table-header th:last-child {
     border-right: none;
 }
@@ -381,6 +479,17 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 80px;
+}
+
+.event-select-cell {
+    width: 80px;
+    min-width: 80px;
+}
+
+.event-message-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
 }
 
 .table-cell:last-child {

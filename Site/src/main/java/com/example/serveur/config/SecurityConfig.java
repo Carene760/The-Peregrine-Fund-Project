@@ -32,6 +32,7 @@ public class SecurityConfig {
                     "/images/**",
                     "/stat/**", 
                     "/history/**", 
+                    "/evenements/**",
                     "/login", 
                     "/alertes/**",
                     "/fonctions/**",

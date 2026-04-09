@@ -18,11 +18,9 @@
             <div class="nav-tabs">
                 <div class="nav-tab"><a href="/history">Historique</a></div>
                 <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                <div class="nav-tab"><a href="/evenements">Événements</a></div>
                 <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
                     <a href="/users">Admin</a>
-                </div>
-                <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
-                    <a href="/gateway">Gateway</a>
                 </div>
             </div>
         </div>
@@ -91,6 +89,15 @@
                 <option value="Maitrise">Maitrise</option>
             </select>
         </div>
+
+        <div class="filter-group">
+            <label>Événement</label>
+            <select id="filterEvenement" class="filter-select">
+                <option value="">Tous</option>
+                <option value="none">Sans événement</option>
+                <option th:each="evt : ${evenements}" th:value="${evt.idEvenement}" th:text="${evt.nom}"></option>
+            </select>
+        </div>
     </section>
 
     <!-- Actions Export/Import -->
@@ -156,11 +163,41 @@
         </div>
     </section>
 
+    <section class="event-group-section" th:if="${user.fonction.fonction == 'Administrateur'}">
+        <div class="event-group-header">
+            <div>
+                <h4>Rassembler un événement</h4>
+                <p>Sélectionnez des messages dans l'historique, puis créez un événement à partir de cette sélection.</p>
+            </div>
+            <div class="event-group-counter" id="selectedEventCount">0 message sélectionné</div>
+        </div>
+
+        <div class="event-group-form">
+            <div class="event-group-field">
+                <label for="eventTitle">Titre</label>
+                <input id="eventTitle" type="text" placeholder="Nom de l'événement" maxlength="150" />
+            </div>
+            <div class="event-group-field">
+                <label for="eventDate">Date</label>
+                <input id="eventDate" type="date" />
+            </div>
+            <div class="event-group-field event-group-field-wide">
+                <label for="eventDescription">Description</label>
+                <textarea id="eventDescription" rows="3" placeholder="Description optionnelle"></textarea>
+            </div>
+            <div class="event-group-actions">
+                <button type="button" class="action-btn export-btn" id="createEventBtn">Rassembler l'événement</button>
+                <span class="event-group-hint">Le titre est obligatoire. La date est préremplie à aujourd'hui.</span>
+            </div>
+        </div>
+    </section>
+
     <!-- Table des données -->
     <section class="data-table-container">
         <table class="data-table">
             <thead class="table-header">
             <tr>
+                <th th:if="${user.fonction.fonction == 'Administrateur'}">Sélection</th>
                 <th>Site</th>
                 <th>Date Début</th>
                 <th>Date Signalement</th>
@@ -188,7 +225,12 @@
                 th:data-mois="${#temporals.format(msg.dateCommencement, 'MM')}"
                 th:data-alerte="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}"
                 th:data-site="${msg.userApp.patrouilleur.site.nom}"
+                th:data-event-id="${msg.evenement != null ? msg.evenement.idEvenement : ''}"
                 th:data-status="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}">
+
+                <td class="table-cell event-select-cell" th:if="${user.fonction.fonction == 'Administrateur'}">
+                    <input type="checkbox" class="event-message-checkbox" th:value="${msg.idMessage}" />
+                </td>
 
                 <!-- Site -->
                 <td class="table-cell" data-column="site" th:text="${msg.userApp.patrouilleur.site.nom}"></td>
@@ -337,6 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterAlerte = document.getElementById("filterAlerte");
     const filterSite = document.getElementById("filterSite");
     const filterStatus = document.getElementById("filterStatus");
+    const filterEvenement = document.getElementById("filterEvenement");
     const rows = document.querySelectorAll("#messageTable tr");
 
     function applyFilters() {
@@ -345,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const alerte = (filterAlerte.value || "").trim().toLowerCase();
         const site = (filterSite.value || "").trim().toLowerCase();
         const status = (filterStatus.value || "").trim().toLowerCase();
+        const evenement = (filterEvenement.value || "").trim();
 
         rows.forEach(row => {
             const rowYear = (row.dataset.annee || "").trim();
@@ -352,6 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const rowAlerte = (row.dataset.alerte || "").trim().toLowerCase();
             const rowSite = (row.dataset.site || "").trim().toLowerCase();
             const rowStatus = (row.dataset.status || "").trim().toLowerCase();
+            const rowEvenement = (row.dataset.eventId || "").trim();
 
             let visible = true;
             if (year && rowYear !== year) visible = false;
@@ -359,17 +404,20 @@ document.addEventListener("DOMContentLoaded", () => {
             if (alerte && rowAlerte !== alerte) visible = false;
             if (site && rowSite !== site) visible = false;
             if (status && rowStatus !== status) visible = false;
+            if (evenement === "none" && rowEvenement) visible = false;
+            if (evenement && evenement !== "none" && rowEvenement !== evenement) visible = false;
 
             row.style.display = visible ? "" : "none";
         });
     }
 
-    [filterYear, filterMonth, filterAlerte, filterSite, filterStatus].forEach(el => {
+    [filterYear, filterMonth, filterAlerte, filterSite, filterStatus, filterEvenement].forEach(el => {
         el.addEventListener("change", applyFilters);
     });
 });
 </script>
 <script th:src="@{/js/historique-edit.js}"></script>
 <script th:src="@{/js/historique-export-import.js}"></script>
+<script th:src="@{/js/historique-evenement.js}"></script>
 </body>
 </html>
