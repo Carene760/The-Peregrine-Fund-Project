@@ -23,12 +23,14 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
         @Param("longitude") Double longitude,
         @Param("latitude") Double latitude);
 
-    // Compter les messages par site
-    @Query(value = "SELECT p.id_site, COUNT(m.*)\r\n" + //
-                "FROM message m \r\n" + //
-                "JOIN UserApp u ON m.iduserapp = u.iduserapp\r\n" + //
-                "JOIN Patrouilleurs p ON u.id_patrouilleur = p.id_patrouilleur\r\n" + //
-                "GROUP BY p.id_site", nativeQuery = true)
+       // Compter les messages par site (nom du site + total)
+       @Query(value = "SELECT s.Nom, COUNT(m.*)\r\n" + //
+                            "FROM message m \r\n" + //
+                            "JOIN UserApp u ON m.iduserapp = u.iduserapp\r\n" + //
+                            "JOIN Patrouilleurs p ON u.id_patrouilleur = p.id_patrouilleur\r\n" + //
+                            "JOIN Site s ON p.id_site = s.id_site\r\n" + //
+                            "GROUP BY s.id_site, s.Nom\r\n" + //
+                            "ORDER BY s.Nom", nativeQuery = true)
     List<Object[]> countMessagesBySite();
 
      boolean existsByDateSignalement(LocalDateTime dateSignalement);
