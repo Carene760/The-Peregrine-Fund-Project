@@ -72,7 +72,7 @@ body {
 }
 .nav-tab a {
     text-decoration: none;
-    color: #ffffff;
+    color: rgb(91, 117, 143);
 }       
 
 .nav-tab.active a{

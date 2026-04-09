@@ -25,6 +25,13 @@ public class RememberUserInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String contextPath = request.getContextPath();
+        String requestUri = request.getRequestURI();
+
+        if (isPublicPath(requestUri, contextPath)) {
+            return true;
+        }
+
         HttpSession session = request.getSession();
         if (session.getAttribute("currentUser") != null) {
             return true;
@@ -44,10 +51,34 @@ public class RememberUserInterceptor implements HandlerInterceptor {
             User user = userService.findByEmail(email).orElse(null);
             if (user != null) {
                 session.setAttribute("currentUser", user);
+                return true;
             }
             break;
         }
 
-        return true;
+        try {
+            response.sendRedirect(contextPath + "/login");
+            return false;
+        } catch (Exception exception) {
+            return false;
+        }
+    }
+
+    private boolean isPublicPath(String requestUri, String contextPath) {
+        String path = requestUri;
+        if (contextPath != null && !contextPath.isEmpty() && requestUri.startsWith(contextPath)) {
+            path = requestUri.substring(contextPath.length());
+        }
+
+        return "/".equals(path)
+                || "/login".equals(path)
+                || "/logout".equals(path)
+                || path.startsWith("/css/")
+                || path.startsWith("/js/")
+                || path.startsWith("/images/")
+                || path.startsWith("/api/")
+                || path.startsWith("/sync/")
+                || path.startsWith("/error")
+                || "/favicon.ico".equals(path);
     }
 }

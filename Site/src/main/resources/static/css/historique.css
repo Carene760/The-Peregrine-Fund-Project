@@ -70,7 +70,7 @@ body {
 }
 .nav-tab a {
     text-decoration: none;
-    color: #ffffff;
+    color: rgb(91, 117, 143);
 }       
 
 .nav-tab.active a{
@@ -105,6 +105,7 @@ body {
 /* Section des filtres */
 .filters-section {
     display: flex;
+    flex-wrap: wrap;
     gap: 30px;
     align-items: center;
     padding: 20px 0;
@@ -155,12 +156,11 @@ body {
     flex-direction: column;
     gap: 14px;
     padding: 16px 20px;
-    background: linear-gradient(135deg, rgba(18, 52, 77, 0.92), rgba(47, 72, 88, 0.84));
+    background: rgba(51,51,51,0.2);
     margin: 20px 0;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-    color: #ffffff;
+    border-radius: 5px;
+    border-left: 4px solid #2f4858;
+    color: #111111;
 }
 
 .event-group-header {
@@ -174,11 +174,14 @@ body {
 .event-group-header h4 {
     margin: 0 0 6px 0;
     font-size: 18px;
+    font-family: 'Inknut Antiqua', serif;
+    color: #111111;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
 }
 
 .event-group-header p {
     margin: 0;
-    color: rgba(255, 255, 255, 0.9);
+    color: #1f2937;
     font-size: 13px;
     line-height: 1.45;
 }
@@ -186,8 +189,9 @@ body {
 .event-group-counter {
     padding: 8px 12px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(47, 72, 88, 0.12);
+    border: 1px solid rgba(47, 72, 88, 0.35);
+    color: #1f2937;
     font-size: 12px;
     white-space: nowrap;
 }
@@ -211,20 +215,28 @@ body {
 .event-group-field label {
     font-size: 13px;
     font-weight: 700;
-    color: #f8fafc;
+    color: #111111;
+    font-family: 'Inknut Antiqua', serif;
 }
 
 .event-group-field input,
 .event-group-field textarea {
     width: 100%;
     padding: 10px 12px;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.96);
-    color: #0f172a;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background: #ffffff;
+    color: #111111;
     font-family: 'Imprima', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     box-sizing: border-box;
+}
+
+.event-group-field input:focus,
+.event-group-field textarea:focus {
+    outline: none;
+    border-color: #2f4858;
+    box-shadow: 0 0 0 2px rgba(47, 72, 88, 0.18);
 }
 
 .event-group-actions {
@@ -237,7 +249,7 @@ body {
 
 .event-group-hint {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.82);
+    color: #374151;
 }
 
 .action-btn.is-disabled {
@@ -548,10 +560,6 @@ body {
     border-bottom: none;
 }
 
-.table-row:hover {
-    background: rgba(51,51,51,0.5);
-}
-
 .table-cell {
     padding: 10px 6px;
     text-align: center;
@@ -647,14 +655,6 @@ body {
 
 .table-cell[data-column="status"] {
     background: rgba(16, 185, 129, 0.12);
-}
-
-.table-row:hover .table-cell[data-column="alerte"] {
-    background: rgba(59, 130, 246, 0.18);
-}
-
-.table-row:hover .table-cell[data-column="status"] {
-    background: rgba(16, 185, 129, 0.18);
 }
 
 .table-cell[data-column="alerte"] .display-value,

@@ -122,7 +122,7 @@
             max-width: 980px;
             margin: 8px auto 26px auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 14px;
         }
 
@@ -167,11 +167,9 @@
                 <div class="nav-tabs">
                     <div class="nav-tab active"><a href="/history">Historique</a></div>
                     <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                    <div class="nav-tab active"><a href="/evenements">Événements</a></div>
                     <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
                         <a href="/users">Admin</a>
-                    </div>
-                    <div class="nav-tab active" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
-                        <a href="/gateway">Gateway</a>
                     </div>
                 </div>
             </div>
@@ -229,22 +227,22 @@
         </div>
         <div class="form-container">
             <!-- Formulaire -->
-            <form class="agent-form" action="/patrouilleurs/form" id="patrouilleur-form-nav" role="form" novalidate>
-            </form>
-
-            <!-- Bouton de soumission -->
-            <button type="submit" form="patrouilleur-form-nav" class="submit-redirect" aria-describedby="signin-description">
-                <span class="submit-text-redirect">Patrouilleur Form</span>
-            </button>
-        </div>
-        <div class="form-container">
-            <!-- Formulaire -->
             <form class="agent-form" action="/agentslist" id="agents-list-form" role="form" novalidate>
             </form>
 
             <!-- Bouton de soumission -->
             <button type="submit" form="agents-list-form" class="submit-redirect" aria-describedby="signin-description">
                 <span class="submit-text-redirect">Liste des agents</span>
+            </button>
+        </div>
+        <div class="form-container">
+            <!-- Formulaire -->
+            <form class="agent-form" action="/patrouilleurs/form" id="patrouilleur-form-nav" role="form" novalidate>
+            </form>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" form="patrouilleur-form-nav" class="submit-redirect" aria-describedby="signin-description">
+                <span class="submit-text-redirect">Patrouilleur Form</span>
             </button>
         </div>
         </section>
@@ -307,7 +305,7 @@
                 <div class="logout-icon">
                     <img
                         class="logout-icon"
-                        src="images/logout.png"
+                        th:src="@{/images/logout.png}"
                         alt="The Peregrine Fund Logo"
                     />
                 </div>

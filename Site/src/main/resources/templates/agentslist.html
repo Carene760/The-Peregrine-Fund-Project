@@ -194,11 +194,9 @@
                 <div class="nav-tabs">
                     <div class="nav-tab active"><a href="/history">Historique</a></div>
                     <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                    <div class="nav-tab active"><a href="/evenements">Événements</a></div>
                     <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
                         <a href="/users">Admin</a>
-                    </div>
-                    <div class="nav-tab active" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
-                        <a href="/gateway">Gateway</a>
                     </div>
                 </div>
             </div>

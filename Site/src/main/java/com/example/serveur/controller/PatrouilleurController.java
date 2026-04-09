@@ -75,16 +75,21 @@ public class PatrouilleurController {
         Object currentUser = session.getAttribute("currentUser");
         Patrouilleurs patrouilleur = patrouilleurService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Patrouilleur non trouvé"));
+        String agentLogin = userAppService.findByPatrouilleurId(id)
+            .map(UserApp::getLogin)
+            .orElse("");
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("patrouilleur", patrouilleur);
+        model.addAttribute("agentLogin", agentLogin);
         model.addAttribute("sites", siteService.findAll());
-        return "patrouilleurs-edit";
+        return "agents-edit";
     }
 
     // Modifier un patrouilleur
     @PostMapping("/edit/{id}")
     public String editPatrouilleur(@PathVariable int id,
                                    @ModelAttribute Patrouilleurs patrouilleur,
+                                   @RequestParam(required = false) String login,
                                    @RequestParam(required = false) String nouveauMotDePasse,
                                    RedirectAttributes redirectAttributes) {
         try {
@@ -100,10 +105,20 @@ public class PatrouilleurController {
                 existing.setSite(patrouilleur.getSite());
             }
 
-            if (nouveauMotDePasse != null && !nouveauMotDePasse.trim().isEmpty()) {
+            String loginValue = login != null ? login.trim() : "";
+            String motDePasseValue = nouveauMotDePasse != null ? nouveauMotDePasse.trim() : "";
+
+            if (!loginValue.isEmpty() || !motDePasseValue.isEmpty()) {
                 UserApp userApp = userAppService.findByPatrouilleurId(id)
                         .orElseThrow(() -> new RuntimeException("Aucun compte application lié à cet agent"));
-                userApp.setMotDePasse(nouveauMotDePasse.trim());
+
+                if (!loginValue.isEmpty()) {
+                    userApp.setLogin(loginValue);
+                }
+                if (!motDePasseValue.isEmpty()) {
+                    userApp.setMotDePasse(motDePasseValue);
+                }
+
                 userAppService.save(userApp);
             }
 

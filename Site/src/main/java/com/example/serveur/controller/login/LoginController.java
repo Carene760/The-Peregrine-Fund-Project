@@ -33,6 +33,11 @@ public class LoginController {
         return "login";
     }
 
+    @GetMapping("/login")
+    public String showLoginAlias(HttpSession session) {
+        return showLoginForm(session);
+    }
+
     @PostMapping("/login")
     public String processLogin(@RequestParam String email,
                             @RequestParam String password,
