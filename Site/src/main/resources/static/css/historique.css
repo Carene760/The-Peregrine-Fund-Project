@@ -448,6 +448,33 @@ body {
     min-width: 90px;
 }
 
+.table-cell[data-column="alerte"] {
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.table-cell[data-column="status"] {
+    background: rgba(16, 185, 129, 0.12);
+}
+
+.table-row:hover .table-cell[data-column="alerte"] {
+    background: rgba(59, 130, 246, 0.18);
+}
+
+.table-row:hover .table-cell[data-column="status"] {
+    background: rgba(16, 185, 129, 0.18);
+}
+
+.table-cell[data-column="alerte"] .display-value,
+.table-cell[data-column="status"] .display-value {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.table-cell[data-column="alerte"] .edit-input,
+.table-cell[data-column="status"] .edit-input {
+    min-width: 90px;
+}
+
 .table-cell[data-column="action"] {
     min-width: 180px;
     white-space: normal;
