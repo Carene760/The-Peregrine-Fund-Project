@@ -19,6 +19,7 @@ public class Message {
     private String phoneNumber;
     private LocalDateTime dateCommencement;
     private LocalDateTime dateSignalement;
+    private LocalDateTime dateEnvoi;
     private String pointRepere;
     private double surfaceApproximative;
     private String description;
@@ -64,6 +65,9 @@ public class Message {
 
     public LocalDateTime getDateSignalement() { return dateSignalement; }
     public void setDateSignalement(LocalDateTime dateSignalement) { this.dateSignalement = dateSignalement; }
+
+    public LocalDateTime getDateEnvoi() { return dateEnvoi; }
+    public void setDateEnvoi(LocalDateTime dateEnvoi) { this.dateEnvoi = dateEnvoi; }
 
     public String getPointRepere() { return pointRepere; }
     public void setPointRepere(String pointRepere) { this.pointRepere = pointRepere; }
@@ -137,6 +141,10 @@ public class Message {
     if (dateSignalement != null) {
         values.put(MyDatabaseHelper.COLUMN_DATE_SIGNAL, dateSignalement.format(formatter));
     }
+    if (dateEnvoi == null) {
+        dateEnvoi = LocalDateTime.now();
+    }
+    values.put(MyDatabaseHelper.COLUMN_DATE_ENVOI, dateEnvoi.format(formatter));
 
     values.put(MyDatabaseHelper.COLUMN_PHONE_NUMBER, phoneNumber);
     values.put(MyDatabaseHelper.COLUMN_POINT_REPERE, pointRepere);

@@ -19,8 +19,13 @@ import com.example.theperegrinefund.HistoriqueMessageStatus;
 
 
 import java.util.Date;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ServerSender {
+    private static final DateTimeFormatter MESSAGE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private final ApiService apiService;
     private final SmsSender smsSender;
@@ -43,10 +48,9 @@ public class ServerSender {
       
         if (historique == null) return "";
         
-
-        return historique.getDateChangement() + "/" +
-               historique.getIdMessage() + "/" +
-               historique.getIdStatusMessage();
+        return "dateChangement=" + historique.getDateChangement() + "/"
+            + "idMessage=" + historique.getIdMessage() + "/"
+            + "idStatus=" + historique.getIdStatusMessage();
     }
     
     public void sendHistory(HistoriqueMessageStatus historique) {
@@ -138,19 +142,35 @@ public class ServerSender {
         MyDatabaseHelper dbHelper = new MyDatabaseHelper(context);
         int idStatus = dbHelper.getIdStatusMessage(status);
         if (message == null) return "";
-        
 
-        return message.getDateCommencement() + "/" +
-               message.getDateSignalement() + "/" +
-               message.getIdIntervention() + "/" +
-               message.isRenfort() + "/" +
-               message.getDirection() + "/" +
-               message.getSurfaceApproximative() + "/" +
-               message.getPointRepere() + "/" +
-               message.getDescription() + "/" +
-               message.getIdUserApp() +  "/" + // exemple pour UserApp
-               message.getLongitude() + "/" +
-               message.getLatitude() + "/" +
-               idStatus;
+        LocalDateTime dateEnvoi = message.getDateEnvoi();
+        if (dateEnvoi == null) {
+            dateEnvoi = LocalDateTime.now();
+            message.setDateEnvoi(dateEnvoi);
+        }
+
+        return "dateCommencement=" + formatDate(message.getDateCommencement()) + "/"
+                + "dateSignalement=" + formatDate(message.getDateSignalement()) + "/"
+                + "idIntervention=" + message.getIdIntervention() + "/"
+                + "renfort=" + message.isRenfort() + "/"
+                + "direction=" + encodeValue(message.getDirection()) + "/"
+                + "surfaceApproximative=" + message.getSurfaceApproximative() + "/"
+                + "pointRepere=" + encodeValue(message.getPointRepere()) + "/"
+                + "description=" + encodeValue(message.getDescription()) + "/"
+                + "idUserApp=" + message.getIdUserApp() + "/"
+                + "longitude=" + message.getLongitude() + "/"
+                + "latitude=" + message.getLatitude() + "/"
+                + "idStatus=" + idStatus + "/"
+                + "dateEnvoi=" + formatDate(dateEnvoi);
+    }
+
+    private String formatDate(LocalDateTime date) {
+        if (date == null) return "";
+        return date.format(MESSAGE_DATE_FORMAT);
+    }
+
+    private String encodeValue(String value) {
+        if (value == null) return "";
+        return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
     }
 }

@@ -99,7 +99,7 @@ public class Fragment1 extends Fragment {
         return statusDropdown != null ? statusDropdown.getText().toString() : "";
     }
 
-   public LocalDateTime getDateTime() {
+   public LocalDateTime getDateCommencement() {
         if (editDateTime != null && !editDateTime.getText().toString().isEmpty()) {
             String value = editDateTime.getText().toString();
             try {
@@ -110,6 +110,10 @@ public class Fragment1 extends Fragment {
             }
         }
         return null;
+    }
+
+    public LocalDateTime getDateTime() {
+        return getDateCommencement();
     }
 
 

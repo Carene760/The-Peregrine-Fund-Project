@@ -9,15 +9,67 @@
 
     <!-- Form Title -->
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/general_info_title2"
         android:textColor="#000000"
         android:fontFamily="serif"
         android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
         android:layout_marginTop="18dp"
-        android:layout_marginStart="82dp" />
-        <!-- pointrepere et desc -->
+        android:layout_marginBottom="16dp" />
+
+    <!-- Date du signalement -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="14dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/datetime_signal_label"
+            android:textColor="#000000"
+            android:fontFamily="serif"
+            android:textSize="18sp"
+            android:layout_marginBottom="6dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="filled"
+            app:boxBackgroundColor="#FFFFFF"
+            app:boxCornerRadiusTopStart="9dp"
+            app:boxCornerRadiusTopEnd="9dp"
+            app:boxCornerRadiusBottomStart="9dp"
+            app:boxCornerRadiusBottomEnd="9dp"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_datetime_signalement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/datetime_signal_hint"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="#000000"
+                android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- pointrepere et desc -->
 
         <LinearLayout
             android:layout_width="match_parent"

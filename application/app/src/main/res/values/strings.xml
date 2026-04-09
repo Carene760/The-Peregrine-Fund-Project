@@ -62,13 +62,15 @@
 
     <!-- Form fields -->
     <string name="category_label">Categorie</string>
-    <string name="datetime_label">Date et heure</string>
+    <string name="datetime_label">Date et heure du commencement</string>
+    <string name="datetime_signal_label">Date et heure du signalement</string>
 
     <!-- Sample values -->
     <string name="navigation_drawer_open">Open navigation drawer</string>   
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="datetime_hint">Select Date-Heure</string>
+    <string name="datetime_hint">Choisir date-heure commencement</string>
+    <string name="datetime_signal_hint">Choisir date-heure signalement</string>
     <string name="status_label">Statut</string>
     <string name="status_hint">Choisir un statut</string>
     <string-array name="status_options">
