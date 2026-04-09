@@ -120,6 +120,41 @@ Votre serveur envoie une requete HTTP vers `gateway.internal-send-url` avec:
 
 Ce flux est implemente par `SmsResponseService`.
 
+### 5.3 Creation du webhook SMSSync via Postman
+
+Pour relier le serveur et la gateway SMSSync, il faut creer un webhook dans l application SMSSync.
+
+#### Creation
+
+- Methode: `POST`
+- URL: `http://192.168.1.145:8080/webhooks`
+- Autorisation: requise
+- Outil utilise pour simplifier: Postman
+
+Body JSON a envoyer:
+
+```json
+{
+  "id": "test",
+  "url": "https://a7e7c8d67145.ngrok-free.app/api/webhook",
+  "event": "sms:received"
+}
+```
+
+#### Suppression
+
+Pour supprimer le webhook cree:
+
+- Methode: `DELETE`
+- URL: `http://192.168.88.5:8080/webhooks/<id_du_webhook_cree_precedemment>`
+
+#### Note importante
+
+- `event: sms:received` correspond a la reception d un SMS par SMSSync.
+- L URL `url` doit pointer vers le endpoint expose par votre serveur.
+- Si vous changez l URL publique ngrok, il faut mettre a jour le webhook.
+- Cette etape est essentielle pour que la gateway envoie automatiquement les SMS recus vers le serveur.
+
 ---
 
 ## 6) Swagger UI
