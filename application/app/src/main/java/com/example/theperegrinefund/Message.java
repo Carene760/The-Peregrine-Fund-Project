@@ -19,6 +19,7 @@ public class Message {
     private String phoneNumber;
     private LocalDateTime dateCommencement;
     private LocalDateTime dateSignalement;
+    private LocalDateTime dateEnvoi;
     private String pointRepere;
     private double surfaceApproximative;
     private String description;
@@ -30,6 +31,8 @@ public class Message {
 
     // Champ utilisé côté mobile pour la synchro
     private int idUserApp;
+    private Integer idEvenement;
+    private Evenement evenement;
 
    public Message( LocalDateTime dateCommencement, LocalDateTime dateSignalement,int idIntervention,boolean renfort,String direction,
                 double surfaceApproximative,String pointRepere,String description, String phoneNumber,
@@ -62,6 +65,9 @@ public class Message {
 
     public LocalDateTime getDateSignalement() { return dateSignalement; }
     public void setDateSignalement(LocalDateTime dateSignalement) { this.dateSignalement = dateSignalement; }
+
+    public LocalDateTime getDateEnvoi() { return dateEnvoi; }
+    public void setDateEnvoi(LocalDateTime dateEnvoi) { this.dateEnvoi = dateEnvoi; }
 
     public String getPointRepere() { return pointRepere; }
     public void setPointRepere(String pointRepere) { this.pointRepere = pointRepere; }
@@ -97,6 +103,12 @@ public class Message {
     public int getIdUserApp() { return idUserApp; }
     public void setIdUserApp(int idUserApp) { this.idUserApp = idUserApp; }
 
+    public Integer getIdEvenement() { return idEvenement; }
+    public void setIdEvenement(Integer idEvenement) { this.idEvenement = idEvenement; }
+
+    public Evenement getEvenement() { return evenement; }
+    public void setEvenement(Evenement evenement) { this.evenement = evenement; }
+
     public String chiffrer(String cleSecrete, String mess) throws Exception {
         SecretKeySpec key = new SecretKeySpec(cleSecrete.getBytes("UTF-8"), "AES");
         Cipher cipher = Cipher.getInstance("AES");
@@ -129,6 +141,10 @@ public class Message {
     if (dateSignalement != null) {
         values.put(MyDatabaseHelper.COLUMN_DATE_SIGNAL, dateSignalement.format(formatter));
     }
+    if (dateEnvoi == null) {
+        dateEnvoi = LocalDateTime.now();
+    }
+    values.put(MyDatabaseHelper.COLUMN_DATE_ENVOI, dateEnvoi.format(formatter));
 
     values.put(MyDatabaseHelper.COLUMN_PHONE_NUMBER, phoneNumber);
     values.put(MyDatabaseHelper.COLUMN_POINT_REPERE, pointRepere);
@@ -144,6 +160,7 @@ public class Message {
 
     values.put(MyDatabaseHelper.COLUMN_INTERVENTION_FK, idIntervention);
     values.put(MyDatabaseHelper.COLUMN_USER_FK, idUserApp);
+    values.put(MyDatabaseHelper.COLUMN_EVENEMENT_FK, idEvenement);
 
     // Insert et récupération de l'ID inséré
     int newId = (int) db.insert(MyDatabaseHelper.TABLE_MESSAGE, null, values);

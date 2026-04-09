@@ -40,6 +40,7 @@
               id="name-input"
               class="text-wrapper-2"
               placeholder="Email"
+              th:value="${submittedEmail != null ? submittedEmail : ''}"
               required
               aria-required="true"
               autocomplete="email"
@@ -53,6 +54,7 @@
               id="password-input"
               class="text-wrapper-2"
               placeholder="Password"
+              th:value="${submittedPassword != null ? submittedPassword : ''}"
               required
               aria-required="true"
               autocomplete="current-password"

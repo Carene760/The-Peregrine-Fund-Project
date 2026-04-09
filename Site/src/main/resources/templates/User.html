@@ -168,11 +168,9 @@
                 <div class="nav-tabs">
                     <div class="nav-tab active"><a href="/history">Historique</a></div>
                     <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                    <div class="nav-tab"><a href="/evenements">Événements</a></div>
                     <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
                         <a href="/users">Admin</a>
-                    </div>
-                    <div class="nav-tab active" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
-                        <a href="/gateway">Gateway</a>
                     </div>
                 </div>
             </div>
@@ -391,6 +389,11 @@
             
             // Initialiser l'affichage
             updateFormFields();
+
+            const phoneInput = document.getElementById("phone-input");
+            if (phoneInput && !phoneInput.value.trim()) {
+                phoneInput.value = "+261";
+            }
             
             // Écouter les changements
             document.getElementById("fonction-select").addEventListener("change", function() {
@@ -408,7 +411,11 @@
                 
                 // Validation de base
                 const nom = document.getElementById("name-input").value.trim();
-                const telephone = document.getElementById("phone-input").value.trim();
+                const telephoneInput = document.getElementById("phone-input");
+                if (telephoneInput && !telephoneInput.value.trim()) {
+                    telephoneInput.value = "+261";
+                }
+                const telephone = telephoneInput ? telephoneInput.value.trim() : "";
                 const email = document.getElementById("email-input").value.trim();
                 const adresse = document.getElementById("address-input").value.trim();
                 const fonction = document.getElementById("fonction-select").value;

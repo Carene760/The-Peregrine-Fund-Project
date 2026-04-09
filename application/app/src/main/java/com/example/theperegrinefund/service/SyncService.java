@@ -2,7 +2,6 @@ package com.example.theperegrinefund.service;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,9 +18,11 @@ import com.example.theperegrinefund.dao.MessageDao;
 import com.example.theperegrinefund.dao.InterventionDao;
 import com.example.theperegrinefund.dao.StatusMessageDao;
 import com.example.theperegrinefund.dao.HistoriqueMessageStatusDao;
+import com.example.theperegrinefund.dao.EvenementDao;
 import com.example.theperegrinefund.StatusMessage;
 import com.example.theperegrinefund.Intervention;
 import com.example.theperegrinefund.HistoriqueMessageStatus;
+import com.example.theperegrinefund.Evenement;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -32,6 +33,7 @@ import com.example.theperegrinefund.security.ConfigLoader;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class SyncService {
     private static final String TAG = "SyncService";
@@ -41,6 +43,7 @@ public class SyncService {
     private final InterventionDao interventionDao;
     private final StatusMessageDao statusDao;
     private final HistoriqueMessageStatusDao historiqueDao;
+    private final EvenementDao evenementDao;
     private final String BASE_URL;
     private final Context context;
 
@@ -63,6 +66,7 @@ public class SyncService {
         interventionDao = new InterventionDao(context);
         statusDao = new StatusMessageDao(context);
         historiqueDao = new HistoriqueMessageStatusDao(context);
+        evenementDao = new EvenementDao(context);
 
         String url;
         try {
@@ -86,6 +90,11 @@ public class SyncService {
         void onError(Exception e);
     }
 
+    public interface EvenementCallback {
+        void onComplete(List<Evenement> evenements);
+        void onError(Exception e);
+    }
+
     public interface StatusCallback {
         void onComplete(List<StatusMessage> statusMessages);
         void onError(Exception e);
@@ -98,13 +107,13 @@ public class SyncService {
 
     public void downloadStatus(StatusCallback callback) {
         String url = BASE_URL + "/status";
-        Request request = new Request.Builder().url(url).build();
+        Request request = buildJsonRequest(url);
 
         new Thread(() -> {
             try {
                 Response response = client.newCall(request).execute();
                 if (response.isSuccessful() && response.body() != null) {
-                    String json = response.body().string();
+                    String json = readJsonOrThrow(response.body());
                     Type listType = new TypeToken<List<StatusMessage>>() {}.getType();
                     List<StatusMessage> statusMessages = gson.fromJson(json, listType);
 
@@ -113,9 +122,6 @@ public class SyncService {
                     }
 
                     if (callback != null) {
-                        ((AppCompatActivity) context).runOnUiThread(() -> {
-                           // Toast.makeText(context, "Statuts téléchargés: " + statusMessages.size(), Toast.LENGTH_LONG).show();
-                        });
                         callback.onComplete(statusMessages);
                     }
                 } else {
@@ -129,62 +135,55 @@ public class SyncService {
 
     public void downloadMessages(int idUser, MessageCallback callback) {
         String url = BASE_URL + "/download/" + idUser;
-        Request request = new Request.Builder().url(url).build();
+        Request request = buildJsonRequest(url);
 
         new Thread(() -> {
             try {
                 Response response = client.newCall(request).execute();
                 if (response.isSuccessful() && response.body() != null) {
-                    String json = response.body().string();
+                    String json = readJsonOrThrow(response.body());
                     Type listType = new TypeToken<List<Message>>() {}.getType();
                     List<Message> messages = gson.fromJson(json, listType);
 
                     int insertedCount = 0;
                     for (Message msg : messages) {
+                        normalizeMessageEvenement(msg);
                         msg.setIdUserApp(idUser);
                         messageDao.insertMessage(msg);
                         insertedCount++;
-                    }
-
-                    if (context instanceof AppCompatActivity) {
-                        ((AppCompatActivity) context).runOnUiThread(() -> {
-                          //  Toast.makeText(context, "Messages reçus du serveur: " + messages.size(), Toast.LENGTH_LONG).show();
-                            List<Message> localMessages = messageDao.getAllMessages();
-                           // Toast.makeText(context, "Messages en local après insertion: " + localMessages.size(), Toast.LENGTH_LONG).show();
-                        });
                     }
 
                     if (callback != null) {
                         callback.onComplete(messages);
                     }
                 } else {
-                    if (context instanceof AppCompatActivity) {
-                        ((AppCompatActivity) context).runOnUiThread(() -> {
-                            Toast.makeText(context, "Erreur HTTP: " + response.code(), Toast.LENGTH_LONG).show();
-                        });
-                    }
                     if (callback != null) callback.onError(new IOException("HTTP " + response.code()));
                 }
             } catch (Exception e) {
-                if (context instanceof AppCompatActivity) {
-                    ((AppCompatActivity) context).runOnUiThread(() -> {
-                        Toast.makeText(context, "Erreur de synchronisation: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    });
-                }
                 if (callback != null) callback.onError(e);
             }
         }).start();
     }
 
+    private void normalizeMessageEvenement(Message message) {
+        if (message == null) {
+            return;
+        }
+
+        if (message.getIdEvenement() == null && message.getEvenement() != null) {
+            message.setIdEvenement(message.getEvenement().getIdEvenement());
+        }
+    }
+
     public void downloadIntervention(InterventionCallback callback) {
         String url = BASE_URL + "/interventions";
-        Request request = new Request.Builder().url(url).build();
+        Request request = buildJsonRequest(url);
 
         new Thread(() -> {
             try {
                 Response response = client.newCall(request).execute();
                 if (response.isSuccessful() && response.body() != null) {
-                    String json = response.body().string();
+                    String json = readJsonOrThrow(response.body());
                     Type listType = new TypeToken<List<Intervention>>() {}.getType();
                     List<Intervention> interventions = gson.fromJson(json, listType);
 
@@ -193,10 +192,35 @@ public class SyncService {
                     }
 
                     if (callback != null) {
-                        ((AppCompatActivity) context).runOnUiThread(() -> {
-                           // Toast.makeText(context, "Interventions téléchargées: " + interventions.size(), Toast.LENGTH_LONG).show();
-                        });
                         callback.onComplete(interventions);
+                    }
+                } else {
+                    if (callback != null) callback.onError(new IOException("HTTP " + response.code()));
+                }
+            } catch (Exception e) {
+                if (callback != null) callback.onError(e);
+            }
+        }).start();
+    }
+
+    public void downloadEvenements(EvenementCallback callback) {
+        String url = BASE_URL + "/evenements";
+        Request request = buildJsonRequest(url);
+
+        new Thread(() -> {
+            try {
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    String json = readJsonOrThrow(response.body());
+                    Type listType = new TypeToken<List<Evenement>>() {}.getType();
+                    List<Evenement> evenements = gson.fromJson(json, listType);
+
+                    for (Evenement evenement : evenements) {
+                        evenementDao.insertEvenement(evenement);
+                    }
+
+                    if (callback != null) {
+                        callback.onComplete(evenements);
                     }
                 } else {
                     if (callback != null) callback.onError(new IOException("HTTP " + response.code()));
@@ -209,13 +233,13 @@ public class SyncService {
 
     public void downloadHistorique(int idUser, HistoriqueCallback callback) {
         String url = BASE_URL + "/historique/" + idUser;
-        Request request = new Request.Builder().url(url).build();
+        Request request = buildJsonRequest(url);
 
         new Thread(() -> {
             try {
                 Response response = client.newCall(request).execute();
                 if (response.isSuccessful() && response.body() != null) {
-                    String json = response.body().string();
+                    String json = readJsonOrThrow(response.body());
                     Type listType = new TypeToken<List<HistoriqueMessageStatus>>() {}.getType();
                     List<HistoriqueMessageStatus> historiques = gson.fromJson(json, listType);
 
@@ -226,9 +250,6 @@ public class SyncService {
                     }
 
                     if (callback != null) {
-                        ((AppCompatActivity) context).runOnUiThread(() -> {
-                           // Toast.makeText(context, "Historiques téléchargés: " + historiques.size(), Toast.LENGTH_LONG).show();
-                        });
                         callback.onComplete(historiques);
                     }
                 } else {
@@ -238,5 +259,25 @@ public class SyncService {
                 if (callback != null) callback.onError(e);
             }
         }).start();
+    }
+
+    private Request buildJsonRequest(String url) {
+        return new Request.Builder()
+                .url(url)
+                .header("Accept", "application/json")
+                .header("ngrok-skip-browser-warning", "true")
+                .build();
+    }
+
+    private String readJsonOrThrow(ResponseBody body) throws IOException {
+        String raw = body.string();
+        String trimmed = raw == null ? "" : raw.trim();
+
+        // Prevent Gson parse errors when ngrok/intermediary returns HTML/text instead of JSON.
+        if (!trimmed.startsWith("[") && !trimmed.startsWith("{")) {
+            String preview = trimmed.length() > 160 ? trimmed.substring(0, 160) + "..." : trimmed;
+            throw new IOException("Réponse serveur non JSON: " + preview);
+        }
+        return trimmed;
     }
 }
