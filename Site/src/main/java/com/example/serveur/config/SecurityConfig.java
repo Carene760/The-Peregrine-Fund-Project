@@ -28,6 +28,7 @@ public class SecurityConfig {
                     "/css/statistique.css",
                     "/css/style.css",
                     "/css/user.css",
+                    "/js/**",
                     "/images/**",
                     "/stat/**", 
                     "/history/**", 
