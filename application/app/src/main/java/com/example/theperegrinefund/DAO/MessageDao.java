@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.theperegrinefund.MyDatabaseHelper;
 import com.example.theperegrinefund.Message;
+import com.example.theperegrinefund.Evenement;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class MessageDao {
            values.put(MyDatabaseHelper.COLUMN_DATE_COMMENCEMENT, message.getDateCommencement().format(dateTimeFormatter));
         }
         if (message.getDateSignalement() != null) {
-           values.put(MyDatabaseHelper.COLUMN_DATE_COMMENCEMENT, message.getDateCommencement().format(dateTimeFormatter));
+              values.put(MyDatabaseHelper.COLUMN_DATE_SIGNAL, message.getDateSignalement().format(dateTimeFormatter));
         }
         values.put(MyDatabaseHelper.COLUMN_POINT_REPERE, message.getPointRepere());
         values.put(MyDatabaseHelper.COLUMN_SURFACE, message.getSurfaceApproximative());
@@ -48,6 +49,7 @@ public class MessageDao {
         values.put(MyDatabaseHelper.COLUMN_LATITUDE, message.getLatitude());
         values.put(MyDatabaseHelper.COLUMN_INTERVENTION_FK, message.getIdIntervention());
         values.put(MyDatabaseHelper.COLUMN_USER_FK, message.getIdUserApp());
+        values.put(MyDatabaseHelper.COLUMN_EVENEMENT_FK, message.getIdEvenement());
         values.put(MyDatabaseHelper.COLUMN_PHONE_NUMBER, message.getPhoneNumber());
        
 
@@ -94,6 +96,7 @@ public class MessageDao {
         msg.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_LATITUDE)));
         msg.setIdIntervention(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_INTERVENTION_FK)));
         msg.setIdUserApp(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_USER_FK)));
+        msg.setIdEvenement(cursor.isNull(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)) ? null : cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)));
         msg.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_PHONE_NUMBER)));
 
         messages.add(msg);
@@ -146,6 +149,7 @@ public class MessageDao {
             msg.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_LATITUDE)));
             msg.setIdIntervention(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_INTERVENTION_FK)));
             msg.setIdUserApp(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_USER_FK)));
+            msg.setIdEvenement(cursor.isNull(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)) ? null : cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)));
             msg.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_PHONE_NUMBER)));
         
 
@@ -196,7 +200,32 @@ public class MessageDao {
             message.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_LATITUDE))); // Correction
             message.setIdIntervention(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_INTERVENTION_FK))); // Correction
             message.setIdUserApp(cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_USER_FK))); // Correction
+            message.setIdEvenement(cursor.isNull(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)) ? null : cursor.getInt(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_FK)));
             message.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_PHONE_NUMBER))); // Correction
+
+            if (message.getIdEvenement() != null) {
+                Cursor eventCursor = db.query(
+                        MyDatabaseHelper.TABLE_EVENEMENT,
+                        null,
+                        MyDatabaseHelper.COLUMN_EVENEMENT_ID + " = ?",
+                        new String[]{String.valueOf(message.getIdEvenement())},
+                        null,
+                        null,
+                        null
+                );
+
+                if (eventCursor != null) {
+                    if (eventCursor.moveToFirst()) {
+                        Evenement evenement = new Evenement();
+                        evenement.setIdEvenement(eventCursor.getInt(eventCursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_ID)));
+                        evenement.setNom(eventCursor.getString(eventCursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_NOM)));
+                        evenement.setDate(eventCursor.getString(eventCursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_DATE)));
+                        evenement.setDescription(eventCursor.getString(eventCursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_EVENEMENT_DESCRIPTION)));
+                        message.setEvenement(evenement);
+                    }
+                    eventCursor.close();
+                }
+            }
             cursor.close();
         }
         db.close();

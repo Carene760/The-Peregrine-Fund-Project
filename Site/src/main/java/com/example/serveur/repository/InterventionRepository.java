@@ -11,5 +11,7 @@ public interface InterventionRepository extends JpaRepository<Intervention, Inte
     @Query("SELECT i FROM Intervention i WHERE i.intervention = :intervention")
     Intervention findByType(@Param("intervention") String intervention);
 
-      Intervention findByIntervention(String intervention);
+  Intervention findByIntervention(String intervention);
+
+  Intervention findFirstByInterventionIgnoreCase(String intervention);
 }

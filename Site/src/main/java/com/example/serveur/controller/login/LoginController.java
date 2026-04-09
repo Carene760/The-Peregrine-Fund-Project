@@ -28,13 +28,16 @@ public class LoginController {
                             @RequestParam String password,
                             HttpSession session,
                             Model model) {
-        User user = userService.findByEmail(email).orElse(null);
+        String normalizedEmail = email == null ? "" : email.replaceAll("\\s+", "");
+        User user = userService.findByEmail(normalizedEmail).orElse(null);
 
         if (user != null && user.getMotDePasse().equals(password)) {
             session.setAttribute("currentUser", user); // <-- stocke dans la session
             return "redirect:/history";
         } else {
             model.addAttribute("error", "Nom d'utilisateur ou mot de passe incorrect");
+            model.addAttribute("submittedEmail", normalizedEmail);
+            model.addAttribute("submittedPassword", password == null ? "" : password);
             return "login";
         }
     }

@@ -39,6 +39,7 @@
               id="name-input"
               class="text-wrapper-2"
               placeholder="Email"
+              th:value="${submittedEmail != null ? submittedEmail : ''}"
               required
               aria-required="true"
               autocomplete="email"
@@ -52,17 +53,41 @@
               id="password-input"
               class="text-wrapper-2"
               placeholder="Password"
+              th:value="${submittedPassword != null ? submittedPassword : ''}"
               required
               aria-required="true"
               autocomplete="current-password"
             />
           </div>
         </form>
+        <div style="position:absolute; top:530px; left:220px; z-index:20; display:flex; align-items:center; gap:8px; color:#ffffff; font-size:14px; background:#333333; padding:8px 10px; border-radius:8px;">
+          <input type="checkbox" id="show-password-toggle" aria-label="Afficher le mot de passe" />
+          <label for="show-password-toggle">Show password</label>
+        </div>
         <button type="submit" form="login-form" class="frame-6" aria-describedby="signin-description">
           <span class="text-wrapper-3">Sign in</span>
         </button>
         
       </main>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const showPasswordToggle = document.getElementById("show-password-toggle");
+        const passwordInput = document.getElementById("password-input");
+        const emailInput = document.getElementById("name-input");
+
+        if (showPasswordToggle && passwordInput) {
+          showPasswordToggle.addEventListener("change", function () {
+            passwordInput.type = this.checked ? "text" : "password";
+          });
+        }
+
+        if (emailInput) {
+          emailInput.addEventListener("blur", function () {
+            this.value = this.value.replace(/\s+/g, "");
+          });
+        }
+      });
+    </script>
   </body>
 </html>

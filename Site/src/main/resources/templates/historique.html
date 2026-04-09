@@ -18,11 +18,9 @@
             <div class="nav-tabs">
                 <div class="nav-tab"><a href="/history">Historique</a></div>
                 <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                <div class="nav-tab"><a href="/evenements">Événements</a></div>
                 <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
                     <a href="/users">Admin</a>
-                </div>
-                <div class="nav-tab active" th:if="${user.fonction.fonction == 'Administrateur'}">
-                    <a href="/gateway">Gateway</a>
                 </div>
             </div>
         </div>
@@ -91,6 +89,107 @@
                 <option value="Maitrise">Maitrise</option>
             </select>
         </div>
+
+        <div class="filter-group">
+            <label>Événement</label>
+            <select id="filterEvenement" class="filter-select">
+                <option value="">Tous</option>
+                <option value="none">Sans événement</option>
+                <option th:each="evt : ${evenements}" th:value="${evt.idEvenement}" th:text="${evt.nom}"></option>
+            </select>
+        </div>
+    </section>
+
+    <!-- Actions Export/Import -->
+    <section class="actions-section">
+        <div class="action-group">
+            <div class="export-control-group">
+                <label for="exportFormat">Format</label>
+                <select id="exportFormat" class="filter-select export-format-select">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                    <option value="pdf">PDF</option>
+                </select>
+            </div>
+
+            <!-- Bouton Export (accessible à tout le monde) -->
+            <button type="button" class="action-btn export-btn" id="exportBtn">
+                📥 Exporter
+            </button>
+
+            <!-- Section Import (réservée ADMIN) -->
+            <div th:if="${user.fonction.fonction == 'Administrateur'}" class="import-section">
+                <button type="button" class="action-btn import-btn" id="importBtn">
+                    📤 Importer
+                </button>
+                <form id="importForm" style="display:none;">
+                    <input type="file" id="csvFile" name="file" accept=".csv,.xlsx" style="display:none;" />
+                </form>
+                <!-- Zone de validation prévue pour l'import -->
+                <div id="importProgress" style="display:none;" class="import-progress">
+                    <p id="importStatus"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="import-help" th:if="${user.fonction.fonction == 'Administrateur'}">
+            <h4>Guide import (CSV/XLSX)</h4>
+            <p><strong>Séparateur CSV :</strong> <span class="import-inline-code">tabulation</span> (pas la virgule)</p>
+            <p><strong>Formats acceptés :</strong> <span class="import-inline-code">.csv</span> et <span class="import-inline-code">.xlsx</span></p>
+
+            <div class="import-columns">
+                <p><strong>Colonnes obligatoires</strong></p>
+                <ul>
+                    <li>date_commencement</li>
+                    <li>date_signalement</li>
+                    <li>site</li>
+                    <li>agent</li>
+                    <li>intervention</li>
+                    <li>direction</li>
+                    <li>status</li>
+                </ul>
+
+                <p><strong>Colonnes optionnelles</strong></p>
+                <ul>
+                    <li>evenement, point_repere, surface_m2, description</li>
+                    <li>renfort, longitude, latitude</li>
+                </ul>
+            </div>
+
+            <p><strong>Exemple d’en-tête</strong></p>
+            <div class="import-sample">date_commencement[TAB]date_signalement[TAB]site[TAB]agent[TAB]intervention[TAB]evenement[TAB]point_repere[TAB]surface_m2[TAB]description[TAB]direction[TAB]status[TAB]renfort[TAB]longitude[TAB]latitude</div>
+
+            <p class="import-note">Les identifiants numériques ne sont pas demandés. Les correspondances se font par nom (site, agent, intervention, événement).</p>
+        </div>
+    </section>
+
+    <section class="event-group-section" th:if="${user.fonction.fonction == 'Administrateur'}">
+        <div class="event-group-header">
+            <div>
+                <h4>Rassembler un événement</h4>
+                <p>Sélectionnez des messages dans l'historique, puis créez un événement à partir de cette sélection.</p>
+            </div>
+            <div class="event-group-counter" id="selectedEventCount">0 message sélectionné</div>
+        </div>
+
+        <div class="event-group-form">
+            <div class="event-group-field">
+                <label for="eventTitle">Titre</label>
+                <input id="eventTitle" type="text" placeholder="Nom de l'événement" maxlength="150" />
+            </div>
+            <div class="event-group-field">
+                <label for="eventDate">Date</label>
+                <input id="eventDate" type="date" />
+            </div>
+            <div class="event-group-field event-group-field-wide">
+                <label for="eventDescription">Description</label>
+                <textarea id="eventDescription" rows="3" placeholder="Description optionnelle"></textarea>
+            </div>
+            <div class="event-group-actions">
+                <button type="button" class="action-btn export-btn" id="createEventBtn">Rassembler l'événement</button>
+                <span class="event-group-hint">Le titre est obligatoire. La date est préremplie à aujourd'hui.</span>
+            </div>
+        </div>
     </section>
 
     <!-- Table des données -->
@@ -98,45 +197,162 @@
         <table class="data-table">
             <thead class="table-header">
             <tr>
+                <th th:if="${user.fonction.fonction == 'Administrateur'}">Sélection</th>
                 <th>Site</th>
+                <th>Date Début</th>
+                <th>Date Signalement</th>
+                <th>Point Repère</th>
+                <th>Surface (m²)</th>
+                <th>Description</th>
+                <th>Direction</th>
+                <th>Renfort</th>
+                <th>Longitude</th>
+                <th>Latitude</th>
+                <th>Intervention</th>
+                <th>Événement</th>
                 <th>Alerte</th>
                 <th>Status</th>
-                <th>Date</th>
                 <th>Agent</th>
-                <th>Surface</th>
+                <th th:if="${user.fonction.fonction == 'Administrateur'}">Action</th>
             </tr>
             </thead>
             <tbody class="table-body" id="messageTable">
             <tr class="table-row"
                 th:each="msg : ${messages}"
+                th:attr="data-message-id=${msg.idMessage}"
+                th:data-alert-id="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.idTypeAlerte : ''}"
                 th:data-annee="${#temporals.format(msg.dateCommencement, 'yyyy')}"
                 th:data-mois="${#temporals.format(msg.dateCommencement, 'MM')}"
                 th:data-alerte="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}"
                 th:data-site="${msg.userApp.patrouilleur.site.nom}"
+                th:data-event-id="${msg.evenement != null ? msg.evenement.idEvenement : ''}"
                 th:data-status="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}">
 
+                <td class="table-cell event-select-cell" th:if="${user.fonction.fonction == 'Administrateur'}">
+                    <input type="checkbox" class="event-message-checkbox" th:value="${msg.idMessage}" />
+                </td>
+
                 <!-- Site -->
-                <td class="table-cell" th:text="${msg.userApp.patrouilleur.site.nom}"></td>
+                <td class="table-cell" data-column="site" th:text="${msg.userApp.patrouilleur.site.nom}"></td>
+
+                <!-- Date Commencement -->
+                <td class="table-cell" data-column="dateCommencement">
+                    <span class="display-value" th:text="${#temporals.format(msg.dateCommencement, 'yyyy-MM-dd HH:mm')}"></span>
+                    <input class="edit-input is-hidden" type="datetime-local" th:value="${#temporals.format(msg.dateCommencement, 'yyyy-MM-dd HH:mm')}" />
+                </td>
+
+                <!-- Date Signalement -->
+                <td class="table-cell" data-column="dateSignalement">
+                    <span class="display-value" th:text="${#temporals.format(msg.dateSignalement, 'yyyy-MM-dd HH:mm')}"></span>
+                    <input class="edit-input is-hidden" type="datetime-local" th:value="${#temporals.format(msg.dateSignalement, 'yyyy-MM-dd HH:mm')}" />
+                </td>
+
+                <!-- Point Repère -->
+                <td class="table-cell" data-column="pointRepere">
+                    <span class="display-value" th:text="${msg.pointRepere}"></span>
+                    <input class="edit-input is-hidden" type="text" th:value="${msg.pointRepere != null ? msg.pointRepere : ''}" />
+                </td>
+
+                <!-- Surface -->
+                <td class="table-cell" data-column="surface">
+                    <span class="display-value" th:text="${msg.surfaceApproximative}"></span>
+                    <input class="edit-input is-hidden" type="number" step="0.01" th:value="${msg.surfaceApproximative != null ? msg.surfaceApproximative : ''}" />
+                </td>
+
+                <!-- Description -->
+                <td class="table-cell" data-column="description">
+                    <span class="display-value" th:text="${msg.description}" title="${msg.description}"></span>
+                    <textarea class="edit-input is-hidden" th:text="${msg.description}"></textarea>
+                </td>
+
+                <!-- Direction -->
+                <td class="table-cell" data-column="direction">
+                    <span class="display-value" th:text="${msg.direction}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="dir : ${directions}" th:value="${dir}" th:text="${dir}" th:selected="${msg.direction == dir}"></option>
+                    </select>
+                </td>
+
+                <!-- Renfort -->
+                <td class="table-cell" data-column="renfort">
+                    <span class="display-value" th:text="${msg.renfort ? 'Oui' : 'Non'}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="true" th:selected="${msg.renfort}">Oui</option>
+                        <option value="false" th:selected="${!msg.renfort}">Non</option>
+                    </select>
+                </td>
+
+                <!-- Longitude -->
+                <td class="table-cell" data-column="longitude">
+                    <span class="display-value" th:text="${msg.longitude}"></span>
+                    <input class="edit-input is-hidden" type="number" step="0.000001" th:value="${msg.longitude != null ? msg.longitude : ''}" />
+                </td>
+
+                <!-- Latitude -->
+                <td class="table-cell" data-column="latitude">
+                    <span class="display-value" th:text="${msg.latitude}"></span>
+                    <input class="edit-input is-hidden" type="number" step="0.000001" th:value="${msg.latitude != null ? msg.latitude : ''}" />
+                </td>
+
+                <!-- Intervention -->
+                <td class="table-cell" data-column="intervention">
+                    <span class="display-value" th:text="${msg.intervention != null ? msg.intervention.intervention : ''}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="intervention : ${interventions}" 
+                                th:value="${intervention.id_Intervention}" 
+                                th:text="${intervention.intervention}"
+                                th:selected="${msg.intervention != null && msg.intervention.id_Intervention == intervention.id_Intervention}"></option>
+                    </select>
+                </td>
+
+                <!-- Événement -->
+                <td class="table-cell" data-column="evenement">
+                    <span class="display-value" th:text="${msg.evenement != null ? msg.evenement.nom : ''}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Aucun --</option>
+                        <option th:each="evt : ${evenements}" 
+                                th:value="${evt.idEvenement}" 
+                                th:text="${evt.nom}"
+                                th:selected="${msg.evenement != null && msg.evenement.idEvenement == evt.idEvenement}"></option>
+                    </select>
+                </td>
 
                 <!-- Alerte -->
-                <td class="table-cell">
-                    <span th:each="a : ${alerteMessage[msg.idMessage]}"
-                          th:text="${a.typeAlerte.zone}"></span>
+                <td class="table-cell" data-column="alerte">
+                    <span class="display-value" th:text="${alerteMessage[msg.idMessage] != null ? alerteMessage[msg.idMessage].get(0).typeAlerte.zone : ''}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="ta : ${typeAlertes}"
+                                th:value="${ta.idTypeAlerte}"
+                                th:text="${ta.zone}"
+                                th:selected="${alerteMessage[msg.idMessage] != null && alerteMessage[msg.idMessage].get(0).typeAlerte.idTypeAlerte == ta.idTypeAlerte}"></option>
+                    </select>
                 </td>
 
                 <!-- Dernier statut -->
-                <td class="table-cell"
-                    th:text="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}">
+                <td class="table-cell" data-column="status">
+                    <span class="display-value" th:text="${statusMessage[msg.idMessage] != null ? statusMessage[msg.idMessage].status.status : ''}"></span>
+                    <select class="edit-input is-hidden">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="st : ${statuses}"
+                                th:value="${st.idStatusMessage}"
+                                th:text="${st.status}"
+                                th:selected="${statusMessage[msg.idMessage] != null && statusMessage[msg.idMessage].status.idStatusMessage == st.idStatusMessage}"></option>
+                    </select>
                 </td>
 
-                <!-- Date -->
-                <td class="table-cell" th:text="${#temporals.format(msg.dateCommencement, 'yyyy-MM-dd HH:mm')}"></td>
-
                 <!-- Agent -->
-                <td class="table-cell" th:text="${msg.userApp.patrouilleur.nom}"></td>
+                <td class="table-cell" data-column="agent" th:text="${msg.userApp.patrouilleur.nom}"></td>
 
-                <!-- Surface -->
-                <td class="table-cell" th:text="${msg.surfaceApproximative}"></td>
+                <!-- Action Admin -->
+                <td class="table-cell" data-column="action" th:if="${user.fonction.fonction == 'Administrateur'}">
+                    <button type="button" class="action-btn js-edit-message" th:attr="data-message-id=${msg.idMessage}">Editer</button>
+                    <button type="button" class="action-btn is-hidden js-validate-message" th:attr="data-message-id=${msg.idMessage}">Valider</button>
+                    <button type="button" class="action-btn is-hidden js-cancel-message" th:attr="data-message-id=${msg.idMessage}">Annuler</button>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -163,6 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterAlerte = document.getElementById("filterAlerte");
     const filterSite = document.getElementById("filterSite");
     const filterStatus = document.getElementById("filterStatus");
+    const filterEvenement = document.getElementById("filterEvenement");
     const rows = document.querySelectorAll("#messageTable tr");
 
     function applyFilters() {
@@ -171,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const alerte = (filterAlerte.value || "").trim().toLowerCase();
         const site = (filterSite.value || "").trim().toLowerCase();
         const status = (filterStatus.value || "").trim().toLowerCase();
+        const evenement = (filterEvenement.value || "").trim();
 
         rows.forEach(row => {
             const rowYear = (row.dataset.annee || "").trim();
@@ -178,6 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const rowAlerte = (row.dataset.alerte || "").trim().toLowerCase();
             const rowSite = (row.dataset.site || "").trim().toLowerCase();
             const rowStatus = (row.dataset.status || "").trim().toLowerCase();
+            const rowEvenement = (row.dataset.eventId || "").trim();
 
             let visible = true;
             if (year && rowYear !== year) visible = false;
@@ -185,15 +404,20 @@ document.addEventListener("DOMContentLoaded", () => {
             if (alerte && rowAlerte !== alerte) visible = false;
             if (site && rowSite !== site) visible = false;
             if (status && rowStatus !== status) visible = false;
+            if (evenement === "none" && rowEvenement) visible = false;
+            if (evenement && evenement !== "none" && rowEvenement !== evenement) visible = false;
 
             row.style.display = visible ? "" : "none";
         });
     }
 
-    [filterYear, filterMonth, filterAlerte, filterSite, filterStatus].forEach(el => {
+    [filterYear, filterMonth, filterAlerte, filterSite, filterStatus, filterEvenement].forEach(el => {
         el.addEventListener("change", applyFilters);
     });
 });
 </script>
+<script th:src="@{/js/historique-edit.js}"></script>
+<script th:src="@{/js/historique-export-import.js}"></script>
+<script th:src="@{/js/historique-evenement.js}"></script>
 </body>
 </html>
