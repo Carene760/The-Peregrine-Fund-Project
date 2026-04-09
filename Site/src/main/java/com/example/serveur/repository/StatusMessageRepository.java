@@ -11,6 +11,8 @@ public interface StatusMessageRepository extends JpaRepository<StatusMessage, In
     @Query("SELECT s FROM StatusMessage s WHERE s.status = :status")
     StatusMessage findByStatus(@Param("status") String status);
 
+    StatusMessage findFirstByStatusIgnoreCase(String status);
+
         // Vérifie si un status existe déjà
     boolean existsByStatus(String status);
 }

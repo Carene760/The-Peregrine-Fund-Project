@@ -20,6 +20,15 @@ public class MessageService {
     public Message save(Message message) {
         return messageRepository.save(message);
     }
+    
+    public Message saveMessage(Message message) {
+        return messageRepository.save(message);
+    }
+    
+    public Message getMessageById(int id) {
+        Optional<Message> msg = messageRepository.findById(id);
+        return msg.orElse(null);
+    }
 
     public List<Message> findAll() {
         return messageRepository.findAll();
