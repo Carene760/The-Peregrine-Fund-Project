@@ -8,7 +8,7 @@ import android.database.Cursor;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "MaBase.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     // ---------- TABLE USERS ----------
     public static final String TABLE_USERS = "users";
@@ -24,6 +24,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_MESSAGE_ID = "id_message";
     public static final String COLUMN_DATE_COMMENCEMENT = "date_commencement";
     public static final String COLUMN_DATE_SIGNAL = "date_signalement";
+    public static final String COLUMN_DATE_ENVOI = "date_envoi";
     public static final String COLUMN_POINT_REPERE = "pointrepere";
     public static final String COLUMN_SURFACE = "surface_approximative";
     public static final String COLUMN_DESCRIPTION = "description";
@@ -43,6 +44,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_MESSAGE_ID + " INTEGER PRIMARY KEY , " +
                     COLUMN_DATE_COMMENCEMENT + " TEXT, " +
                     COLUMN_DATE_SIGNAL + " TEXT, " +
+                    COLUMN_DATE_ENVOI + " TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
                     COLUMN_POINT_REPERE + " TEXT, " +
                     COLUMN_SURFACE + " REAL, " +
                     COLUMN_DESCRIPTION + " TEXT, " +

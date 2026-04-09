@@ -289,8 +289,8 @@ public class BaseActivity extends AppCompatActivity {
         Fragment2 f2 = adapter.getFragment2();
 
         final Message message = new Message(
-                f1.getDateTime(),
-                 LocalDateTime.now(),
+            f1.getDateCommencement(),
+            f2.getDateSignalement(),
                 f1.getIntervention().getIdIntervention(),
                 f1.isRenfort(),
                 f1.getDirection(),
@@ -300,6 +300,7 @@ public class BaseActivity extends AppCompatActivity {
                 FIXED_NUMBER,
                 0, 0, FIXED_USER_ID
         );
+        message.setDateEnvoi(LocalDateTime.now());
 
         // Obtenir la localisation puis envoyer le message
         getCurrentLocationAndSend(message, new Runnable() {

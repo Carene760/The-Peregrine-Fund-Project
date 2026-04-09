@@ -40,6 +40,11 @@ public class MessageDao {
         if (message.getDateSignalement() != null) {
               values.put(MyDatabaseHelper.COLUMN_DATE_SIGNAL, message.getDateSignalement().format(dateTimeFormatter));
         }
+          if (message.getDateEnvoi() != null) {
+              values.put(MyDatabaseHelper.COLUMN_DATE_ENVOI, message.getDateEnvoi().format(dateTimeFormatter));
+          } else {
+              values.put(MyDatabaseHelper.COLUMN_DATE_ENVOI, LocalDateTime.now().format(dateTimeFormatter));
+          }
         values.put(MyDatabaseHelper.COLUMN_POINT_REPERE, message.getPointRepere());
         values.put(MyDatabaseHelper.COLUMN_SURFACE, message.getSurfaceApproximative());
         values.put(MyDatabaseHelper.COLUMN_DESCRIPTION, message.getDescription());
@@ -82,6 +87,15 @@ public class MessageDao {
         if (signalementStr != null) {
             try {
                 msg.setDateSignalement(LocalDateTime.parse(signalementStr, dateTimeFormatter));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        String envoiStr = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_DATE_ENVOI));
+        if (envoiStr != null) {
+            try {
+                msg.setDateEnvoi(LocalDateTime.parse(envoiStr, dateTimeFormatter));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -132,7 +146,16 @@ public class MessageDao {
             String signalementStr = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_DATE_SIGNAL));
             if (signalementStr != null) {
                 try {
-                    msg.setDateSignalement(LocalDateTime.parse(commencementStr, dateTimeFormatter));
+                    msg.setDateSignalement(LocalDateTime.parse(signalementStr, dateTimeFormatter));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            String envoiStr = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_DATE_ENVOI));
+            if (envoiStr != null) {
+                try {
+                    msg.setDateEnvoi(LocalDateTime.parse(envoiStr, dateTimeFormatter));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -187,6 +210,15 @@ public class MessageDao {
             if (signalementStr != null) {
                 try {
                     message.setDateSignalement(LocalDateTime.parse(signalementStr, dateTimeFormatter));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            String envoiStr = cursor.getString(cursor.getColumnIndexOrThrow(MyDatabaseHelper.COLUMN_DATE_ENVOI));
+            if (envoiStr != null) {
+                try {
+                    message.setDateEnvoi(LocalDateTime.parse(envoiStr, dateTimeFormatter));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
