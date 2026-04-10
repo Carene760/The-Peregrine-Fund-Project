@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inknut+Antiqua&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Imprima&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/historique.css}" />
+    <title>Gateway Webhooks</title>
+    <style>
+        .gateway-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 22px;
+            margin: 24px 0 40px;
+            background: #f9f9f9;
+            border: 1px solid #d7dde5;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .gateway-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .gateway-header h1 {
+            margin: 0;
+            font-family: 'Inknut Antiqua', serif;
+            font-size: 24px;
+            color: #12344d;
+        }
+
+        .gateway-header p {
+            margin: 6px 0 0;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .gateway-badge {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #12344d;
+            color: #ffffff;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .gateway-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .gateway-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .gateway-field label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #12344d;
+        }
+
+        .gateway-field input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Imprima', sans-serif;
+            font-size: 14px;
+        }
+
+        .gateway-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .gateway-output {
+            padding: 14px;
+            border-radius: 8px;
+            background: #101828;
+            color: #f8fafc;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            min-height: 92px;
+        }
+
+        .gateway-note {
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .gateway-help {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .gateway-help code {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #eaf2fb;
+            color: #12344d;
+        }
+
+        @media (max-width: 780px) {
+            .gateway-grid,
+            .gateway-help {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img class="frame-2" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png" alt="The Peregrine Fund Logo"/>
+            </div>
+            <div class="nav-tabs">
+                <div class="nav-tab active"><a href="/history">Historique</a></div>
+                <div class="nav-tab active"><a href="/stat">Statistiques</a></div>
+                <div class="nav-tab active"><a href="/evenements">Événements</a></div>
+                <div class="nav-tab active" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                    <a href="/users">Admin</a>
+                </div>
+                <div class="nav-tab" th:if="${currentUser.fonction.fonction == 'Administrateur'}">
+                    <a href="/admin/gateway/webhooks/ui">Webhooks</a>
+                </div>
+            </div>
+        </div>
+        <div class="tagline-admin">
+            <div class="tagline">"Saving raptors, enriching lives."</div>
+            <div class="admin-label"><span th:text="${currentUser.fonction.fonction}"></span></div>
+        </div>
+    </header>
+
+    <section class="gateway-section">
+        <div class="gateway-header">
+            <div>
+                <h1>Test Webhook Gateway</h1>
+                <p>Cette page reprend la même structure que le reste du site et permet de créer/supprimer le webhook directement dans Chrome.</p>
+            </div>
+            <div class="gateway-badge" th:text="${currentUser.fonction.fonction}">Administrateur</div>
+        </div>
+
+        <div class="gateway-grid">
+            <div class="gateway-field">
+                <label for="webhook-id">Webhook ID</label>
+                <input id="webhook-id" type="text" th:value="${webhookId}" />
+            </div>
+            <div class="gateway-field">
+                <label for="webhook-event">Event</label>
+                <input id="webhook-event" type="text" th:value="${webhookEvent}" />
+            </div>
+            <div class="gateway-field" style="grid-column: 1 / -1;">
+                <label for="webhook-url">Callback URL</label>
+                <input id="webhook-url" type="text" th:value="${webhookUrl}" />
+            </div>
+        </div>
+
+        <div class="gateway-actions">
+            <button type="button" class="action-btn export-btn" id="create-btn">Créer webhook</button>
+            <button type="button" class="action-btn import-btn" id="delete-btn">Supprimer webhook</button>
+            <button type="button" class="action-btn" id="reset-btn">Réinitialiser</button>
+        </div>
+
+        <div class="gateway-help">
+            <div><code>POST /admin/gateway/webhooks/default</code> pour créer.</div>
+            <div><code>DELETE /admin/gateway/webhooks/{id}</code> pour supprimer.</div>
+            <div>Authentification: session admin ou Basic Auth.</div>
+        </div>
+
+        <div class="gateway-output" id="output">Prêt.</div>
+        <div class="gateway-note">Si vous modifiez l'URL publique ngrok, recréez le webhook avec le nouveau callback.</div>
+    </section>
+</div>
+
+<footer class="footer">
+    <div class="main-container">
+        <a href="/logout" class="logout-btn">
+            <div class="logout-icon">
+                <img class="logout-icon" src="images/logout.png" alt="The Peregrine Fund Logo"/>
+            </div>
+            Déconnexion
+        </a>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const webhookId = document.getElementById("webhook-id");
+        const webhookEvent = document.getElementById("webhook-event");
+        const webhookUrl = document.getElementById("webhook-url");
+        const createBtn = document.getElementById("create-btn");
+        const deleteBtn = document.getElementById("delete-btn");
+        const resetBtn = document.getElementById("reset-btn");
+        const output = document.getElementById("output");
+
+        const defaults = {
+            id: webhookId.value,
+            event: webhookEvent.value,
+            url: webhookUrl.value
+        };
+
+        function show(data) {
+            output.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+        }
+
+        async function callApi(url, method, body) {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: body ? JSON.stringify(body) : undefined
+            });
+
+            const text = await response.text();
+            let payload = text;
+            try {
+                payload = text ? JSON.parse(text) : {};
+            } catch (e) {
+                payload = text;
+            }
+
+            show({ status: response.status, payload });
+            return response.ok;
+        }
+
+        createBtn.addEventListener("click", async () => {
+            createBtn.disabled = true;
+            deleteBtn.disabled = true;
+            try {
+                await callApi("/admin/gateway/webhooks/default", "POST", {
+                    id: webhookId.value.trim(),
+                    url: webhookUrl.value.trim(),
+                    event: webhookEvent.value.trim()
+                });
+            } catch (error) {
+                show("Erreur: " + error.message);
+            } finally {
+                createBtn.disabled = false;
+                deleteBtn.disabled = false;
+            }
+        });
+
+        deleteBtn.addEventListener("click", async () => {
+            createBtn.disabled = true;
+            deleteBtn.disabled = true;
+            try {
+                await callApi(`/admin/gateway/webhooks/${encodeURIComponent(webhookId.value.trim())}`, "DELETE");
+            } catch (error) {
+                show("Erreur: " + error.message);
+            } finally {
+                createBtn.disabled = false;
+                deleteBtn.disabled = false;
+            }
+        });
+
+        resetBtn.addEventListener("click", () => {
+            webhookId.value = defaults.id;
+            webhookEvent.value = defaults.event;
+            webhookUrl.value = defaults.url;
+            show("Champs réinitialisés.");
+        });
+    });
+</script>
+</body>
+</html>

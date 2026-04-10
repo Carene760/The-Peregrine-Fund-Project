@@ -49,6 +49,7 @@ public class SecurityConfig {
                     "/types-alerte/**",
                     "/users-app/**",
                     "/users/**",
+                    "/admin/gateway/webhooks/**",
                     "/userslist",
                     "/agentslist",
                     "/api/**",
