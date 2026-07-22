@@ -60,13 +60,22 @@ public class MessageDao {
 
         return db.insert(MyDatabaseHelper.TABLE_MESSAGE, null, values);
     }
-    public ArrayList<Message> getAllMessagesArrayList() {
+    /**
+     * Retourne uniquement les messages appartenant à l'utilisateur courant.
+     * IMPORTANT (confidentialité): ne jamais interroger la table sans filtre
+     * sur iduserapp, sous peine d'exposer les messages d'un autre agent qui
+     * s'est connecté auparavant sur le même téléphone.
+     */
+    public ArrayList<Message> getAllMessagesArrayList(int currentUserId) {
     ArrayList<Message> messages = new ArrayList<>();
     SQLiteDatabase db = dbHelper.getReadableDatabase();
 
     Cursor cursor = db.query(
             MyDatabaseHelper.TABLE_MESSAGE,
-            null, null, null, null, null, null
+            null,
+            MyDatabaseHelper.COLUMN_USER_FK + " = ?",
+            new String[]{String.valueOf(currentUserId)},
+            null, null, null
     );
 
     while (cursor.moveToNext()) {
@@ -121,13 +130,22 @@ public class MessageDao {
     return messages;
 }
 
-    public List<Message> getAllMessages() {
+    /**
+     * Retourne uniquement les messages appartenant à l'utilisateur courant.
+     * IMPORTANT (confidentialité): ne jamais interroger la table sans filtre
+     * sur iduserapp, sous peine d'exposer les messages d'un autre agent qui
+     * s'est connecté auparavant sur le même téléphone.
+     */
+    public List<Message> getAllMessages(int currentUserId) {
         List<Message> messages = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.query(
                 MyDatabaseHelper.TABLE_MESSAGE,
-                null, null, null, null, null, null
+                null,
+                MyDatabaseHelper.COLUMN_USER_FK + " = ?",
+                new String[]{String.valueOf(currentUserId)},
+                null, null, null
         );
 
         while (cursor.moveToNext()) {

@@ -364,9 +364,9 @@ public class StatActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Récupération des messages depuis SQLite
+        // Récupération des messages depuis SQLite (uniquement ceux de l'utilisateur courant)
         MessageDao dbHelper = new MessageDao(this); // Si Fragment : getContext()
-        List<Message> messages = dbHelper.getAllMessages(); // Utilisez getAllMessages() au lieu de getAllMessagesArrayList()
+        List<Message> messages = dbHelper.getAllMessages(AppData.getCurrentUserId(this));
 
 // Ajouter des marqueurs sur la carte
 for (Message m : messages) {

@@ -136,8 +136,7 @@ public class BaseActivity extends AppCompatActivity {
         smsSender = new SmsSender(this);
         serverSender = new ServerSender(apiService, smsSender, this);
 
-        AppData appData = new AppData();
-        int userId = appData.getCurrentUserId();
+        int userId = AppData.getCurrentUserId(this);
         FIXED_USER_ID = userId;
 
         btnSend.setOnClickListener(new View.OnClickListener() {
@@ -424,7 +423,7 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
         historyItems.clear();
 
         MessageDao messageDao = new MessageDao(this);
-        List<Message> messages = messageDao.getAllMessages();
+        List<Message> messages = messageDao.getAllMessages(AppData.getCurrentUserId(this));
 
         for (Message msg : messages) {
             historyItems.add(new HistoryItemD(

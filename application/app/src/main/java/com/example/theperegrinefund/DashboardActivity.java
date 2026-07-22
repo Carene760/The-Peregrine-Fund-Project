@@ -137,8 +137,7 @@ public class DashboardActivity extends AppCompatActivity {
         logoutIcon.setOnClickListener(v -> logout());
         filterIcon.setOnClickListener(v -> showFilterDialog());
         
-        AppData appData = new AppData();
-        int userId = appData.getCurrentUserId();
+        int userId = AppData.getCurrentUserId(this);
          FIXED_USER_ID = userId;
         // FIXED_USER_ID = 4;
 
@@ -265,7 +264,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void loadMessagesAndApplyFilters() {
         MessageDao messageDao = new MessageDao(this);
-        allMessages = messageDao.getAllMessages();
+        allMessages = messageDao.getAllMessages(AppData.getCurrentUserId(this));
         applyHistoryFilters();
     }
 

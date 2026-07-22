@@ -114,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (userId > 0) {
                         waitingForResponse = false;
                         Toast.makeText(LoginActivity.this, "Authentification réussie!", Toast.LENGTH_SHORT).show();
-                        AppData.setCurrentUserId(userId);
+                        AppData.setCurrentUserId(LoginActivity.this, userId);
 
                         Intent intentDashboard = new Intent(LoginActivity.this, DashboardActivity.class);
                         startActivity(intentDashboard);
