@@ -125,7 +125,7 @@ public class BaseActivity extends AppCompatActivity {
         // CONF RELIE AU SERVEUR
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(SERVER_URL) // Remplace par l’IP locale de ton PC
-            .client(com.example.theperegrinefund.network.NetworkClientProvider.get())
+            .client(com.example.theperegrinefund.network.NetworkClientProvider.get(this))
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

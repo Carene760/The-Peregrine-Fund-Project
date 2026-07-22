@@ -47,6 +47,22 @@ public class ConfigLoader {
             throw e;
         }
     }
+    /**
+     * Cle partagee envoyee dans l'en-tete X-API-Key pour authentifier les
+     * appels de l'app vers /api/** et /sync/** (voir ApiKeyInterceptor cote
+     * serveur). Doit correspondre a app.api.key dans application.properties.
+     */
+    public static String getApiKey(Context context) throws Exception {
+        Properties props = new Properties();
+        try (InputStream input = context.getAssets().open("config.properties")) {
+            if (input == null) {
+                throw new RuntimeException("Fichier config.properties introuvable !");
+            }
+            props.load(input);
+        }
+        return props.getProperty("api.key");
+    }
+
     public static String getBackupServerUrl(Context context) throws Exception {
         Properties props = new Properties();
         try (InputStream input = context.getAssets().open("config.properties")) {

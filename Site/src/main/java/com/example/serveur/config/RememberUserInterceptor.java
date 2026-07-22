@@ -18,9 +18,11 @@ public class RememberUserInterceptor implements HandlerInterceptor {
     private static final String REMEMBER_USER_COOKIE = "rememberUserEmail";
 
     private final UserService userService;
+    private final RememberMeCookieSigner cookieSigner;
 
-    public RememberUserInterceptor(UserService userService) {
+    public RememberUserInterceptor(UserService userService, RememberMeCookieSigner cookieSigner) {
         this.userService = userService;
+        this.cookieSigner = cookieSigner;
     }
 
     @Override
@@ -47,7 +49,15 @@ public class RememberUserInterceptor implements HandlerInterceptor {
                 continue;
             }
 
-            String email = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+            // Verify the HMAC signature before trusting this cookie at all.
+            // Previously any client could set rememberUserEmail=<any-email>
+            // and be logged in as that user with no password check.
+            String encodedEmail = cookieSigner.verifyAndExtractEmail(cookie.getValue());
+            if (encodedEmail == null) {
+                break;
+            }
+
+            String email = URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8);
             User user = userService.findByEmail(email).orElse(null);
             if (user != null) {
                 session.setAttribute("currentUser", user);

@@ -66,7 +66,7 @@ public class SendRetryWorker extends Worker {
 
         ApiService apiService = new Retrofit.Builder()
                 .baseUrl(serverUrl)
-                .client(NetworkClientProvider.get())
+                .client(NetworkClientProvider.get(context))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(ApiService.class);

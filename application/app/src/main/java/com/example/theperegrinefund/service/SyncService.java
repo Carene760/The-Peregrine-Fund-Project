@@ -52,7 +52,7 @@ public class SyncService {
     public SyncService(Context context) {
         this.context = context;
 
-        client = NetworkClientProvider.get();
+        client = NetworkClientProvider.get(context);
 
         // Configuration de Gson avec support de LocalDateTime
         GsonBuilder gsonBuilder = new GsonBuilder();

@@ -8,9 +8,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final RememberUserInterceptor rememberUserInterceptor;
+    private final ApiKeyInterceptor apiKeyInterceptor;
 
-    public WebConfig(RememberUserInterceptor rememberUserInterceptor) {
+    public WebConfig(RememberUserInterceptor rememberUserInterceptor, ApiKeyInterceptor apiKeyInterceptor) {
         this.rememberUserInterceptor = rememberUserInterceptor;
+        this.apiKeyInterceptor = apiKeyInterceptor;
     }
 
     @Override
@@ -23,5 +25,11 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/**",
                         "/sync/**"
                 );
+
+        // Machine-facing endpoints (Android app + SMS gateway) require a
+        // shared API key / Basic auth instead of the interactive session
+        // login handled by rememberUserInterceptor above.
+        registry.addInterceptor(apiKeyInterceptor)
+                .addPathPatterns("/api/**", "/sync/**");
     }
 }

@@ -1,5 +1,6 @@
 package com.example.serveur.controller.login;
 
+import com.example.serveur.config.RememberMeCookieSigner;
 import com.example.serveur.model.User;
 import com.example.serveur.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -21,11 +22,13 @@ public class LoginController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final RememberMeCookieSigner cookieSigner;
 
     @Autowired
-    public LoginController(UserService userService, PasswordEncoder passwordEncoder) {
+    public LoginController(UserService userService, PasswordEncoder passwordEncoder, RememberMeCookieSigner cookieSigner) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.cookieSigner = cookieSigner;
     }
 
     @GetMapping("/")
@@ -54,9 +57,10 @@ public class LoginController {
                 && passwordEncoder.matches(password == null ? "" : password, user.getMotDePasse())) {
             session.setAttribute("currentUser", user); // <-- stocke dans la session
 
+            String encodedEmail = URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8);
             Cookie rememberCookie = new Cookie(
                     REMEMBER_USER_COOKIE,
-                    URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8)
+                    cookieSigner.sign(encodedEmail) // "<email>.<hmac>" - non falsifiable
             );
             rememberCookie.setHttpOnly(true);
             rememberCookie.setPath("/");

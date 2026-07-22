@@ -556,7 +556,7 @@ public class DashboardActivity extends AppCompatActivity {
         ServerSender sender = serverSender != null ? serverSender : new ServerSender(
                 new Retrofit.Builder()
                         .baseUrl(SERVER_URL)
-                        .client(com.example.theperegrinefund.network.NetworkClientProvider.get())
+                        .client(com.example.theperegrinefund.network.NetworkClientProvider.get(this))
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
                         .create(ApiService.class),
