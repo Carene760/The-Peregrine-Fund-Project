@@ -2,6 +2,7 @@ package com.example.serveur.service;
 
 import com.example.serveur.model.*;
 import com.example.serveur.repository.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.Optional;
 public class UserAppService {
 
     private final UserAppRepository userAppRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserAppService(UserAppRepository userAppRepository) {
+    public UserAppService(UserAppRepository userAppRepository, PasswordEncoder passwordEncoder) {
         this.userAppRepository = userAppRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserApp save(UserApp userApp) {
@@ -48,7 +51,7 @@ public class UserAppService {
 
         UserApp userApp = new UserApp();
         userApp.setLogin(login);
-        userApp.setMotDePasse(motDePasse);
+        userApp.setMotDePasse(passwordEncoder.encode(motDePasse));
         userApp.setPatrouilleur(patrouilleur);
         return userApp;
     }
@@ -61,7 +64,8 @@ public class UserAppService {
             Patrouilleurs patrouilleur = patrouilleurs.get(i);
             UserApp userApp = new UserApp();
             userApp.setLogin("agent" + patrouilleur.getIdPatrouilleur());
-            userApp.setMotDePasse("password" + i + patrouilleur.getTelephone() + "" + i ); // Vous devriez hasher les mots de passe dans une vraie application
+            String generatedPassword = "password" + i + patrouilleur.getTelephone() + "" + i;
+            userApp.setMotDePasse(passwordEncoder.encode(generatedPassword)); // hashé en BCrypt avant stockage
             userApp.setPatrouilleur(patrouilleur);
             usersapp.add(userApp);
 

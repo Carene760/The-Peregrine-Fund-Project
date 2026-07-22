@@ -3,6 +3,7 @@ package com.example.serveur.controller;
 import com.example.serveur.model.*;
 import com.example.serveur.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,16 +25,19 @@ public class UserController {
     private final FonctionService fonctionService;
     private final SiteService siteService;
     private final PatrouilleurService patrouilleurService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserController(UserService userService,
                         FonctionService fonctionService,
                         SiteService siteService,
-                        PatrouilleurService patrouilleurService) {
+                        PatrouilleurService patrouilleurService,
+                        PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.fonctionService = fonctionService;
         this.siteService = siteService;
         this.patrouilleurService = patrouilleurService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -110,7 +114,9 @@ public class UserController {
                     redirectAttributes.addFlashAttribute("user", user);
                     return "redirect:/users";
                 }
-                
+
+                user.setMotDePasse(passwordEncoder.encode(user.getMotDePasse().trim()));
+
                 // Sauvegarde de l'utilisateur
                 userService.save(user);
                 
@@ -144,6 +150,7 @@ public class UserController {
                 return "redirect:/users";
             }
 
+            user.setMotDePasse(passwordEncoder.encode(user.getMotDePasse().trim()));
             userService.save(user);
             redirectAttributes.addFlashAttribute("successMessage", "Utilisateur ajouté avec succès");
 
@@ -214,6 +221,9 @@ public class UserController {
     // Ajouter un utilisateur
     @PostMapping("/add")
     public String addUser(@ModelAttribute User user) {
+        if (user.getMotDePasse() != null && !user.getMotDePasse().trim().isEmpty()) {
+            user.setMotDePasse(passwordEncoder.encode(user.getMotDePasse().trim()));
+        }
         userService.save(user);
         return "redirect:/users-app";
     }
@@ -250,7 +260,7 @@ public class UserController {
             }
 
             if (user.getMotDePasse() != null && !user.getMotDePasse().trim().isEmpty()) {
-                existingUser.setMotDePasse(user.getMotDePasse().trim());
+                existingUser.setMotDePasse(passwordEncoder.encode(user.getMotDePasse().trim()));
             }
 
             userService.save(existingUser);

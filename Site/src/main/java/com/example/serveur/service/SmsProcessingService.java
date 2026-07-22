@@ -5,6 +5,7 @@ import com.example.serveur.repository.UserAppRepository;
 import com.example.serveur.util.EncryptionUtil;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
@@ -16,16 +17,19 @@ import java.util.Optional;
 
 @Service
 public class SmsProcessingService {
-    
+
     private final EncryptionUtil encryptionUtil;
     private final UserAppRepository userAppRepository;
+    private final PasswordEncoder passwordEncoder;
     private final String separateur;
 
-    public SmsProcessingService(EncryptionUtil encryptionUtil, 
+    public SmsProcessingService(EncryptionUtil encryptionUtil,
                                UserAppRepository userAppRepository,
+                               PasswordEncoder passwordEncoder,
                                @Value("${message.separator}") String separateur) {
         this.encryptionUtil = encryptionUtil;
         this.userAppRepository = userAppRepository;
+        this.passwordEncoder = passwordEncoder;
         this.separateur = separateur;
     }
 
@@ -94,23 +98,35 @@ public class SmsProcessingService {
                 if (login.isEmpty() || motDePasse.isEmpty()) {
                     return false;
                 }
-                return userAppRepository.findByLoginAndMotDePasse(login, motDePasse).isPresent();
+                return checkCredentials(login, motDePasse);
             }
 
             String[] parties = message.split("\\" + separateur);
             if (parties.length != 2) {
                 return false;
             }
-            
+
             String login = parties[0].trim();
             String motDePasse = parties[1].trim();
-            
-            Optional<UserApp> userOpt = userAppRepository.findByLoginAndMotDePasse(login, motDePasse);
-            return userOpt.isPresent();
-            
+
+            return checkCredentials(login, motDePasse);
+
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Vérifie les identifiants d'un utilisateur mobile (userapp) en comparant
+     * le mot de passe fourni au hash BCrypt stocké en base.
+     */
+    private boolean checkCredentials(String login, String rawPassword) {
+        Optional<UserApp> userOpt = userAppRepository.findByLogin(login);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        String storedHash = userOpt.get().getMotDePasse();
+        return storedHash != null && passwordEncoder.matches(rawPassword, storedHash);
     }
 
     public String getUserId(String message) {

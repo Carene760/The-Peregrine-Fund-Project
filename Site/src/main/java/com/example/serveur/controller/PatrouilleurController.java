@@ -7,6 +7,7 @@ import com.example.serveur.service.PatrouilleurService;
 import com.example.serveur.service.SiteService;
 import com.example.serveur.service.UserAppService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,14 +24,17 @@ public class PatrouilleurController {
     private final PatrouilleurService patrouilleurService;
     private final SiteService siteService;
     private final UserAppService userAppService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public PatrouilleurController(PatrouilleurService patrouilleurService,
                                   SiteService siteService,
-                                  UserAppService userAppService) {
+                                  UserAppService userAppService,
+                                  PasswordEncoder passwordEncoder) {
         this.patrouilleurService = patrouilleurService;
         this.siteService = siteService;
         this.userAppService = userAppService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Liste de tous les patrouilleurs
@@ -116,7 +120,7 @@ public class PatrouilleurController {
                     userApp.setLogin(loginValue);
                 }
                 if (!motDePasseValue.isEmpty()) {
-                    userApp.setMotDePasse(motDePasseValue);
+                    userApp.setMotDePasse(passwordEncoder.encode(motDePasseValue));
                 }
 
                 userAppService.save(userApp);

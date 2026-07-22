@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,12 @@ public class LoginController {
     private static final String REMEMBER_USER_COOKIE = "rememberUserEmail";
 
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LoginController(UserService userService) {
+    public LoginController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/")
@@ -47,7 +50,8 @@ public class LoginController {
         String normalizedEmail = email == null ? "" : email.replaceAll("\\s+", "");
         User user = userService.findByEmail(normalizedEmail).orElse(null);
 
-        if (user != null && user.getMotDePasse().equals(password)) {
+        if (user != null && user.getMotDePasse() != null
+                && passwordEncoder.matches(password == null ? "" : password, user.getMotDePasse())) {
             session.setAttribute("currentUser", user); // <-- stocke dans la session
 
             Cookie rememberCookie = new Cookie(
