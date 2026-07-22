@@ -24,8 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -186,6 +189,20 @@ public class AlerteService {
             if (idStatus == null) {
                 return "❌ ID Status manquant ou invalide";
             }
+
+            if (!dateSignalement.isAfter(dateCommencement)) {
+                if (isV2Format && dateCommencement.isAfter(dateSignalement)) {
+                    // Compatibilite: certains clients V2 inversent ces deux champs.
+                    LocalDateTime temp = dateCommencement;
+                    dateCommencement = dateSignalement;
+                    dateSignalement = temp;
+                    System.out.println("⚠️ Dates inversées détectées en V2: correction appliquée");
+                }
+            }
+
+            if (!dateSignalement.isAfter(dateCommencement)) {
+                return "❌ Incohérence des dates: dateSignalement doit être > dateCommencement";
+            }
             
             System.out.println("✅ Données parsées - ID UserApp: " + idUserApp);
 
@@ -277,6 +294,24 @@ public class AlerteService {
             return null;
         }
         try {
+            String normalized = value.trim();
+
+            try {
+                return OffsetDateTime.parse(normalized)
+                        .atZoneSameInstant(ZoneId.systemDefault())
+                        .toLocalDateTime();
+            } catch (DateTimeParseException e) {
+                // Fallback sur les autres parseurs
+            }
+
+            try {
+                return Instant.parse(normalized)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime();
+            } catch (DateTimeParseException e) {
+                // Fallback sur les autres parseurs
+            }
+
             DateTimeFormatter[] formatters = {
                 DateTimeFormatter.ISO_LOCAL_DATE_TIME,
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
@@ -286,10 +321,10 @@ public class AlerteService {
             
             for (DateTimeFormatter formatter : formatters) {
                 try {
-                    if (value.length() <= 10) {
-                        return LocalDateTime.parse(value + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    if (normalized.length() <= 10) {
+                        return LocalDateTime.parse(normalized + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                     } else {
-                        return LocalDateTime.parse(value, formatter);
+                        return LocalDateTime.parse(normalized, formatter);
                     }
                 } catch (DateTimeParseException e) {
                     // Continuer avec le formateur suivant

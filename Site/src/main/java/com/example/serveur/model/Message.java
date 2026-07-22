@@ -17,6 +17,9 @@ public class Message {
     
     @Column(name = "date_signalement", nullable = false)
     private LocalDateTime dateSignalement;
+
+    @Column(name = "date_envoi")
+    private LocalDateTime dateEnvoi;
     
     @Column(name = "pointrepere")
     private String pointRepere;
@@ -61,6 +64,9 @@ public class Message {
     
     public LocalDateTime getDateSignalement() { return dateSignalement; }
     public void setDateSignalement(LocalDateTime dateSignalement) { this.dateSignalement = dateSignalement; }
+
+    public LocalDateTime getDateEnvoi() { return dateEnvoi; }
+    public void setDateEnvoi(LocalDateTime dateEnvoi) { this.dateEnvoi = dateEnvoi; }
     
     public String getPointRepere() { return pointRepere; }
     public void setPointRepere(String pointRepere) { this.pointRepere = pointRepere; }

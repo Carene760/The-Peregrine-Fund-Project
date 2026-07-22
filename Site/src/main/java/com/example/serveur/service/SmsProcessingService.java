@@ -35,8 +35,10 @@ public class SmsProcessingService {
         
         System.out.println("🔍 Message après nettoyage: '" + messageChiffre + "'");
         
-        // Vérifier si le message est déjà en clair
-        if (!isBase64(messageChiffre)) {
+        // Vérifier si le message ressemble vraiment à un payload chiffré AES.
+        // Certains textes courts comme "OK" sont techniquement décodables en Base64,
+        // mais ne peuvent pas être un ciphertext valide pour AES.
+        if (!isLikelyEncryptedPayload(messageChiffre)) {
             return messageChiffre; // Déjà en clair
         }
         
@@ -44,10 +46,19 @@ public class SmsProcessingService {
         return encryptionUtil.dechiffrer(messageChiffre);
     }
 
-    private boolean isBase64(String str) {
+    private boolean isLikelyEncryptedPayload(String str) {
         try {
-            Base64.getDecoder().decode(str);
-            return true;
+            String cleaned = str.replaceAll("\\s+", "").replace("-", "+").replace("_", "/");
+            if (cleaned.length() < 16) {
+                return false;
+            }
+
+            if (cleaned.length() % 4 != 0) {
+                cleaned = cleaned + "=".repeat((4 - cleaned.length() % 4) % 4);
+            }
+
+            byte[] decoded = Base64.getDecoder().decode(cleaned);
+            return decoded.length >= 16 && decoded.length % 16 == 0;
         } catch (IllegalArgumentException e) {
             return false;
         }
