@@ -7,6 +7,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Raw SQL dump screen for local debugging only.
+ *
+ * SECURITY: this exposes the full local message/history content with no
+ * access control. It must never be reachable in a release build. Guarded at
+ * runtime (BuildConfig.DEBUG) in addition to being excluded from the
+ * manifest merge for release builds (see src/debug/AndroidManifest.xml).
+ */
 public class DbDebugActivity extends AppCompatActivity {
 
     private TextView dbTextView;
@@ -15,6 +23,14 @@ public class DbDebugActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!BuildConfig.DEBUG) {
+            // Belt-and-braces: even if this activity somehow ends up
+            // reachable in a release build, refuse to show anything.
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_db_debug);
 
         dbTextView = findViewById(R.id.dbTextView);

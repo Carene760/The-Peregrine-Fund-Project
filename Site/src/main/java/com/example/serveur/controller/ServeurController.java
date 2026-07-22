@@ -51,53 +51,12 @@ public class ServeurController {
         System.out.println("✅ Serveur démarré avec " + allowedNumbersService.getNumerosAutorises().size() + " numéros autorisés");
     }
 
-    @GetMapping("/test-chiffrement")
-    public String testChiffrement(@RequestParam String message) {
-        EncryptionUtil encryptionUtil= new EncryptionUtil("0123456789abcdef");
-
-        try {
-            String dechiffre = encryptionUtil.dechiffrer(message);
-            String chiffre = encryptionUtil.chiffrer(dechiffre);
-            
-            return String.format("""
-                Original: %s
-                Chiffré: %s
-                Déchiffré: %s
-                Match: %s
-                Longueur original: %d
-                Longueur chiffré: %d
-                """, 
-                message, chiffre, dechiffre, 
-                message.equals(dechiffre),
-                message.length(), chiffre.length());
-        } catch (Exception e) {
-            return "Erreur: " + e.getMessage();
-        }
-    }
-
-    @GetMapping("/test-dechiffrement")
-    public String testDeChiffrement(@RequestParam String message) {
-        EncryptionUtil encryptionUtil= new EncryptionUtil("0123456789abcdef");
-
-        try {
-            String chiffre = encryptionUtil.chiffrer(message);
-            String dechiffre = encryptionUtil.dechiffrer(chiffre);
-            
-            return String.format("""
-                Original: %s
-                Chiffré: %s
-                Déchiffré: %s
-                Match: %s
-                Longueur original: %d
-                Longueur chiffré: %d
-                """, 
-                message, chiffre, dechiffre, 
-                message.equals(dechiffre),
-                message.length(), chiffre.length());
-        } catch (Exception e) {
-            return "Erreur: " + e.getMessage();
-        }
-    }
+    // NOTE (security fix): the /api/test-chiffrement and /api/test-dechiffrement
+    // debug endpoints that used to live here were removed. They were live,
+    // unauthenticated endpoints that decrypted/encrypted arbitrary input with a
+    // hardcoded key, unrelated to configured encryption.secret-key. They served
+    // no production purpose and were not gated behind any profile or auth, so
+    // they were deleted outright rather than kept behind a flag.
 
     // ==================== ENDPOINT SMS WEBHOOK (EXISTANT) ====================
     @PostMapping("/webhook")

@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Debug-only manifest additions, merged into the main manifest only
+        for debug builds (never for release). This is where DbDebugActivity
+        (raw local-DB SQL dump screen) is registered so it cannot ship in a
+        release APK even if the runtime BuildConfig.DEBUG guard in the
+        activity itself were ever bypassed or removed by mistake.
+    -->
+    <application>
+        <activity
+            android:name=".DbDebugActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ThePeregrineFund.NoActionBar"
+            android:screenOrientation="portrait" />
+    </application>
+
+</manifest>

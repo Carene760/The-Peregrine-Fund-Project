@@ -56,12 +56,9 @@
             android:theme="@style/Theme.ThePeregrineFund.NoActionBar"
             android:screenOrientation="portrait" />
 
-        <activity
-            android:name=".DbDebugActivity"
-            android:exported="false"
-            android:theme="@style/Theme.ThePeregrineFund.NoActionBar"
-            android:screenOrientation="portrait" />
-
+        <!-- DbDebugActivity (raw SQL dump screen) is registered only for
+             debug builds, see src/debug/AndroidManifest.xml. It must never
+             ship in a release build. -->
 
         <receiver android:name=".SmsReceiver" android:exported="true">
             <intent-filter>
