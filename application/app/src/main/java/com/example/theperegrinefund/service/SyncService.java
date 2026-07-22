@@ -29,6 +29,8 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.theperegrinefund.network.NetworkClientProvider;
+import com.example.theperegrinefund.network.NetworkUtils;
 import com.example.theperegrinefund.security.ConfigLoader;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -50,7 +52,7 @@ public class SyncService {
     public SyncService(Context context) {
         this.context = context;
 
-        client = new OkHttpClient();
+        client = NetworkClientProvider.get();
 
         // Configuration de Gson avec support de LocalDateTime
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -71,10 +73,21 @@ public class SyncService {
         String url;
         try {
             url = ConfigLoader.getBackupServerUrl(context);
-            Log.d(TAG, "URL chargée depuis config.properties : " + url);
+            Log.d(TAG, "URL chargée depuis config.properties (server.backup.url) : " + url);
         } catch (Exception e) {
-            Log.e(TAG, "Impossible de charger l'URL du serveur, utilisation de fallback", e);
-            url = "https://a19675263dca.ngrok-free.app";
+            Log.w(TAG, "server.backup.url indisponible dans config.properties, tentative avec server.url", e);
+            try {
+                // Pas d'URL en dur ici: on retombe sur l'URL serveur principale déjà
+                // configurée dans config.properties plutôt qu'un tunnel ngrok périmé
+                // codé en dur (bug corrigé - l'ancienne valeur ne pointait plus vers
+                // rien depuis longtemps).
+                url = ConfigLoader.getServerUrl(context);
+                Log.w(TAG, "Utilisation de server.url en secours pour la synchronisation : " + url);
+            } catch (Exception e2) {
+                Log.e(TAG, "Aucune URL serveur exploitable dans config.properties (server.backup.url et server.url manquants). "
+                        + "La synchronisation restera indisponible tant que config.properties n'est pas corrigé.", e2);
+                url = "";
+            }
         }
         BASE_URL = url;
         Log.d(TAG, "BASE_URL finale: " + BASE_URL);
@@ -270,14 +283,6 @@ public class SyncService {
     }
 
     private String readJsonOrThrow(ResponseBody body) throws IOException {
-        String raw = body.string();
-        String trimmed = raw == null ? "" : raw.trim();
-
-        // Prevent Gson parse errors when ngrok/intermediary returns HTML/text instead of JSON.
-        if (!trimmed.startsWith("[") && !trimmed.startsWith("{")) {
-            String preview = trimmed.length() > 160 ? trimmed.substring(0, 160) + "..." : trimmed;
-            throw new IOException("Réponse serveur non JSON: " + preview);
-        }
-        return trimmed;
+        return NetworkUtils.readJsonOrThrow(body);
     }
 }

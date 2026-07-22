@@ -8,7 +8,7 @@ import android.database.Cursor;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "MaBase.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     // ---------- TABLE USERS ----------
     public static final String TABLE_USERS = "users";
@@ -109,6 +109,33 @@ public static final String COLUMN_HISTORIQUE_MESSAGE_FK = "id_message";
                     "FOREIGN KEY(" + COLUMN_HISTORIQUE_STATUS_FK + ") REFERENCES " + TABLE_STATUS + "(" + COLUMN_STATUS_ID + "), " +
                     "FOREIGN KEY(" + COLUMN_HISTORIQUE_MESSAGE_FK + ") REFERENCES " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_ID + "));";
 
+    // ---------- TABLE OUTBOX (file d'attente des envois en échec) ----------
+    // Contient les messages (alertes / mises à jour de statut) que l'app n'a
+    // pas réussi à envoyer ni par HTTP direct ni par SMS, pour permettre une
+    // relance ultérieure (voir SendRetryWorker).
+    public static final String TABLE_OUTBOX = "outbox_message";
+    public static final String COLUMN_OUTBOX_ID = "id_outbox";
+    public static final String COLUMN_OUTBOX_TYPE = "message_type"; // ALERTE | HISTORIQUE
+    public static final String COLUMN_OUTBOX_CONTENT = "content"; // contenu en clair (re-chiffré à l'envoi)
+    public static final String COLUMN_OUTBOX_PHONE = "phone_number";
+    public static final String COLUMN_OUTBOX_USER_FK = "iduserapp";
+    public static final String COLUMN_OUTBOX_STATUS = "status"; // PENDING | SENT | FAILED
+    public static final String COLUMN_OUTBOX_ATTEMPTS = "attempts";
+    public static final String COLUMN_OUTBOX_CREATED_AT = "created_at";
+    public static final String COLUMN_OUTBOX_UPDATED_AT = "updated_at";
+
+    private static final String CREATE_TABLE_OUTBOX =
+            "CREATE TABLE " + TABLE_OUTBOX + " (" +
+                    COLUMN_OUTBOX_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_OUTBOX_TYPE + " TEXT NOT NULL, " +
+                    COLUMN_OUTBOX_CONTENT + " TEXT NOT NULL, " +
+                    COLUMN_OUTBOX_PHONE + " TEXT, " +
+                    COLUMN_OUTBOX_USER_FK + " INTEGER, " +
+                    COLUMN_OUTBOX_STATUS + " TEXT NOT NULL DEFAULT 'PENDING', " +
+                    COLUMN_OUTBOX_ATTEMPTS + " INTEGER NOT NULL DEFAULT 0, " +
+                    COLUMN_OUTBOX_CREATED_AT + " TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+                    COLUMN_OUTBOX_UPDATED_AT + " TEXT);";
+
     public MyDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -123,6 +150,7 @@ public static final String COLUMN_HISTORIQUE_MESSAGE_FK = "id_message";
         db.execSQL(CREATE_TABLE_STATUS);
         db.execSQL(CREATE_TABLE_HISTORIQUE);
         db.execSQL(CREATE_TABLE_INTERVENTION);
+        db.execSQL(CREATE_TABLE_OUTBOX);
     }
 
     @Override
@@ -133,6 +161,7 @@ public static final String COLUMN_HISTORIQUE_MESSAGE_FK = "id_message";
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENEMENT);
           db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORIQUE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_STATUS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_OUTBOX);
         onCreate(db);
     }
     // Retourne l'id d'une intervention à partir de son nom

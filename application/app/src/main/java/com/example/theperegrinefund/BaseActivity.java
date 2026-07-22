@@ -125,6 +125,7 @@ public class BaseActivity extends AppCompatActivity {
         // CONF RELIE AU SERVEUR
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(SERVER_URL) // Remplace par l’IP locale de ton PC
+            .client(com.example.theperegrinefund.network.NetworkClientProvider.get())
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
@@ -138,6 +139,10 @@ public class BaseActivity extends AppCompatActivity {
 
         int userId = AppData.getCurrentUserId(this);
         FIXED_USER_ID = userId;
+
+        // File d'attente de renvoi (WorkManager): relance périodiquement (et dès
+        // le retour du réseau) les messages restés PENDING dans l'outbox local.
+        com.example.theperegrinefund.work.RetryWorkScheduler.schedulePeriodic(this);
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -301,17 +306,23 @@ public class BaseActivity extends AppCompatActivity {
         );
         message.setDateEnvoi(LocalDateTime.now());
 
-        // Obtenir la localisation puis envoyer le message
+        // Obtenir la localisation puis envoyer le message.
+        // Priorité HTTP direct si internet est disponible ; repli automatique
+        // sur le SMS gateway sinon (voir ServerSender.dispatch()).
         getCurrentLocationAndSend(message, new Runnable() {
             @Override
             public void run() {
-                
+                if (serverSender != null) {
+                    serverSender.send(message, f1.getStatus());
+                } else {
+                    // Config serveur indisponible au démarrage: on retombe directement sur le SMS.
                     try {
-                        smsSender.send(message, f1.getStatus()); // <-- bien dans un try/catch
+                        smsSender.send(message, f1.getStatus());
                         Toast.makeText(BaseActivity.this, " Message envoyé par SMS.", Toast.LENGTH_SHORT).show();
                     } catch (Exception ex) {
                         Toast.makeText(BaseActivity.this, "Erreur SMS : " + ex.getMessage(), Toast.LENGTH_LONG).show();
                     }
+                }
             }
         });
     }

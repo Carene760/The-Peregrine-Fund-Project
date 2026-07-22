@@ -65,11 +65,11 @@ public class SmsSender {
                 null
             );
         }
-        
-       // int newId = message.save(context);
-      //  long a = historique.insertHistorique
-       // Log.d("SMS", "Message sauvegardé avec ID: " + newId);
-        
+
+        // NOTE: le suivi des envois (réussi/échoué/en attente) est désormais
+        // assuré par ServerSender via OutboxDao, qui englobe cet appel SMS
+        // dans son flux HTTP-first + fallback + file d'attente locale.
+
     } catch (Exception e) {
         Log.e("SMS", "Erreur envoi: " + e.getMessage(), e);
         throw e;

@@ -139,6 +139,10 @@ public class DashboardActivity extends AppCompatActivity {
         
         int userId = AppData.getCurrentUserId(this);
          FIXED_USER_ID = userId;
+
+        // File d'attente de renvoi (WorkManager): relance périodiquement (et dès
+        // le retour du réseau) les messages restés PENDING dans l'outbox local.
+        com.example.theperegrinefund.work.RetryWorkScheduler.schedulePeriodic(this);
         // FIXED_USER_ID = 4;
 
         syncTopButton = findViewById(R.id.btn_sync_top);
@@ -536,7 +540,6 @@ public class DashboardActivity extends AppCompatActivity {
     private void updateStatus(int messageId, String newStatus, Button btnEnCours, Button btnMaitrise) {
         btnEnCours.setVisibility(View.GONE);
         btnMaitrise.setVisibility(View.GONE);
-        SmsSender smsSender = new SmsSender(this);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String currentDateString = LocalDateTime.now().format(formatter);
@@ -546,24 +549,32 @@ public class DashboardActivity extends AppCompatActivity {
             getStatusIdFromName(newStatus),
             messageId
         );
-        
-       try {
-            smsSender.sendHistory(historique);
 
-            runOnUiThread(() -> {
+        // Priorité HTTP direct si internet est disponible ; repli SMS sinon
+        // (voir ServerSender.dispatch()). Les boutons sont ré-affichés
+        // uniquement si l'envoi finit par échouer même en SMS.
+        ServerSender sender = serverSender != null ? serverSender : new ServerSender(
+                new Retrofit.Builder()
+                        .baseUrl(SERVER_URL)
+                        .client(com.example.theperegrinefund.network.NetworkClientProvider.get())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+                        .create(ApiService.class),
+                new SmsSender(this), this);
+
+        sender.sendHistory(historique, new ServerSender.SendCallback() {
+            @Override
+            public void onSent() {
                 showMessageDetails(messageId);
-                Toast.makeText(this, "Historique envoyé par SMS", Toast.LENGTH_SHORT).show();
-            });
+            }
 
-        } catch (Exception e) {
-            Toast.makeText(this, "Erreur envoi SMS : " + e.getMessage(), Toast.LENGTH_LONG).show();
-
-            // Réafficher les boutons en cas d’échec
-            btnEnCours.setVisibility(View.VISIBLE);
-            btnMaitrise.setVisibility(View.VISIBLE);
-        }
-
-      //  showMessageDetails(messageId);
+            @Override
+            public void onQueuedForRetry() {
+                // Réafficher les boutons en cas d'échec complet (HTTP + SMS)
+                btnEnCours.setVisibility(View.VISIBLE);
+                btnMaitrise.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private int getStatusIdFromName(String statusName) {

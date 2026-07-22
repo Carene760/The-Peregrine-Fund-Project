@@ -30,6 +30,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 }
 
@@ -49,6 +50,9 @@ dependencies {
     // Lifecycle components
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+
+    // WorkManager: offline retry/queue for failed message sends (HTTP/SMS)
+    implementation 'androidx.work:work-runtime:2.9.0'
 
     // Tests
     testImplementation 'junit:junit:4.13.2'
