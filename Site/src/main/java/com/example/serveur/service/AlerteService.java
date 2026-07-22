@@ -55,7 +55,8 @@ public class AlerteService {
     private EmailService emailService;
     
     private final AlerteRepository alerteRepository;
-    
+    private final DeadLetterService deadLetterService;
+
     public AlerteService(MessageRepository messageRepository,
                         HistoriqueMessageStatusRepository historiqueRepository,
                         InterventionRepository interventionRepository,
@@ -66,7 +67,8 @@ public class AlerteService {
                         SmsResponseService smsResponseService,
                         AlerteRepository alerteRepository,
                         FonctionZoneAlerteRepository fonctionZoneAlerteRepository, // ← Nouveau
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        DeadLetterService deadLetterService) {
         this.messageRepository = messageRepository;
         this.historiqueRepository = historiqueRepository;
         this.interventionRepository = interventionRepository;
@@ -78,6 +80,7 @@ public class AlerteService {
         this.alerteRepository = alerteRepository;
         this.fonctionZoneAlerteRepository = fonctionZoneAlerteRepository;
         this.userRepository = userRepository;
+        this.deadLetterService = deadLetterService;
     }
 
     public Alerte save(Alerte alerte) {
@@ -144,8 +147,8 @@ public class AlerteService {
                 String[] parties = messageAlerte.split("/", -1);
 
                 if (parties.length != 12) {
-                    return "❌ Format invalide: " + (parties.length - 1) +
-                           " séparateurs trouvés (12 attendus). Éléments manquants.";
+                    return reject(phoneNumber, messageAlerte,
+                            "Format invalide: " + (parties.length - 1) + " séparateurs trouvés (12 attendus)");
                 }
 
                 // Debug: Afficher toutes les parties
@@ -175,19 +178,19 @@ public class AlerteService {
             
             // Validation renforcée des champs obligatoires
             if (dateCommencement == null) {
-                return "❌ Date de commencement manquante ou invalide";
+                return reject(phoneNumber, messageAlerte, "Date de commencement manquante ou invalide");
             }
             if (dateSignalement == null) {
-                return "❌ Date de signalement manquante ou invalide";
+                return reject(phoneNumber, messageAlerte, "Date de signalement manquante ou invalide");
             }
             if (idIntervention == null) {
-                return "❌ ID intervention manquant ou invalide";
+                return reject(phoneNumber, messageAlerte, "ID intervention manquant ou invalide");
             }
             if (idUserApp == null) {
-                return "❌ ID UserApp manquant ou invalide";
+                return reject(phoneNumber, messageAlerte, "ID UserApp manquant ou invalide");
             }
             if (idStatus == null) {
-                return "❌ ID Status manquant ou invalide";
+                return reject(phoneNumber, messageAlerte, "ID Status manquant ou invalide");
             }
 
             if (!dateSignalement.isAfter(dateCommencement)) {
@@ -201,29 +204,29 @@ public class AlerteService {
             }
 
             if (!dateSignalement.isAfter(dateCommencement)) {
-                return "❌ Incohérence des dates: dateSignalement doit être > dateCommencement";
+                return reject(phoneNumber, messageAlerte, "Incohérence des dates: dateSignalement doit être > dateCommencement");
             }
-            
+
             System.out.println("✅ Données parsées - ID UserApp: " + idUserApp);
 
             if (isDuplicateMessage(longitude, latitude)) {
                 return "⚠️ Message déjà existant - Doublon ignoré";
             }
-            
+
             // Vérifier que les entités référencées existent
             Optional<Intervention> interventionOpt = interventionRepository.findById(idIntervention);
             if (interventionOpt.isEmpty()) {
-                return "❌ Intervention non trouvée avec ID: " + idIntervention;
+                return reject(phoneNumber, messageAlerte, "Intervention non trouvée avec ID: " + idIntervention);
             }
-            
+
             Optional<UserApp> userAppOpt = userAppRepository.findById(idUserApp);
             if (userAppOpt.isEmpty()) {
-                return "❌ UserApp non trouvé avec ID: " + idUserApp;
+                return reject(phoneNumber, messageAlerte, "UserApp non trouvé avec ID: " + idUserApp);
             }
-            
+
             Optional<StatusMessage> statusOpt = statusMessageRepository.findById(idStatus);
             if (statusOpt.isEmpty()) {
-                return "❌ Status non trouvé avec ID: " + idStatus;
+                return reject(phoneNumber, messageAlerte, "Status non trouvé avec ID: " + idStatus);
             }
             
             // Créer et sauvegarder le message
@@ -277,8 +280,16 @@ public class AlerteService {
         } catch (Exception e) {
             System.err.println("❌ Erreur détaillée lors du traitement de l'alerte: " + e.getMessage());
             e.printStackTrace();
-            return "❌ Erreur lors du traitement de l'alerte: " + e.getMessage();
-        } 
+            deadLetterService.record("AlerteService.processAlerte", phoneNumber,
+                    "Exception: " + e.getClass().getSimpleName() + ": " + e.getMessage(), messageAlerte);
+            return "❌ Erreur lors du traitement de l'alerte";
+        }
+    }
+
+    /** Records a malformed/rejected alert in the dead-letter log before returning the user-facing reason. */
+    private String reject(String phoneNumber, String rawMessage, String reason) {
+        deadLetterService.record("AlerteService.processAlerte", phoneNumber, reason, rawMessage);
+        return "❌ " + reason;
     }
 
     private boolean isDuplicateMessage(Double longitude, Double latitude) {

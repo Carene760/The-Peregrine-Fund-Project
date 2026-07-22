@@ -13,6 +13,8 @@ import jakarta.annotation.PostConstruct;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,9 @@ import com.example.serveur.util.*;
 @RestController
 @RequestMapping("/api")
 public class ServeurController {
+
+    private static final Logger log = LoggerFactory.getLogger(ServeurController.class);
+    private static final String GENERIC_SERVER_ERROR = "Erreur serveur, veuillez réessayer plus tard";
 
     private final SmsProcessingService smsProcessingService;
     private final SmsResponseService smsResponseService;
@@ -124,8 +129,8 @@ public class ServeurController {
             return new LoginResponse(loginValide, message, userId);
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors du login: " + e.getMessage());
-            return new LoginResponse(false, "Erreur serveur: " + e.getMessage(), null);
+            log.error("Erreur lors du login pour {}", request.getPhoneNumber(), e);
+            return new LoginResponse(false, GENERIC_SERVER_ERROR, null);
         }
     }
 
@@ -169,8 +174,8 @@ public class ServeurController {
             return new AlerteResponse(true, reponseAccuse, idSite);
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors du traitement de l'alerte: " + e.getMessage());
-            return new AlerteResponse(false, "Erreur serveur: " + e.getMessage(), null);
+            log.error("Erreur lors du traitement de l'alerte pour {}", request.getPhoneNumber(), e);
+            return new AlerteResponse(false, GENERIC_SERVER_ERROR, null);
         }
     }
 
@@ -221,8 +226,8 @@ public class ServeurController {
             return new StatusUpdateResponse(success, resultat);
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la mise à jour du statut: " + e.getMessage());
-            return new StatusUpdateResponse(false, "Erreur serveur: " + e.getMessage());
+            log.error("Erreur lors de la mise à jour du statut pour {}", request.getPhoneNumber(), e);
+            return new StatusUpdateResponse(false, GENERIC_SERVER_ERROR);
         }
     }
     
@@ -257,8 +262,8 @@ public ResponseEntity<?> handleAnyMessage(@RequestBody Map<String, Object> reque
         return ResponseEntity.badRequest().body("Format de message non supporté");
         
     } catch (Exception e) {
-        System.err.println("❌ Erreur traitement message: " + e.getMessage());
-        return ResponseEntity.status(500).body("Erreur serveur");
+        log.error("Erreur traitement message /api/message", e);
+        return ResponseEntity.status(500).body(GENERIC_SERVER_ERROR);
     }
 }
 
@@ -266,13 +271,14 @@ private ResponseEntity<?> handleWebhookFormat(String phoneNumber, String message
     try {
         String messageClair = smsProcessingService.processMessage(message, phoneNumber);
         String reponseAccuse = traiterMessage(messageClair, phoneNumber, true);
-        
+
         smsLoggingService.logSms(phoneNumber, messageClair, receivedAt);
         smsResponseService.sendResponse(phoneNumber, reponseAccuse);
-        
+
         return ResponseEntity.ok().body(Map.of("status", "success", "message", reponseAccuse));
     } catch (Exception e) {
-        return ResponseEntity.status(500).body(Map.of("status", "error", "message", e.getMessage()));
+        log.error("Erreur traitement message webhook pour {}", phoneNumber, e);
+        return ResponseEntity.status(500).body(Map.of("status", "error", "message", GENERIC_SERVER_ERROR));
     }
 }
 
@@ -280,13 +286,14 @@ private ResponseEntity<?> handleDirectFormat(String phoneNumber, String message)
     try {
         String messageClair = smsProcessingService.processMessage(message, phoneNumber);
         String reponseAccuse = traiterMessage(messageClair, phoneNumber, true);
-        
+
         smsLoggingService.logSms(phoneNumber, messageClair, java.time.LocalDateTime.now().toString());
         smsResponseService.sendResponse(phoneNumber, reponseAccuse);
-        
+
         return ResponseEntity.ok().body(Map.of("status", "success", "message", reponseAccuse));
     } catch (Exception e) {
-        return ResponseEntity.status(500).body(Map.of("status", "error", "message", e.getMessage()));
+        log.error("Erreur traitement message direct pour {}", phoneNumber, e);
+        return ResponseEntity.status(500).body(Map.of("status", "error", "message", GENERIC_SERVER_ERROR));
     }
 }
 
