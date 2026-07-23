@@ -5,10 +5,8 @@ import java.time.LocalDateTime;
 import java.util.Locale;   
 import android.content.ContentValues;
 import android.content.Context;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import android.util.Base64;
 import android.database.sqlite.SQLiteDatabase;
+import com.example.theperegrinefund.security.CryptoUtils;
 import com.google.gson.annotations.SerializedName;
 
 import java.time.LocalDateTime;
@@ -109,21 +107,17 @@ public class Message {
     public Evenement getEvenement() { return evenement; }
     public void setEvenement(Evenement evenement) { this.evenement = evenement; }
 
+    // Délègue à CryptoUtils (AES/GCM/NoPadding) plutôt que de dupliquer la
+    // logique de chiffrement ici. Cette classe utilisait auparavant sa
+    // propre copie de Cipher.getInstance("AES") (ECB, non sécurisé) - voir
+    // CryptoUtils pour le détail du correctif et le format de fil (IV
+    // préfixé au ciphertext).
     public String chiffrer(String cleSecrete, String mess) throws Exception {
-        SecretKeySpec key = new SecretKeySpec(cleSecrete.getBytes("UTF-8"), "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        byte[] encrypted = cipher.doFinal(mess.getBytes("UTF-8"));
-        return Base64.encodeToString(encrypted, Base64.DEFAULT);
+        return CryptoUtils.encrypt(cleSecrete, mess);
     }
 
     public String dechiffrer(String cleSecrete, String texteChiffre) throws Exception {
-        SecretKeySpec key = new SecretKeySpec(cleSecrete.getBytes("UTF-8"), "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        byte[] decoded = Base64.decode(texteChiffre, Base64.DEFAULT);
-        byte[] decrypted = cipher.doFinal(decoded);
-        return new String(decrypted, "UTF-8");
+        return CryptoUtils.decrypt(cleSecrete, texteChiffre);
     }
    public int save(Context context) {
     MyDatabaseHelper dbHelper = new MyDatabaseHelper(context);

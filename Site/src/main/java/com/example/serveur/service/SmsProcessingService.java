@@ -50,6 +50,14 @@ public class SmsProcessingService {
         return encryptionUtil.dechiffrer(messageChiffre);
     }
 
+    // Chiffrement AES/GCM: IV (12 octets) + tag d'authentification (16 octets)
+    // = 28 octets de surcoût minimum, quelle que soit la taille du texte
+    // clair. Contrairement à l'ancien mode ECB (aligné sur des blocs de 16
+    // octets), un ciphertext GCM n'a AUCUNE contrainte d'alignement: ne pas
+    // vérifier "% 16 == 0" ici, sous peine de rejeter à tort de vrais
+    // messages chiffrés comme "déjà en clair".
+    private static final int GCM_MIN_CIPHERTEXT_BYTES = 28;
+
     private boolean isLikelyEncryptedPayload(String str) {
         try {
             String cleaned = str.replaceAll("\\s+", "").replace("-", "+").replace("_", "/");
@@ -62,7 +70,7 @@ public class SmsProcessingService {
             }
 
             byte[] decoded = Base64.getDecoder().decode(cleaned);
-            return decoded.length >= 16 && decoded.length % 16 == 0;
+            return decoded.length >= GCM_MIN_CIPHERTEXT_BYTES;
         } catch (IllegalArgumentException e) {
             return false;
         }
