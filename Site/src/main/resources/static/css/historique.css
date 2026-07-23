@@ -852,6 +852,21 @@ select.edit-input {
     }
 }
 
+@media (max-width: 900px) {
+    /* Colonnes secondaires (moins consultées au quotidien) masquées pour
+       réduire la largeur de la table sur petit écran - toujours présentes
+       dans le DOM (juste cachées visuellement) donc l'édition en ligne,
+       l'export/import et le regroupement d'événements continuent de
+       fonctionner normalement, y compris sur ces colonnes. */
+    .data-table {
+        min-width: 1040px;
+    }
+
+    .col-secondary {
+        display: none;
+    }
+}
+
 @media (max-width: 480px) {
     .user-form {
         padding: 30px 15px;

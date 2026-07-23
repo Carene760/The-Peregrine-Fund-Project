@@ -9,6 +9,7 @@
     <title>Historique</title>
 </head>
 <body>
+<div th:replace="~{fragments/language-switcher :: switcher}"></div>
 <div class="main-container" role="main" aria-label="Contenu principal">
     <!-- Header -->
     <header class="header">
@@ -38,11 +39,12 @@
     <section class="filters-section">
         <div class="filter-group">
             <label for="filterYear">Année</label>
+            <!-- Options generees dynamiquement en JS depuis les annees reellement
+                 presentes dans les donnees (voir renderTable() plus bas) - une
+                 liste figee ici finit toujours par etre fausse (annees manquantes
+                 ou obsoletes, comme le montrait la version precedente). -->
             <select id="filterYear" class="filter-select">
                 <option value="">Toutes</option>
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
             </select>
         </div>
 
@@ -112,6 +114,7 @@
                 <select id="exportFormat" class="filter-select export-format-select">
                     <option value="csv">CSV</option>
                     <option value="xlsx">XLSX</option>
+                    <option value="json">JSON</option>
                 </select>
             </div>
 
@@ -201,21 +204,21 @@
             <thead class="table-header">
             <tr>
                 <th th:if="${user.fonction.fonction == 'Administrateur'}">Sélection</th>
-                <th>Site</th>
-                <th>Date Début</th>
-                <th>Date Signalement</th>
-                <th>Point Repère</th>
-                <th>Surface (m²)</th>
-                <th>Description</th>
-                <th>Direction</th>
-                <th>Renfort</th>
-                <th>Longitude</th>
-                <th>Latitude</th>
-                <th>Intervention</th>
-                <th>Événement</th>
-                <th>Alerte</th>
-                <th>Status</th>
-                <th>Agent</th>
+                <th data-column="site">Site</th>
+                <th data-column="dateCommencement">Date Début</th>
+                <th data-column="dateSignalement">Date Signalement</th>
+                <th data-column="pointRepere">Point Repère</th>
+                <th data-column="surface">Surface (m²)</th>
+                <th data-column="description">Description</th>
+                <th data-column="direction" class="col-secondary">Direction</th>
+                <th data-column="renfort" class="col-secondary">Renfort</th>
+                <th data-column="longitude" class="col-secondary">Longitude</th>
+                <th data-column="latitude" class="col-secondary">Latitude</th>
+                <th data-column="intervention">Intervention</th>
+                <th data-column="evenement">Événement</th>
+                <th data-column="alerte">Alerte</th>
+                <th data-column="status">Status</th>
+                <th data-column="agent">Agent</th>
                 <th th:if="${user.fonction.fonction == 'Administrateur'}">Action</th>
             </tr>
             </thead>
@@ -269,7 +272,7 @@
                 </td>
 
                 <!-- Direction -->
-                <td class="table-cell" data-column="direction">
+                <td class="table-cell col-secondary" data-column="direction">
                     <span class="display-value" th:text="${msg.direction}"></span>
                     <select class="edit-input is-hidden">
                         <option value="">-- Sélectionner --</option>
@@ -278,7 +281,7 @@
                 </td>
 
                 <!-- Renfort -->
-                <td class="table-cell" data-column="renfort">
+                <td class="table-cell col-secondary" data-column="renfort">
                     <span class="display-value" th:text="${msg.renfort ? 'Oui' : 'Non'}"></span>
                     <select class="edit-input is-hidden">
                         <option value="">-- Sélectionner --</option>
@@ -288,13 +291,13 @@
                 </td>
 
                 <!-- Longitude -->
-                <td class="table-cell" data-column="longitude">
+                <td class="table-cell col-secondary" data-column="longitude">
                     <span class="display-value" th:text="${msg.longitude}"></span>
                     <input class="edit-input is-hidden" type="number" step="0.000001" th:value="${msg.longitude != null ? msg.longitude : ''}" />
                 </td>
 
                 <!-- Latitude -->
-                <td class="table-cell" data-column="latitude">
+                <td class="table-cell col-secondary" data-column="latitude">
                     <span class="display-value" th:text="${msg.latitude}"></span>
                     <input class="edit-input is-hidden" type="number" step="0.000001" th:value="${msg.latitude != null ? msg.latitude : ''}" />
                 </td>
@@ -406,6 +409,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const rows = Array.from(document.querySelectorAll("#messageTable tr.table-row"));
 
     let currentPage = 1;
+
+    function populateYearFilter() {
+        const years = new Set();
+        rows.forEach(row => {
+            const year = (row.dataset.annee || "").trim();
+            if (year) years.add(year);
+        });
+        Array.from(years).sort((a, b) => b.localeCompare(a)).forEach(year => {
+            const option = document.createElement("option");
+            option.value = year;
+            option.textContent = year;
+            filterYear.appendChild(option);
+        });
+    }
+    populateYearFilter();
 
     function getFilteredRows() {
         const year = (filterYear.value || "").trim();

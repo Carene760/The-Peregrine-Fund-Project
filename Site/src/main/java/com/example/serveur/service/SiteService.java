@@ -7,19 +7,23 @@ import org.springframework.stereotype.Service;
 
 import com.example.serveur.repository.PatrouilleursRepository;
 import com.example.serveur.repository.SiteRepository;
+import com.example.serveur.repository.UserAppRepository;
 import com.example.serveur.model.Patrouilleurs;
 import com.example.serveur.model.Site;
 
 @Service
 public class SiteService {
-    
+
     private final PatrouilleursRepository patrouilleurRepository;
     private final SiteRepository siteRepository;
+    private final UserAppRepository userAppRepository;
 
-    
-    public SiteService(PatrouilleursRepository patrouilleurRepository, SiteRepository siteRepository) {
+
+    public SiteService(PatrouilleursRepository patrouilleurRepository, SiteRepository siteRepository,
+                        UserAppRepository userAppRepository) {
         this.patrouilleurRepository = patrouilleurRepository;
         this.siteRepository = siteRepository;
+        this.userAppRepository = userAppRepository;
     }
 
     public Site save(Site site) {
@@ -74,6 +78,24 @@ public class SiteService {
         return phoneNumber.replaceAll("[\\s\\-\\(\\)\\+]", "");
     }
     
+    /**
+     * Détermine l'ID du site à partir de l'ID de l'utilisateur mobile
+     * connecté (idUserApp), plutôt que du numéro de téléphone.
+     *
+     * Nécessaire pour l'envoi HTTP direct (sans passer par le gateway SMS) :
+     * dans ce cas, le "phoneNumber" transmis au serveur est le numéro fixe
+     * de la passerelle (ServerSender envoie ConfigLoader.getFixedNumber()),
+     * pas celui de l'agent connecté - determinerIdSite(phoneNumber) échoue
+     * donc systématiquement pour ce chemin, alors que idUserApp est déjà
+     * présent dans le contenu du message et identifie l'agent sans ambiguïté.
+     */
+    public Integer determinerIdSiteParUserApp(Integer idUserApp) {
+        if (idUserApp == null) {
+            return null;
+        }
+        return userAppRepository.findIdSiteByUserAppId(idUserApp).orElse(null);
+    }
+
     /**
      * Version alternative avec gestion des erreurs plus avancée
      */

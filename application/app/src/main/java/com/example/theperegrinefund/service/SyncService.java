@@ -89,7 +89,11 @@ public class SyncService {
                 url = "";
             }
         }
-        BASE_URL = url;
+        // Défensif: chaque appel ci-dessous concatène "BASE_URL + \"/xxx\"" -
+        // un éventuel "/" final sur l'URL source (config.properties ou une
+        // future évolution de ConfigLoader) produirait un ".../sync//xxx"
+        // ne correspondant à aucune route serveur.
+        BASE_URL = url != null && url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
         Log.d(TAG, "BASE_URL finale: " + BASE_URL);
     }
 

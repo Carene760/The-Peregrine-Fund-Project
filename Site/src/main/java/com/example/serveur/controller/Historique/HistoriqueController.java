@@ -160,6 +160,7 @@ public class HistoriqueController {
         String extension = switch (normalizedFormat) {
             case "xlsx" -> "xlsx";
             case "pdf" -> "pdf";
+            case "json" -> "json";
             default -> "csv";
         };
 
@@ -167,6 +168,7 @@ public class HistoriqueController {
         String contentType = switch (extension) {
             case "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
             case "pdf" -> MediaType.APPLICATION_PDF_VALUE;
+            case "json" -> MediaType.APPLICATION_JSON_VALUE;
             default -> "text/csv; charset=UTF-8";
         };
 

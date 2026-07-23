@@ -21,13 +21,16 @@ public class HistoriqueMessageStatusService {
     private final HistoriqueMessageStatusRepository historiqueMessageStatusRepository;
     private final MessageRepository messageRepository;
     private final StatusMessageRepository statusMessageRepository;
-    
+    private final AlerteService alerteService;
+
     public HistoriqueMessageStatusService(HistoriqueMessageStatusRepository historiqueMessageStatusRepository,
                                   MessageRepository messageRepository,
-                                  StatusMessageRepository statusMessageRepository) {
+                                  StatusMessageRepository statusMessageRepository,
+                                  AlerteService alerteService) {
         this.historiqueMessageStatusRepository = historiqueMessageStatusRepository;
         this.messageRepository = messageRepository;
         this.statusMessageRepository = statusMessageRepository;
+        this.alerteService = alerteService;
     }
 
     public HistoriqueMessageStatus save(HistoriqueMessageStatus historiqueMessageStatus) {
@@ -110,8 +113,14 @@ public class HistoriqueMessageStatusService {
             System.out.println("  - Message ID: " + idMessage);
             System.out.println("  - Nouveau statut: " + statusText);
             System.out.println("  - Date: " + dateChangement);
-            
-            return String.format("✅ Statut du message %d mis à jour vers '%s' le %s", 
+
+            // Prévenir les mêmes destinataires que l'alerte initiale (fonctions
+            // concernées + zone email) du changement de statut - sans ça,
+            // personne d'autre que l'expéditeur (accusé SMS optionnel)
+            // n'était informé de l'évolution de la situation.
+            alerteService.notifierChangementStatut(messageOpt.get(), statusText);
+
+            return String.format("✅ Statut du message %d mis à jour vers '%s' le %s",
                                 idMessage, statusText, dateChangement.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
             
         } catch (Exception e) {

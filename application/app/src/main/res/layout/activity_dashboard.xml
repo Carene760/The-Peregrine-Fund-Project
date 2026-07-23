@@ -341,6 +341,16 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="16dp" />
 
+    <!-- Langue -->
+    <ImageView
+        android:id="@+id/language_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_language"
+        android:contentDescription="@string/language_picker_title"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true" />
+
     <!-- Logout -->
     <ImageView
         android:id="@+id/logout_icon"

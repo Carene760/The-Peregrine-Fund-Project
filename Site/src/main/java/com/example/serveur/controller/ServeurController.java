@@ -85,6 +85,7 @@ public class ServeurController {
         smsLoggingService.logSms(phoneNumber, messageClair, payload.getReceivedAt());
         smsResponseService.sendResponse(phoneNumber, reponseAccuse);
 
+        System.out.println("✅ [gateway SMS] Action traitée pour " + phoneNumber + " -> " + reponseAccuse);
         return smsResponseService.createSuccessResponse();
     }
 
@@ -126,6 +127,8 @@ public class ServeurController {
             // Log de l'activité
             smsLoggingService.logSms(request.getPhoneNumber(), messageClair, java.time.LocalDateTime.now().toString());
 
+            System.out.println("✅ [internet direct /api/login] Action traitée pour "
+                    + request.getPhoneNumber() + " -> " + message);
             return new LoginResponse(loginValide, message, userId);
 
         } catch (Exception e) {
@@ -155,7 +158,7 @@ public class ServeurController {
             }
 
             // Déterminer le site
-            Integer idSite = siteService.determinerIdSite(request.getPhoneNumber());
+            Integer idSite = resolveIdSite(request.getPhoneNumber(), messageClair);
             if (idSite == null) {
                 return new AlerteResponse(false, "Impossible de déterminer le site", null);
             }
@@ -171,6 +174,8 @@ public class ServeurController {
             // Log de l'activité
             smsLoggingService.logSms(request.getPhoneNumber(), messageClair, java.time.LocalDateTime.now().toString());
 
+            System.out.println("✅ [internet direct /api/message-alerte] Action traitée pour "
+                    + request.getPhoneNumber() + " -> " + reponseAccuse);
             return new AlerteResponse(true, reponseAccuse, idSite);
 
         } catch (Exception e) {
@@ -223,6 +228,8 @@ public class ServeurController {
             smsLoggingService.logSms(request.getPhoneNumber(), messageClair, java.time.LocalDateTime.now().toString());
 
             boolean success = resultat.startsWith("✅");
+            System.out.println("✅ [internet direct /api/update-status] Action traitée pour "
+                    + request.getPhoneNumber() + " -> " + resultat);
             return new StatusUpdateResponse(success, resultat);
 
         } catch (Exception e) {
@@ -270,12 +277,19 @@ public ResponseEntity<?> handleAnyMessage(@RequestBody Map<String, Object> reque
 private ResponseEntity<?> handleWebhookFormat(String phoneNumber, String message, String receivedAt) {
     try {
         String messageClair = smsProcessingService.processMessage(message, phoneNumber);
+        System.out.println("🔎 Message déchiffré (webhook): '" + messageClair + "'");
         String reponseAccuse = traiterMessage(messageClair, phoneNumber, true);
 
         smsLoggingService.logSms(phoneNumber, messageClair, receivedAt);
         smsResponseService.sendResponse(phoneNumber, reponseAccuse);
 
-        return ResponseEntity.ok().body(Map.of("status", "success", "message", reponseAccuse));
+        // Map.of() rejette les valeurs null (ex: type MESSAGE_SIMPLE, pour
+        // lequel traiterMessage() ne construit volontairement aucune réponse)
+        // - sans ce repli, ce cas provoquait un 500 (NullPointerException).
+        String messageReponse = reponseAccuse != null ? reponseAccuse : "Message reçu (aucune réponse à renvoyer)";
+
+        System.out.println("✅ [webhook] Action traitée pour " + phoneNumber + " -> " + reponseAccuse);
+        return ResponseEntity.ok().body(Map.of("status", "success", "message", messageReponse));
     } catch (Exception e) {
         log.error("Erreur traitement message webhook pour {}", phoneNumber, e);
         return ResponseEntity.status(500).body(Map.of("status", "error", "message", GENERIC_SERVER_ERROR));
@@ -285,12 +299,22 @@ private ResponseEntity<?> handleWebhookFormat(String phoneNumber, String message
 private ResponseEntity<?> handleDirectFormat(String phoneNumber, String message) {
     try {
         String messageClair = smsProcessingService.processMessage(message, phoneNumber);
+        System.out.println("🔎 Message déchiffré (internet direct): '" + messageClair + "'");
         String reponseAccuse = traiterMessage(messageClair, phoneNumber, true);
 
         smsLoggingService.logSms(phoneNumber, messageClair, java.time.LocalDateTime.now().toString());
         smsResponseService.sendResponse(phoneNumber, reponseAccuse);
 
-        return ResponseEntity.ok().body(Map.of("status", "success", "message", reponseAccuse));
+        // Voir commentaire équivalent dans handleWebhookFormat: Map.of()
+        // rejette les valeurs null.
+        String messageReponse = reponseAccuse != null ? reponseAccuse : "Message reçu (aucune réponse à renvoyer)";
+
+        // Confirmation explicite et visible en console qu'une action envoyée
+        // directement par internet (sans passer par le gateway SMS) a bien
+        // été reçue et traitée par le serveur - demandé pour pouvoir
+        // vérifier en direct pendant les tests locaux.
+        System.out.println("✅ [internet direct] Action traitée pour " + phoneNumber + " -> " + reponseAccuse);
+        return ResponseEntity.ok().body(Map.of("status", "success", "message", messageReponse));
     } catch (Exception e) {
         log.error("Erreur traitement message direct pour {}", phoneNumber, e);
         return ResponseEntity.status(500).body(Map.of("status", "error", "message", GENERIC_SERVER_ERROR));
@@ -337,8 +361,8 @@ private ResponseEntity<?> handleDirectFormat(String phoneNumber, String message)
                 
             case ALERTE:
                 System.out.println("🚨 Alerte détectée - Traitement spécialisé");
-                Integer idSite = siteService.determinerIdSite(phoneNumber);
-                
+                Integer idSite = resolveIdSite(phoneNumber, messageClair);
+
                 if (idSite != null) {
                     reponseAccuse = alerteService.processAlerte(messageClair, idSite, phoneNumber);
                 } else {
@@ -358,6 +382,42 @@ private ResponseEntity<?> handleDirectFormat(String phoneNumber, String message)
         }
 
         return reponseAccuse;
+    }
+
+    /**
+     * Détermine le site d'une alerte à partir du numéro de téléphone, avec
+     * repli sur idUserApp si le numéro ne correspond à aucun patrouilleur.
+     *
+     * Le repli est nécessaire pour l'envoi HTTP direct depuis l'appli (sans
+     * passer par le gateway SMS) : ServerSender envoie le numéro fixe de la
+     * passerelle comme "phoneNumber" (il n'y a pas d'autre numéro
+     * disponible côté transport HTTP), qui ne correspond à aucun
+     * patrouilleur réel - determinerIdSite(phoneNumber) échouerait alors
+     * systématiquement pour ce chemin, alors que idUserApp (l'agent
+     * réellement connecté) est déjà présent dans le contenu du message.
+     */
+    private Integer resolveIdSite(String phoneNumber, String messageClair) {
+        Integer idSite = siteService.determinerIdSite(phoneNumber);
+        if (idSite != null) {
+            return idSite;
+        }
+
+        Map<String, String> v2Fields = smsProcessingService.parseV2Fields(messageClair);
+        String idUserAppStr = v2Fields.get("idUserApp");
+        if (idUserAppStr == null || idUserAppStr.isBlank()) {
+            return null;
+        }
+        try {
+            Integer idUserApp = Integer.parseInt(idUserAppStr.trim());
+            Integer idSiteParUserApp = siteService.determinerIdSiteParUserApp(idUserApp);
+            if (idSiteParUserApp != null) {
+                System.out.println("✅ Site trouvé via idUserApp=" + idUserApp
+                        + " (repli, numéro '" + phoneNumber + "' non reconnu)");
+            }
+            return idSiteParUserApp;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private String[] extractStatusFields(String messageClair) {

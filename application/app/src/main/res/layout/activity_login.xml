@@ -19,7 +19,7 @@
         <!-- Section Header avec Logo et Slogan -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="119dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="26dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
@@ -27,20 +27,20 @@
             <!-- Logo -->
             <ImageView
                 android:id="@+id/logo"
-                android:layout_width="143dp"
-                android:layout_height="143dp"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:src="@drawable/logo_raptor"
                 android:contentDescription="@string/logo_description"
-                android:scaleType="centerCrop" />
+                android:scaleType="fitCenter" />
 
             <!-- Container pour le slogan -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="114dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="9dp"
                 android:gravity="center_vertical|start"
-                android:paddingStart="48dp"
+                android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
                 <TextView
@@ -85,7 +85,7 @@
 
                 <!-- Champ Nom -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="310dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
@@ -95,7 +95,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_name"
-                        android:layout_width="310dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/name_hint"
                         android:textColor="#000000"
@@ -106,7 +106,7 @@
 
                 <!-- Champ Mot de passe -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="310dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     app:boxBackgroundColor="#F5F5F5"
@@ -117,7 +117,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_password"
-                        android:layout_width="310dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/password_hint"
                         android:textColor="#000000"
@@ -132,7 +132,7 @@
         <!-- Bouton Sign In -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_sign_in"
-            android:layout_width="342dp"
+            android:layout_width="match_parent"
             android:layout_height="78dp"
             android:layout_marginTop="56dp"
             android:layout_marginStart="5dp"

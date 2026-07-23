@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Fragment inclus sur chaque page (th:replace="~{fragments/language-switcher :: switcher}").
+  Recharge la page courante avec ?lang=xx : WebConfig.localeChangeInterceptor()
+  intercepte ce paramètre et met à jour le cookie "app-locale" (voir
+  WebConfig.localeResolver()), donc le choix est mémorisé pour les pages
+  suivantes sans dépendre de la session de connexion.
+-->
+<div th:fragment="switcher">
+    <nav class="tpf-language-switcher" aria-label="Choix de la langue / Language / Fiteny"
+         style="position:fixed;top:8px;right:8px;z-index:1000;background:#fff;border:1px solid #ccc;border-radius:6px;padding:4px 8px;font:14px sans-serif;box-shadow:0 1px 4px rgba(0,0,0,0.15);">
+        <a href="#" onclick="tpfSetLang('fr'); return false;" style="margin:0 4px;text-decoration:none;color:#333;">FR</a>
+        <a href="#" onclick="tpfSetLang('en'); return false;" style="margin:0 4px;text-decoration:none;color:#333;">EN</a>
+        <a href="#" onclick="tpfSetLang('mg'); return false;" style="margin:0 4px;text-decoration:none;color:#333;">MG</a>
+    </nav>
+    <script>
+        function tpfSetLang(lang) {
+            var url = new URL(window.location.href);
+            url.searchParams.set('lang', lang);
+            window.location.href = url.toString();
+        }
+    </script>
+</div>
+</body>
+</html>

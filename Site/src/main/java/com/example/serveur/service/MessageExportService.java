@@ -3,6 +3,7 @@ package com.example.serveur.service;
 import com.example.serveur.model.Message;
 import com.example.serveur.model.HistoriqueMessageStatus;
 import com.example.serveur.repository.HistoriqueMessageStatusRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -23,15 +24,20 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MessageExportService {
 
     private final HistoriqueMessageStatusRepository historiqueMessageStatusRepository;
+    private final ObjectMapper objectMapper;
 
-    public MessageExportService(HistoriqueMessageStatusRepository historiqueMessageStatusRepository) {
+    public MessageExportService(HistoriqueMessageStatusRepository historiqueMessageStatusRepository,
+                                 ObjectMapper objectMapper) {
         this.historiqueMessageStatusRepository = historiqueMessageStatusRepository;
+        this.objectMapper = objectMapper;
     }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -170,8 +176,31 @@ public class MessageExportService {
         return switch (normalizedFormat) {
             case "xlsx" -> exportMessagesAsXlsx(messages);
             case "pdf" -> exportMessagesAsPdf(messages);
+            case "json" -> exportMessagesAsJson(messages);
             default -> exportMessagesAsCSV(messages).getBytes(StandardCharsets.UTF_8);
         };
+    }
+
+    /**
+     * Export JSON - mêmes colonnes/valeurs que le CSV, réutilise toRow(),
+     * pratique pour une réutilisation programmatique (tableau de bord
+     * externe, script d'analyse) plutôt qu'un tableur.
+     */
+    public byte[] exportMessagesAsJson(List<Message> messages) {
+        List<Map<String, String>> rows = new ArrayList<>();
+        for (Message message : messages) {
+            List<String> values = toRow(message);
+            Map<String, String> row = new LinkedHashMap<>();
+            for (int i = 0; i < HEADERS.size(); i++) {
+                row.put(HEADERS.get(i), i < values.size() ? values.get(i) : "");
+            }
+            rows.add(row);
+        }
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(rows);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de l'export JSON", e);
+        }
     }
 
     private List<String> toRow(Message message) {

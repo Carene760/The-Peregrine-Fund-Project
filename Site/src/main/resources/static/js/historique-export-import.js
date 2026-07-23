@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            const extension = selectedFormat === "xlsx" ? "xlsx" : selectedFormat === "pdf" ? "pdf" : "csv";
+            const extension = selectedFormat === "xlsx" ? "xlsx" : selectedFormat === "pdf" ? "pdf" : selectedFormat === "json" ? "json" : "csv";
             link.download = "historique_filtre_" + new Date().toISOString().split('T')[0] + "." + extension;
             document.body.appendChild(link);
             link.click();

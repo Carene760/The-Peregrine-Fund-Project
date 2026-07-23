@@ -39,13 +39,27 @@ public class ConfigLoader {
                 throw new RuntimeException("Fichier config.properties introuvable !");
             }
             props.load(input);
-            String url = props.getProperty("server.url");
+            String url = ensureTrailingSlash(props.getProperty("server.url"));
             Log.d("ConfigLoader", "URL chargée: " + url);
             return url;
         } catch (Exception e) {
             Log.e("ConfigLoader", "Erreur de lecture du fichier config", e);
             throw e;
         }
+    }
+
+    /**
+     * Retrofit's Retrofit.Builder#baseUrl() throws IllegalArgumentException
+     * if the URL does not end with "/". config.properties values are
+     * hand-edited (e.g. "http://192.168.1.103:8080") and easy to get wrong,
+     * so every caller of getServerUrl()/getBackupServerUrl() goes through
+     * this instead of trusting the raw property value.
+     */
+    private static String ensureTrailingSlash(String url) {
+        if (url == null || url.isEmpty() || url.endsWith("/")) {
+            return url;
+        }
+        return url + "/";
     }
     /**
      * Cle partagee envoyee dans l'en-tete X-API-Key pour authentifier les
@@ -71,6 +85,13 @@ public class ConfigLoader {
                 throw new RuntimeException("Fichier config.properties introuvable !");
             }
             props.load(input);
+            // Pas de ensureTrailingSlash ici volontairement: contrairement à
+            // getServerUrl() (consommé par Retrofit.Builder#baseUrl(), qui
+            // EXIGE un "/" final), server.backup.url est consommé par
+            // SyncService via une concaténation brute du type BASE_URL +
+            // "/status" - un "/" final ajouté ici produirait un double
+            // slash (".../sync//status") qui ne correspond à aucune route
+            // côté serveur (@RequestMapping("/sync") + @GetMapping("/status")).
             String url = props.getProperty("server.backup.url");
             Log.d("ConfigLoader", "URL backup chargée: " + url);
             return url;

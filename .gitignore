@@ -1,0 +1,4 @@
+# Fichiers de logs runtime (contenu potentiellement sensible: messages,
+# coordonnées GPS) - voir Site/src/main/resources/application.properties
+# (sms.logfile.path, deadletter.logfile.path), non versionné lui-même.
+/logs/

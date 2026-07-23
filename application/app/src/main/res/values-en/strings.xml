@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Application Name -->
+    <string name="app_name">The Peregrine Fund</string>
+
+    <!-- Login Screen -->
+    <string name="slogan_text">Saving raptors, enriching lives.</string>
+    <string name="name_hint">Name</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="send_mess_text">Send</string>
+
+    <!-- Error/Success Messages -->
+    <string name="error_name_required">Name is required</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_invalid_credentials">Incorrect username or password</string>
+    <string name="success_login">Login successful!</string>
+
+    <!-- Main Interface -->
+    <string name="welcome_message">Welcome to The Peregrine Fund!</string>
+    <string name="app_description">Discover the fascinating world of raptors and help protect them. Explore, learn, and act for the conservation of these magnificent birds of prey.</string>
+    <string name="explore_button">Explore</string>
+    <string name="profile_button">My Profile</string>
+
+    <!-- Menu Items -->
+    <string name="action_logout">Log out</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Accessibility -->
+    <string name="logo_description">Raptor app logo</string>
+    <string name="decoration_description">Central decorative image</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Raptor Dashboard</string>
+    <string name="history_title">History of sent messages</string>
+    <string name="fire_message">Message details </string>
+    <string name="fire_message_date"> </string>
+
+    <!-- Information Card -->
+    <string name="code_label">Code</string>
+    <string name="code_sample">dshdgs/hdjsa/23-09-25</string>
+    <string name="information_label">information</string>
+
+    <!-- Texte pour l'ouverture et la fermeture du Drawer -->
+    <string name="open_drawer">Open menu</string>
+    <string name="close_drawer">Close menu</string>
+
+    <!-- Message -->
+    <string name="thank_message">Please fill in the fields</string>
+
+    <!-- Form specific strings -->
+    <string name="form_title">Information form</string>
+    <string name="form_instruction">Please fill in</string>
+    <string name="general_info_title">General information</string>
+    <string name="general_info_title2">Additional information</string>
+
+    <!-- Form fields -->
+    <string name="category_label">Category</string>
+    <string name="datetime_label">Start date and time</string>
+    <string name="datetime_signal_label">Report date and time</string>
+
+    <!-- Sample values -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="datetime_hint">Choose start date-time</string>
+    <string name="datetime_signal_hint">Choose report date-time</string>
+    <string name="status_label">Status</string>
+    <string name="status_hint">Choose a status</string>
+    <string-array name="status_options">
+        <item>Start of fire</item>
+        <item>In progress</item>
+        <item>Under control</item>
+    </string-array>
+
+    <string name="intervention_label">Intervention</string>
+    <string name="intervention_hint">Choose an intervention</string>
+    <string-array name="intervention_options">
+        <item>Possible</item>
+        <item>Partial</item>
+        <item>Impossible</item>
+    </string-array>
+
+    <string name="zone_label">Backup</string>
+    <string name="zone_hint">Need backup?</string>
+    <string-array name="zone_options">
+        <item>No</item>
+        <item>Yes</item>
+    </string-array>
+
+    <string name="direction_label">Direction</string>
+    <string name="direction_hint">Choose a direction</string>
+    <string-array name="direction_options">
+        <item>North</item>
+        <item>South</item>
+        <item>East</item>
+        <item>West</item>
+    </string-array>
+
+    <string name="surface_label">Area (m2)</string>
+    <string name="surface_hint">Approximate area in m2</string>
+
+    <string name="pointR_label">Landmark</string>
+    <string name="pointR_hint">Landmark</string>
+
+    <string name="desc_label">Description</string>
+    <string name="desc_hint">Description</string>
+
+    <!-- Navigation -->
+    <string name="next_button">Next</string>
+    <string name="previous_button">Previous</string>
+    <string name="save_button">Save</string>
+
+    <!-- Validation messages -->
+    <string name="error_category_required">Category is required</string>
+    <string name="error_date_required">Date is required</string>
+    <string name="error_status_required">Status is required</string>
+    <string name="form_saved_success">Form saved successfully</string>
+
+    <string name="map_title">Bushfire map</string>
+    <string name="piechart_title">Alert zone distribution</string>
+    <string name="barchart_title">Number of messages per site</string>
+
+    <!-- Language picker -->
+    <string name="language_picker_title">Language</string>
+</resources>

@@ -70,7 +70,12 @@ public class Fragment2 extends Fragment {
                 e.printStackTrace();
             }
         }
-        return null;
+        // Champ non renseigné (ou illisible) - valeur par défaut "maintenant"
+        // plutôt que null: dateSignalement fait partie des champs requis
+        // pour qu'un message soit reconnu comme une alerte côté serveur
+        // (SmsProcessingService.determineMessageType) - le laisser vide
+        // faisait tomber le message en type MESSAGE_SIMPLE au lieu d'ALERTE.
+        return LocalDateTime.now();
     }
 
     private void openDateTimePicker(TextInputEditText editText) {

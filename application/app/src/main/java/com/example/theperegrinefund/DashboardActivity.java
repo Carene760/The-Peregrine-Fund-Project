@@ -98,6 +98,7 @@ public class DashboardActivity extends AppCompatActivity {
             
             Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(SERVER_URL)
+                .client(com.example.theperegrinefund.network.NetworkClientProvider.get(this))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
             
@@ -136,6 +137,8 @@ public class DashboardActivity extends AppCompatActivity {
         ImageView logoutIcon = findViewById(R.id.logout_icon);
         logoutIcon.setOnClickListener(v -> logout());
         filterIcon.setOnClickListener(v -> showFilterDialog());
+        ImageView languageIcon = findViewById(R.id.language_icon);
+        languageIcon.setOnClickListener(v -> showLanguagePicker());
         
         int userId = AppData.getCurrentUserId(this);
          FIXED_USER_ID = userId;
@@ -147,8 +150,6 @@ public class DashboardActivity extends AppCompatActivity {
 
         syncTopButton = findViewById(R.id.btn_sync_top);
         syncTopButton.setOnClickListener(v -> startSynchronization());
-
-        startSynchronization();
 
         newIcon.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, BaseActivity.class);
@@ -162,6 +163,16 @@ public class DashboardActivity extends AppCompatActivity {
         historyRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         historyRecyclerView.setAdapter(historyAdapter);
         loadMessagesAndApplyFilters();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Se declenche a chaque retour au premier plan (y compris retour
+        // depuis BaseActivity apres l'envoi d'un message/statut) - remplace
+        // l'appel unique qui etait dans onCreate() pour que l'ecran d'accueil
+        // se resynchronise automatiquement sans action manuelle de l'utilisateur.
+        startSynchronization();
     }
 
     private void startSynchronization() {
@@ -565,6 +576,11 @@ public class DashboardActivity extends AppCompatActivity {
         sender.sendHistory(historique, new ServerSender.SendCallback() {
             @Override
             public void onSent() {
+                // Ecriture locale immediate: sendHistory() ne fait que
+                // transmettre au serveur/SMS, la table historique locale
+                // n'est sinon mise a jour qu'au prochain SyncService.downloadHistorique(),
+                // ce qui faisait apparaitre l'ancien statut jusqu'a la prochaine synchro.
+                new HistoriqueMessageStatusDao(DashboardActivity.this).insertHistorique(historique);
                 showMessageDetails(messageId);
             }
 
@@ -631,6 +647,23 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Français (par défaut) / anglais / malgache - voir res/values{-en,-mg}/strings.xml.
+     * AppCompatDelegate.setApplicationLocales() persiste le choix et recrée
+     * automatiquement les activités AppCompat visibles pour appliquer la
+     * nouvelle langue, sans code de redémarrage manuel.
+     */
+    private void showLanguagePicker() {
+        String[] labels = {"Français", "English", "Malagasy"};
+        String[] tags = {"fr", "en", "mg"};
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.language_picker_title)
+                .setItems(labels, (dialog, which) ->
+                        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                                androidx.core.os.LocaleListCompat.forLanguageTags(tags[which])))
+                .show();
     }
 
     private void refreshData() {

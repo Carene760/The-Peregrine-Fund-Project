@@ -109,7 +109,9 @@ public class Fragment1 extends Fragment {
                 e.printStackTrace();
             }
         }
-        return null;
+        // Champ non renseigné (ou illisible) - valeur par défaut "maintenant"
+        // plutôt que null, par cohérence avec Fragment2.getDateSignalement().
+        return LocalDateTime.now();
     }
 
     public LocalDateTime getDateTime() {

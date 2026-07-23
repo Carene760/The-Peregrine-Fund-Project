@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Application Name -->
+    <string name="app_name">The Peregrine Fund</string>
+
+    <!-- Login Screen -->
+    <string name="slogan_text">Mamonjy vorona mpihaza, manatsara ny fiainana.</string>
+    <string name="name_hint">Anarana</string>
+    <string name="password_hint">Tenimiafina</string>
+    <string name="sign_in_text">Hiditra</string>
+    <string name="send_mess_text">Alefaso</string>
+
+    <!-- Error/Success Messages -->
+    <string name="error_name_required">Ilaina ny anarana</string>
+    <string name="error_password_required">Ilaina ny tenimiafina</string>
+    <string name="error_invalid_credentials">Diso ny anarana mpampiasa na ny tenimiafina</string>
+    <string name="success_login">Nahomby ny fidirana!</string>
+
+    <!-- Main Interface -->
+    <string name="welcome_message">Tongasoa ao amin\'ny The Peregrine Fund!</string>
+    <string name="app_description">Fantaro ny tontolon\'ny vorona mpihaza ary manampia amin\'ny fiarovana azy ireo. Tsidiho, ianaro ary miasà ho fiarovana ireo vorona mpihaza tsara tarehy ireo.</string>
+    <string name="explore_button">Jereo</string>
+    <string name="profile_button">Ny mombamomba ahy</string>
+
+    <!-- Menu Items -->
+    <string name="action_logout">Hivoaka</string>
+    <string name="action_settings">Fandrindrana</string>
+
+    <!-- Accessibility -->
+    <string name="logo_description">Logon\'ny fampiharana raptor</string>
+    <string name="decoration_description">Sary haingo afovoany</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Tabilaon\'ny Raptor</string>
+    <string name="history_title">Tantaran\'ny hafatra nalefa</string>
+    <string name="fire_message">Antsipirian\'ny hafatra </string>
+    <string name="fire_message_date"> </string>
+
+    <!-- Information Card -->
+    <string name="code_label">Kaody</string>
+    <string name="code_sample">dshdgs/hdjsa/23-09-25</string>
+    <string name="information_label">vaovao</string>
+
+    <!-- Texte pour l'ouverture et la fermeture du Drawer -->
+    <string name="open_drawer">Sokafy ny menu</string>
+    <string name="close_drawer">Hidio ny menu</string>
+
+    <!-- Message -->
+    <string name="thank_message">Azafady fenoy ny saha</string>
+
+    <!-- Form specific strings -->
+    <string name="form_title">Taratasy fanontaniana</string>
+    <string name="form_instruction">Azafady fenoy</string>
+    <string name="general_info_title">Vaovao ankapobeny</string>
+    <string name="general_info_title2">Vaovao fanampiny</string>
+
+    <!-- Form fields -->
+    <string name="category_label">Sokajy</string>
+    <string name="datetime_label">Daty sy ora nanombohana</string>
+    <string name="datetime_signal_label">Daty sy ora fitaterana</string>
+
+    <!-- Sample values -->
+    <string name="navigation_drawer_open">Sokafy ny tabilaon-tsivana</string>
+    <string name="navigation_drawer_close">Hidio ny tabilaon-tsivana</string>
+
+    <string name="datetime_hint">Safidio ny daty-ora fanombohana</string>
+    <string name="datetime_signal_hint">Safidio ny daty-ora fitaterana</string>
+    <string name="status_label">Sata</string>
+    <string name="status_hint">Safidio ny sata</string>
+    <string-array name="status_options">
+        <item>Fiandohan\'ny afo</item>
+        <item>Mandeha</item>
+        <item>Voafehy</item>
+    </string-array>
+
+    <string name="intervention_label">Fidirana an-tsehatra</string>
+    <string name="intervention_hint">Safidio ny fidirana an-tsehatra</string>
+    <string-array name="intervention_options">
+        <item>Azo atao</item>
+        <item>Sasany</item>
+        <item>Tsy azo atao</item>
+    </string-array>
+
+    <string name="zone_label">Fanampiana</string>
+    <string name="zone_hint">Mila fanampiana ve?</string>
+    <string-array name="zone_options">
+        <item>Tsia</item>
+        <item>Eny</item>
+    </string-array>
+
+    <string name="direction_label">Fironana</string>
+    <string name="direction_hint">Safidio ny fironana</string>
+    <string-array name="direction_options">
+        <item>Avaratra</item>
+        <item>Atsimo</item>
+        <item>Atsinanana</item>
+        <item>Andrefana</item>
+    </string-array>
+
+    <string name="surface_label">Velarantany (m2)</string>
+    <string name="surface_hint">Velarantany manodidina amin\'ny m2</string>
+
+    <string name="pointR_label">Famantarana toerana</string>
+    <string name="pointR_hint">Famantarana toerana</string>
+
+    <string name="desc_label">Famaritana</string>
+    <string name="desc_hint">Famaritana</string>
+
+    <!-- Navigation -->
+    <string name="next_button">Manaraka</string>
+    <string name="previous_button">Teo aloha</string>
+    <string name="save_button">Tehirizo</string>
+
+    <!-- Validation messages -->
+    <string name="error_category_required">Ilaina ny sokajy</string>
+    <string name="error_date_required">Ilaina ny daty</string>
+    <string name="error_status_required">Ilaina ny sata</string>
+    <string name="form_saved_success">Voatahiry soa aman-tsara ny taratasy</string>
+
+    <string name="map_title">Sarintany misy afo</string>
+    <string name="piechart_title">Fizarana ny faritra fampitandremana</string>
+    <string name="barchart_title">Isan\'ny hafatra isaky ny toerana</string>
+
+    <!-- Language picker -->
+    <string name="language_picker_title">Fiteny</string>
+</resources>

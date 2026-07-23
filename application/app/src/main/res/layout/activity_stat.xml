@@ -149,26 +149,24 @@
                     android:layout_marginTop="20dp">
 
 
-                    <!-- back (en bas à gauche du bouton) -->
+                    <!-- back -->
                     <ImageView
                         android:id="@+id/back_icon"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_back"
                         android:contentDescription="Back"
-                        android:layout_below="@id/btn_send_mess"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"/>
 
-                    <!-- Logout (en bas à droite du bouton) -->
+                    <!-- Logout -->
                     <ImageView
                         android:id="@+id/logout_icon"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_logout"
                         android:contentDescription="Logout"
-                        android:layout_below="@id/btn_send_mess"
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="16dp"
                         android:layout_marginTop="16dp"/>

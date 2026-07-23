@@ -7,6 +7,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,12 +25,15 @@ public class LoginController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final RememberMeCookieSigner cookieSigner;
+    private final MessageSource messageSource;
 
     @Autowired
-    public LoginController(UserService userService, PasswordEncoder passwordEncoder, RememberMeCookieSigner cookieSigner) {
+    public LoginController(UserService userService, PasswordEncoder passwordEncoder,
+                            RememberMeCookieSigner cookieSigner, MessageSource messageSource) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.cookieSigner = cookieSigner;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/")
@@ -69,7 +74,8 @@ public class LoginController {
 
             return "redirect:/history";
         } else {
-            model.addAttribute("error", "Nom d'utilisateur ou mot de passe incorrect");
+            model.addAttribute("error",
+                    messageSource.getMessage("login.default_error", null, LocaleContextHolder.getLocale()));
             model.addAttribute("submittedEmail", normalizedEmail);
             model.addAttribute("submittedPassword", password == null ? "" : password);
             return "login";

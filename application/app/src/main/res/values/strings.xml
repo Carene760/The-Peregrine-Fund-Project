@@ -127,4 +127,7 @@
     <string name="map_title">Carte des feux de brousse</string>
     <string name="piechart_title">Répartition des Zones d alerte</string>
     <string name="barchart_title">Nombre de messages par site</string>
+
+    <!-- Language picker -->
+    <string name="language_picker_title">Langue</string>
 </resources>

@@ -57,6 +57,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.Collections;
 import android.database.ContentObserver;
 import android.os.Handler;
+import android.os.Looper;
+import android.location.LocationManager;
+import java.util.concurrent.atomic.AtomicBoolean;
 import android.net.Uri;
 import android.database.Cursor;
 import android.util.Log;
@@ -73,6 +76,8 @@ import java.time.format.DateTimeFormatter;
 
 
 public class BaseActivity extends AppCompatActivity {
+
+    private static final String TAG = "BaseActivity";
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
@@ -99,6 +104,10 @@ public class BaseActivity extends AppCompatActivity {
     private int user;
     private String dernierSms = "";
     private static final int PERMISSION_REQUEST_READ_SMS = 100;
+
+    private Button btnSend;
+    private String btnSendDefaultText;
+    private boolean isSendingMessage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +142,8 @@ public class BaseActivity extends AppCompatActivity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        Button btnSend = findViewById(R.id.btn_send_mess);
+        btnSend = findViewById(R.id.btn_send_mess);
+        btnSendDefaultText = btnSend.getText().toString();
         smsSender = new SmsSender(this);
         serverSender = new ServerSender(apiService, smsSender, this);
 
@@ -147,6 +157,11 @@ public class BaseActivity extends AppCompatActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (isSendingMessage) {
+                    Log.d(TAG, "Clic ignoré: un envoi est déjà en cours.");
+                    Toast.makeText(BaseActivity.this, "Envoi déjà en cours…", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (ContextCompat.checkSelfPermission(BaseActivity.this, Manifest.permission.SEND_SMS)
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(BaseActivity.this,
@@ -286,9 +301,32 @@ public class BaseActivity extends AppCompatActivity {
         return dernierSms;
     }
 
+    /**
+     * Retour à l'écran d'accueil après un envoi réussi (HTTP ou SMS direct).
+     * DashboardActivity resynchronise automatiquement dans son onResume(),
+     * donc pas besoin de déclencher la synchro explicitement ici.
+     */
+    private void returnToHomeAfterSend() {
+        finish();
+    }
+
+    /** Active/désactive le bouton d'envoi et bascule son libellé pendant le traitement. */
+    private void setSendButtonBusy(boolean busy) {
+        isSendingMessage = busy;
+        if (btnSend != null) {
+            btnSend.setEnabled(!busy);
+            btnSend.setText(busy ? "Envoi en cours…" : btnSendDefaultText);
+        }
+    }
+
     private void sendMessage() {
     CardPagerAdapter adapter = (CardPagerAdapter) viewPager.getAdapter();
-    if (adapter != null) {
+    if (adapter == null) {
+        return;
+    }
+    setSendButtonBusy(true);
+    Log.d(TAG, "Envoi du message: démarrage (localisation en cours d'acquisition).");
+    {
         Fragment1 f1 = adapter.getFragment1();
         Fragment2 f2 = adapter.getFragment2();
 
@@ -313,14 +351,35 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (serverSender != null) {
-                    serverSender.send(message, f1.getStatus());
+                    Log.d(TAG, "Envoi du message: localisation acquise, envoi vers le serveur/SMS.");
+                    serverSender.send(message, f1.getStatus(), new ServerSender.SendCallback() {
+                        @Override
+                        public void onSent() {
+                            Log.d(TAG, "Envoi du message: terminé avec succès.");
+                            runOnUiThread(() -> {
+                                setSendButtonBusy(false);
+                                returnToHomeAfterSend();
+                            });
+                        }
+
+                        @Override
+                        public void onQueuedForRetry() {
+                            Log.w(TAG, "Envoi du message: échec, mis en file d'attente pour renvoi automatique.");
+                            runOnUiThread(() -> setSendButtonBusy(false));
+                        }
+                    });
                 } else {
                     // Config serveur indisponible au démarrage: on retombe directement sur le SMS.
                     try {
                         smsSender.send(message, f1.getStatus());
+                        Log.d(TAG, "Envoi du message: terminé (SMS direct, pas de config serveur).");
                         Toast.makeText(BaseActivity.this, " Message envoyé par SMS.", Toast.LENGTH_SHORT).show();
+                        returnToHomeAfterSend();
                     } catch (Exception ex) {
+                        Log.e(TAG, "Envoi du message: échec de l'envoi SMS direct.", ex);
                         Toast.makeText(BaseActivity.this, "Erreur SMS : " + ex.getMessage(), Toast.LENGTH_LONG).show();
+                    } finally {
+                        setSendButtonBusy(false);
                     }
                 }
             }
@@ -350,6 +409,32 @@ private int extraireIdUser(String sms) {
             && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+        // onLocationReady ne sera jamais appelé pour cette tentative (l'utilisateur
+        // doit d'abord répondre à la demande de permission puis retaper "Envoyer") -
+        // sans ça le bouton resterait bloqué en "Envoi en cours…" indéfiniment.
+        Log.w(TAG, "Envoi du message: permission de localisation manquante, envoi annulé.");
+        setSendButtonBusy(false);
+        return;
+    }
+
+    // Si la localisation est désactivée au niveau système (GPS ET réseau
+    // coupés), fusedLocationClient.requestLocationUpdates() n'appellera
+    // JAMAIS onLocationResult - l'ancien mécanisme de "timeout" ci-dessous
+    // ne comptait les tentatives que DANS ce callback, donc ne se déclenchait
+    // jamais dans ce cas: l'envoi restait bloqué indéfiniment (observé:
+    // 5+ minutes d'attente, aucune requête n'atteignant jamais le serveur).
+    // On vérifie donc l'état des services de localisation en amont pour
+    // sauter l'attente immédiatement si elle ne peut de toute façon aboutir.
+    LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    boolean locationServiceEnabled = locationManager != null
+            && (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+    if (!locationServiceEnabled) {
+        Log.w(TAG, "Envoi du message: services de localisation désactivés, envoi sans coordonnées GPS.");
+        Toast.makeText(this, "Localisation désactivée : message envoyé sans position GPS.", Toast.LENGTH_LONG).show();
+        if (onLocationReady != null) {
+            onLocationReady.run();
+        }
         return;
     }
 
@@ -358,6 +443,13 @@ private int extraireIdUser(String sms) {
     locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // GPS pur
     locationRequest.setInterval(1000); // Mise à jour toutes les secondes
     locationRequest.setFastestInterval(1000);
+
+    // Garantit que onLocationReady n'est appelé qu'une seule fois, que ce
+    // soit via un fix GPS obtenu, via l'ancien compteur de tentatives, ou
+    // via le timeout matériel ci-dessous (celui-ci est le vrai filet de
+    // sécurité: il se déclenche même si onLocationResult n'est JAMAIS appelé).
+    final AtomicBoolean alreadyProceeded = new AtomicBoolean(false);
+    final Handler timeoutHandler = new Handler(Looper.getMainLooper());
 
     // Déclarer le callback
     final LocationCallback locationCallback = new LocationCallback() {
@@ -379,26 +471,41 @@ private int extraireIdUser(String sms) {
                     // Position GPS valide
                     message.setLatitude(lat);
                     message.setLongitude(lon);
-                    // Appeler la callback pour envoyer le message
-                    if (onLocationReady != null) {
+                    fusedLocationClient.removeLocationUpdates(this);
+                    timeoutHandler.removeCallbacksAndMessages(null);
+                    if (onLocationReady != null && alreadyProceeded.compareAndSet(false, true)) {
                         onLocationReady.run();
                     }
-
-                    // Stopper les mises à jour
-                    fusedLocationClient.removeLocationUpdates(this);
                     return;
                 }
             }
 
-            // Timeout si on dépasse le nombre max d’essais
+            // Timeout "logique" si on dépasse le nombre max d'essais (ne se
+            // déclenche que si onLocationResult est bien appelé au moins
+            // MAX_ATTEMPTS fois - voir le timeout matériel ci-dessous pour
+            // le cas où il n'est jamais appelé du tout).
             if (attempts >= MAX_ATTEMPTS) {
                 fusedLocationClient.removeLocationUpdates(this);
-                if (onLocationReady != null) {
+                timeoutHandler.removeCallbacksAndMessages(null);
+                if (onLocationReady != null && alreadyProceeded.compareAndSet(false, true)) {
                     onLocationReady.run(); // On envoie le message même si GPS pas fixé
                 }
             }
         }
     };
+
+    // Timeout matériel (15s), indépendant du callback: filet de sécurité
+    // si onLocationResult n'est jamais appelé (ex: fix GPS impossible en
+    // intérieur, provider qui ne répond pas malgré isProviderEnabled=true).
+    timeoutHandler.postDelayed(() -> {
+        if (alreadyProceeded.compareAndSet(false, true)) {
+            Log.w(TAG, "Envoi du message: timeout localisation (15s), envoi sans position GPS.");
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+            if (onLocationReady != null) {
+                onLocationReady.run();
+            }
+        }
+    }, 15000);
 
     // Demander les mises à jour GPS
     fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);

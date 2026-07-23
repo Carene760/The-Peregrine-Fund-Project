@@ -70,6 +70,86 @@ public class ServerSender {
         void onQueuedForRetry();
     }
 
+    /**
+     * Result callback for the login flow. Unlike send()/sendHistory() (where
+     * "sent via SMS" and "sent via HTTP" are equivalent outcomes for the
+     * caller), login has three genuinely different outcomes:
+     *  - onSuccess: the server was reached over HTTP and accepted the
+     *    credentials - proceed straight to the dashboard, no SMS involved.
+     *  - onRejected: the server was reached over HTTP and explicitly refused
+     *    the credentials (wrong login/password) - this is a definitive
+     *    answer, retrying over SMS would not change it.
+     *  - onFallbackToSms: the server could not be reached at all (no
+     *    connectivity, timeout, non-JSON response) - the caller should fall
+     *    back to the existing SMS + BroadcastReceiver flow.
+     */
+    public interface LoginCallback {
+        void onSuccess(String userId, String message);
+        void onRejected(String message);
+        void onFallbackToSms();
+    }
+
+    /**
+     * Attempts login directly over HTTP first (same /api/message pipeline
+     * used by send()/sendHistory(), which already routes LOGIN-type messages
+     * through SmsProcessingService.processLogin() server-side), falling back
+     * to the caller's existing SMS flow only when the server can't be
+     * reached - never when it explicitly rejects the credentials.
+     */
+    public void sendLogin(String encryptedMessage, LoginCallback callback) {
+        String phoneNumber;
+        try {
+            phoneNumber = ConfigLoader.getFixedNumber(context);
+        } catch (Exception e) {
+            phoneNumber = null;
+        }
+
+        if (!NetworkUtils.isNetworkAvailable(context)) {
+            Log.i(TAG, "Pas de connexion internet détectée pour le login -> SMS.");
+            callback.onFallbackToSms();
+            return;
+        }
+
+        ApiService.DirectMessageRequest request =
+                new ApiService.DirectMessageRequest(phoneNumber, encryptedMessage);
+
+        apiService.sendEncryptedMessage(request).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) {
+                    Log.w(TAG, "Login HTTP direct: code " + response.code() + ", bascule sur SMS.");
+                    callback.onFallbackToSms();
+                    return;
+                }
+                try {
+                    String json = NetworkUtils.readJsonOrThrow(response.body());
+                    org.json.JSONObject obj = new org.json.JSONObject(json);
+                    String message = obj.optString("message", "");
+
+                    java.util.regex.Matcher matcher =
+                            java.util.regex.Pattern.compile("ID:\\s*(\\d+)").matcher(message);
+                    if (matcher.find()) {
+                        callback.onSuccess(matcher.group(1), message);
+                    } else {
+                        // Le serveur a répondu explicitement (identifiants invalides,
+                        // numéro non autorisé, etc.) - réponse définitive, pas de repli SMS.
+                        callback.onRejected(message.isEmpty()
+                                ? "Échec connexion: Identifiants invalides" : message);
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "Réponse login HTTP non exploitable, bascule sur SMS.", e);
+                    callback.onFallbackToSms();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.w(TAG, "Echec de l'envoi HTTP direct du login, bascule sur SMS.", t);
+                callback.onFallbackToSms();
+            }
+        });
+    }
+
     public void sendHistory(HistoriqueMessageStatus historique) {
         sendHistory(historique, null);
     }

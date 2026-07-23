@@ -4,6 +4,7 @@ import com.example.serveur.model.SmsResponse;
 import com.example.serveur.util.EncryptionUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -48,6 +49,15 @@ public class SmsResponseService {
         return response;
     }
 
+    /**
+     * @Async: cet accusé de réception part vers la passerelle SMS via
+     * RestTemplate (gateway.internal-send-url), qui peut être injoignable
+     * sur le terrain. Même bornée par un timeout (voir
+     * ServeurApplication.restTemplate()), cette latence ne doit pas retarder
+     * la réponse HTTP renvoyée à l'appelant (app Android ou webhook
+     * SMSSync), qui n'a de toute façon pas besoin d'attendre ce résultat.
+     */
+    @Async
     public void sendResponse(String phoneNumber, String message) {
         try {
             String messageChiffre = encryptionUtil.chiffrer(message);
@@ -84,6 +94,8 @@ public class SmsResponseService {
         }
     }
 
+    /** @Async: voir sendResponse() ci-dessus. */
+    @Async
     public void sendResponseSansChiffre(String phoneNumber, String message) {
         try {
             String messageChiffre = message;

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Release/production policy: no cleartext (HTTP) traffic permitted, ever.
+  The deployed server (Render/Railway, see DEPLOYMENT.md) serves HTTPS
+  automatically, so this should never need an exception in a real build.
+  For local dev/testing against a plain http://<lan-ip>:8080 server, see
+  the debug-only override at src/debug/res/xml/network_security_config.xml
+  instead of adding exceptions here.
+-->
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.88.7</domain>
-    </domain-config>
+    <base-config cleartextTrafficPermitted="false" />
 </network-security-config>

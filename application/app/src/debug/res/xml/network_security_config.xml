@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only override (this file replaces src/main/res/xml/network_security_config.xml
+  for debug builds only, via Gradle resource source-set overlay - same
+  mechanism already used for DbDebugActivity in src/debug/AndroidManifest.xml).
+
+  Permits plain HTTP so `config.properties` can point at
+  http://<your-lan-ip>:8080 for local testing without editing this file
+  every time the dev machine's IP changes. Never packaged into a release
+  build - release keeps the strict HTTPS-only policy in src/main.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

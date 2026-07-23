@@ -26,6 +26,9 @@ import com.example.theperegrinefund.security.ConfigLoader;
 import com.example.theperegrinefund.security.CredentialUtil;
 import com.example.theperegrinefund.security.CryptoUtils;
 
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
@@ -75,16 +78,8 @@ public class LoginActivity extends AppCompatActivity {
                 CryptoUtils crypto = new CryptoUtils(combined);
                 lastChiffre = crypto.chiffrer(cle);
 
-                waitingForResponse = true;
-                textViewSms.setText("En attente de réponse…");
-
-                if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.SEND_SMS)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(LoginActivity.this,
-                            new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_SEND_SMS);
-                } else {
-                    sendMessage();
-                }
+                textViewSms.setText("Connexion en cours…");
+                attemptLogin();
 
             } catch (Exception e) {
                 Toast.makeText(this, "Erreur chiffrement: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -157,6 +152,77 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         return -1; // rien trouvé ou erreur
+    }
+
+    /**
+     * Priorité HTTP direct (via ServerSender, même pipeline /api/message que
+     * l'envoi d'alertes) - repli SMS uniquement si le serveur est injoignable,
+     * jamais si les identifiants sont explicitement refusés.
+     */
+    private void attemptLogin() {
+        try {
+            String serverUrl = ConfigLoader.getServerUrl(this);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(serverUrl)
+                    .client(com.example.theperegrinefund.network.NetworkClientProvider.get(this))
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            ApiService apiService = retrofit.create(ApiService.class);
+            ServerSender serverSender = new ServerSender(apiService, smsSender, this);
+
+            serverSender.sendLogin(lastChiffre, new ServerSender.LoginCallback() {
+                @Override
+                public void onSuccess(String userId, String message) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(LoginActivity.this, "Authentification réussie!", Toast.LENGTH_SHORT).show();
+                        try {
+                            AppData.setCurrentUserId(LoginActivity.this, Integer.parseInt(userId));
+                        } catch (NumberFormatException ignored) {
+                        }
+                        Intent intentDashboard = new Intent(LoginActivity.this, DashboardActivity.class);
+                        startActivity(intentDashboard);
+                        finish();
+                    });
+                }
+
+                @Override
+                public void onRejected(String message) {
+                    runOnUiThread(() -> {
+                        textViewSms.setText(message);
+                        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
+                    });
+                }
+
+                @Override
+                public void onFallbackToSms() {
+                    runOnUiThread(() -> {
+                        waitingForResponse = true;
+                        textViewSms.setText("En attente de réponse (SMS)…");
+
+                        if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.SEND_SMS)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(LoginActivity.this,
+                                    new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_SEND_SMS);
+                        } else {
+                            sendMessage();
+                        }
+                    });
+                }
+            });
+        } catch (Exception e) {
+            // Impossible de lire la config serveur (config.properties absent/corrompu) -
+            // on retombe directement sur le SMS, comportement historique.
+            Log.e(TAG, "Impossible de tenter le login HTTP, bascule sur SMS.", e);
+            waitingForResponse = true;
+            textViewSms.setText("En attente de réponse (SMS)…");
+            if (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(LoginActivity.this,
+                        new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_SEND_SMS);
+            } else {
+                sendMessage();
+            }
+        }
     }
 
     private void sendMessage() {

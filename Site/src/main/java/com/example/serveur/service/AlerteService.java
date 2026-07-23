@@ -28,6 +28,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 import java.time.ZoneId;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -266,10 +267,16 @@ public class AlerteService {
                 statusText, interventionText, renfort, idSite, savedMessage.getIdMessage());
 
             // ENVOYER LES ALERTES AUX FONCTIONS CONCERNÉES
-            envoyerAlerteAuxFonctionsConcernées(niveau, savedMessage);
+            // Hors du fil de la requête: passe par la passerelle SMS (RestTemplate,
+            // gateway.internal-send-url) qui peut être injoignable sur le terrain -
+            // même bornée par un timeout (voir ServeurApplication.restTemplate()),
+            // une attente de plusieurs secondes ici retarderait inutilement la
+            // réponse HTTP renvoyée au ranger, alors que son alerte est déjà
+            // enregistrée en base à ce stade (voir test de charge).
+            CompletableFuture.runAsync(() -> envoyerAlerteAuxFonctionsConcernées(niveau, savedMessage));
 
-            emailService.envoyerAlertesPourZone(niveau);
-            
+            emailService.envoyerAlertesPourZone(niveau, savedMessage);
+
 
             // GÉNÉRER ET ENVOYER L'INFO DE RETOUR
             String infoRetour = infoRetourService.genererInfoRetour(savedMessage);
@@ -422,78 +429,140 @@ public class AlerteService {
         }
     }
 
+    /**
+     * Trouve les numéros de téléphone des utilisateurs dont la fonction est
+     * concernée par une zone d'alerte donnée (vert/jaune/orange/rouge).
+     * Factorisé pour être réutilisé à la fois pour l'alerte initiale
+     * (envoyerAlerteAuxFonctionsConcernées) et pour la notification de
+     * changement de statut (notifierChangementStatut).
+     */
+    private List<String> telephonesPourZone(String niveauAlerte) {
+        List<FonctionZoneAlerte> fonctionsZone = fonctionZoneAlerteRepository.findByTypeAlerteZone(niveauAlerte);
+        if (fonctionsZone.isEmpty()) {
+            System.out.println("⚠️ Aucune fonction trouvée pour la zone: " + niveauAlerte);
+            return List.of();
+        }
+
+        List<Integer> idFonctions = fonctionsZone.stream()
+            .map(fza -> fza.getFonction().getIdFonction())
+            .collect(Collectors.toList());
+
+        List<User> usersConcernes = userRepository.findByFonctionIdIn(idFonctions);
+        if (usersConcernes.isEmpty()) {
+            System.out.println("⚠️ Aucun utilisateur trouvé pour les fonctions: " + idFonctions);
+            return List.of();
+        }
+
+        return usersConcernes.stream()
+            .map(User::getTelephone)
+            .filter(tel -> tel != null && !tel.trim().isEmpty())
+            .collect(Collectors.toList());
+    }
+
+    private void envoyerSmsAFonctionsConcernées(String niveauAlerte, String messageDetaille) {
+        List<String> numerosTelephone = telephonesPourZone(niveauAlerte);
+        for (String numero : numerosTelephone) {
+            try {
+                smsResponseService.sendResponseSansChiffre(numero, messageDetaille);
+                System.out.println("✅ Notification envoyée à: " + numero);
+            } catch (Exception e) {
+                System.err.println("❌ Erreur envoi notification à " + numero + ": " + e.getMessage());
+            }
+        }
+        System.out.println("📨 Notifications envoyées à " + numerosTelephone.size() + " utilisateurs pour la zone: " + niveauAlerte);
+    }
+
     // Ajoutez cette nouvelle méthode
     private void envoyerAlerteAuxFonctionsConcernées(String niveauAlerte, Message message) {
         try {
-            // 1. Trouver les fonctions associées à cette zone d'alerte
-            List<FonctionZoneAlerte> fonctionsZone = fonctionZoneAlerteRepository.findByTypeAlerteZone(niveauAlerte);
-            
-            if (fonctionsZone.isEmpty()) {
-                System.out.println("⚠️ Aucune fonction trouvée pour la zone: " + niveauAlerte);
-                return;
-            }
-            
-            // 2. Récupérer les IDs des fonctions concernées
-            List<Integer> idFonctions = fonctionsZone.stream()
-                .map(fza -> fza.getFonction().getIdFonction())
-                .collect(Collectors.toList());
-            
-            // 3. Trouver les utilisateurs ayant ces fonctions
-            List<User> usersConcernes = userRepository.findByFonctionIdIn(idFonctions);
-            
-            if (usersConcernes.isEmpty()) {
-                System.out.println("⚠️ Aucun utilisateur trouvé pour les fonctions: " + idFonctions);
-                return;
-            }
-            
-            // 4. Récupérer les numéros de téléphone
-            List<String> numerosTelephone = usersConcernes.stream()
-                .map(User::getTelephone)
-                .filter(tel -> tel != null && !tel.trim().isEmpty())
-                .collect(Collectors.toList());
-            
-            // 5. Préparer le message détaillé
             String messageDetaille = genererMessageDetailleAlerte(message, niveauAlerte);
-            
-            // 6. Envoyer les SMS
-            for (String numero : numerosTelephone) {
-                try {
-                    smsResponseService.sendResponseSansChiffre(numero, messageDetaille);
-                    System.out.println("✅ Alerte envoyée à: " + numero);
-                } catch (Exception e) {
-                    System.err.println("❌ Erreur envoi alerte à " + numero + ": " + e.getMessage());
-                }
-            }
-            
-            System.out.println("📨 Alertes envoyées à " + numerosTelephone.size() + " utilisateurs pour la zone: " + niveauAlerte);
-            
+            envoyerSmsAFonctionsConcernées(niveauAlerte, messageDetaille);
         } catch (Exception e) {
             System.err.println("❌ Erreur lors de l'envoi des alertes aux fonctions: " + e.getMessage());
         }
     }
 
+    /**
+     * Notifie les mêmes destinataires que l'alerte initiale (fonctions
+     * concernées par SMS + email de zone) qu'un changement de statut est
+     * survenu sur un message déjà signalé (ex: "Debut de feu" -> "Maitrise").
+     *
+     * Contrairement à processAlerte()/niveauAlerteService.traiterAlerteComplete,
+     * cette méthode NE crée PAS de nouvel enregistrement Alerte: elle
+     * réutilise le niveau/la zone déjà déterminés à la création de l'alerte
+     * initiale (retrouvée via AlerteRepository), pour éviter de dupliquer
+     * les statistiques d'alertes à chaque changement de statut.
+     *
+     * Appelée depuis HistoriqueMessageStatusService.updateMessageStatus()
+     * après un changement de statut réussi - avant ce correctif, un
+     * changement de statut n'était jamais notifié à personne d'autre que,
+     * éventuellement, l'expéditeur lui-même (accusé SMS optionnel).
+     */
+    public void notifierChangementStatut(Message message, String nouveauStatut) {
+        alerteRepository.findTopByMessage_IdMessageOrderByIdAlerteDesc(message.getIdMessage())
+            .ifPresentOrElse(alerte -> {
+                String niveau = alerte.getTypeAlerte().getZone();
+                String messageDetaille = genererMessageChangementStatut(message, niveau, nouveauStatut);
+                CompletableFuture.runAsync(() -> envoyerSmsAFonctionsConcernées(niveau, messageDetaille));
+                emailService.envoyerAlertesPourZone(niveau, message);
+            }, () -> System.out.println(
+                "⚠️ Pas d'alerte associée au message " + message.getIdMessage()
+                    + ", notification de changement de statut ignorée"));
+    }
+
+    private String pictoZone(String niveauAlerte) {
+        if (niveauAlerte == null) return "⚪";
+        switch (niveauAlerte.toLowerCase()) {
+            case "vert": return "🟢";
+            case "jaune": return "🟡";
+            case "orange": return "🟠";
+            case "rouge": return "🔴";
+            default: return "⚪";
+        }
+    }
+
+    private String genererMessageChangementStatut(Message message, String niveauAlerte, String nouveauStatut) {
+        return String.format("""
+            %s MISE À JOUR - Niveau %s
+            Nouveau statut : %s
+            Point de repère : %s
+            Intervention : %s
+            Localisation : %.6f, %.6f
+            """,
+            pictoZone(niveauAlerte),
+            niveauAlerte,
+            nouveauStatut,
+            message.getPointRepere() != null && !message.getPointRepere().isBlank() ? message.getPointRepere() : "Non renseigné",
+            message.getIntervention() != null ? message.getIntervention().getIntervention() : "Non renseignée",
+            message.getLatitude() != null ? message.getLatitude() : 0,
+            message.getLongitude() != null ? message.getLongitude() : 0
+        );
+    }
+
     // Ajoutez cette méthode pour générer le message détaillé
     private String genererMessageDetailleAlerte(Message message, String niveauAlerte) {
         return String.format("""
-            🚨 ALERTE %s
-            Localisation: %.6f, %.6f
-            Début: %s
-            Intervention: %s
-            Surface: %s m²
-            Direction: %s
-            Description: %s
-            Renfort: %s
+            %s ALERTE INCENDIE - Niveau %s
+            Point de repère : %s
+            Intervention : %s / Renfort : %s
+            Début : %s
+            Surface estimée : %s
+            Direction : %s
+            Localisation : %.6f, %.6f
+            Description : %s
             """,
+            pictoZone(niveauAlerte),
             niveauAlerte,
-            message.getLatitude(),
-            message.getLongitude(),
-            message.getDateCommencement().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
-            message.getIntervention().getIntervention(),
-            message.getSurfaceApproximative() != null ? message.getSurfaceApproximative().toString() : "Non spécifiée",
-            message.getDirection(),
-            message.getDescription() != null ? message.getDescription() : "Aucune description",
-            message.getRenfort() != null && message.getRenfort() ? "Oui" : "Non"
+            message.getPointRepere() != null && !message.getPointRepere().isBlank() ? message.getPointRepere() : "Non renseigné",
+            message.getIntervention() != null ? message.getIntervention().getIntervention() : "Non renseignée",
+            message.getRenfort() != null && message.getRenfort() ? "Oui" : "Non",
+            message.getDateCommencement() != null ? message.getDateCommencement().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "Non renseigné",
+            message.getSurfaceApproximative() != null ? message.getSurfaceApproximative() + " m²" : "Non renseignée",
+            message.getDirection() != null && !message.getDirection().isBlank() ? message.getDirection() : "Non renseignée",
+            message.getLatitude() != null ? message.getLatitude() : 0,
+            message.getLongitude() != null ? message.getLongitude() : 0,
+            message.getDescription() != null && !message.getDescription().isBlank() ? message.getDescription() : "Aucune description fournie"
         );
     }
-    
+
 }

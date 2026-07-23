@@ -1,44 +1,47 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
-    <meta name="description" content="Page de connexion du système The Peregrine Fund pour accéder aux tableaux de bord et aux outils de gestion." />
-    <title>The Peregrine Fund - Login</title>
+    <meta name="description" th:content="#{login.meta_description}" content="Page de connexion du système The Peregrine Fund pour accéder aux tableaux de bord et aux outils de gestion." />
+    <title th:text="#{login.title}">The Peregrine Fund - Login</title>
     <link rel="stylesheet" th:href="@{/css/globals.css}" />
     <link rel="stylesheet" th:href="@{/css/style.css}" />
   </head>
   <body>
+    <div th:replace="~{fragments/language-switcher :: switcher}"></div>
     <div class="desktop">
-      <main class="div" role="main" aria-label="Connexion">
+      <main class="div" role="main" th:aria-label="#{login.aria_connexion}" aria-label="Connexion">
         <header class="frame">
           <img
             class="frame-2"
             src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-11.png"
+            th:alt="#{login.logo_alt}"
             alt="The Peregrine Fund Logo"
           />
           <div class="saving-raptors-wrapper">
-            <p class="saving-raptors">"Saving raptors, enriching lives."</p>
+            <p class="saving-raptors" th:text="#{login.slogan}">"Saving raptors, enriching lives."</p>
           </div>
         </header>
-        
+
         <!-- Message d'erreur -->
         <div th:if="${error}" class="error-message" role="alert" aria-live="polite">
           <span th:text="${error}">Nom d'utilisateur ou mot de passe incorrect</span>
         </div>
-        
+
         <section class="frame-3">
-          <img class="frame-4" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-56.png" alt="Raptor icon" />
-          <h1 class="text-wrapper" id="login-heading">LOG IN</h1>
+          <img class="frame-4" src="https://c.animaapp.com/mebffkcgJYBuIF/img/frame-56.png" th:alt="#{login.icon_alt}" alt="Raptor icon" />
+          <h1 class="text-wrapper" id="login-heading" th:text="#{login.heading}">LOG IN</h1>
         </section>
         <form class="frame-5" action="/login" method="post" id="login-form" role="form" aria-labelledby="login-heading" novalidate>
           <div class="div-wrapper">
-            <label for="name-input" class="visually-hidden">Email</label>
+            <label for="name-input" class="visually-hidden" th:text="#{login.email_label}">Email</label>
             <input
               type="text"
               name="email"
               id="name-input"
               class="text-wrapper-2"
+              th:placeholder="#{login.email_placeholder}"
               placeholder="Email"
               th:value="${submittedEmail != null ? submittedEmail : ''}"
               required
@@ -47,12 +50,13 @@
             />
           </div>
           <div class="div-wrapper password-wrapper">
-            <label for="password-input" class="visually-hidden">Password</label>
+            <label for="password-input" class="visually-hidden" th:text="#{login.password_label}">Password</label>
             <input
               type="password"
               name="password"
               id="password-input"
               class="text-wrapper-2"
+              th:placeholder="#{login.password_placeholder}"
               placeholder="Password"
               th:value="${submittedPassword != null ? submittedPassword : ''}"
               required
@@ -63,20 +67,28 @@
               type="button"
               class="password-toggle"
               id="password-toggle"
+              th:attr="aria-label=#{login.password_show_aria}"
               aria-label="Afficher le mot de passe"
               aria-pressed="false"
+              th:text="#{login.password_show}"
             >
               Afficher
             </button>
           </div>
         </form>
         <button type="submit" form="login-form" class="frame-6" aria-describedby="signin-description">
-          <span class="text-wrapper-3">Sign in</span>
+          <span class="text-wrapper-3" th:text="#{login.signin_button}">Sign in</span>
         </button>
-        
+
       </main>
     </div>
-    <script>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const tpfLabelShow = /*[[#{login.password_show}]]*/ "Afficher";
+      const tpfLabelHide = /*[[#{login.password_hide}]]*/ "Masquer";
+      const tpfAriaShow = /*[[#{login.password_show_aria}]]*/ "Afficher le mot de passe";
+      const tpfAriaHide = /*[[#{login.password_hide_aria}]]*/ "Masquer le mot de passe";
+      /*]]>*/
       document.addEventListener("DOMContentLoaded", () => {
         const passwordInput = document.getElementById("password-input");
         const passwordToggle = document.getElementById("password-toggle");
@@ -88,8 +100,8 @@
         passwordToggle.addEventListener("click", () => {
           const isHidden = passwordInput.type === "password";
           passwordInput.type = isHidden ? "text" : "password";
-          passwordToggle.textContent = isHidden ? "Masquer" : "Afficher";
-          passwordToggle.setAttribute("aria-label", isHidden ? "Masquer le mot de passe" : "Afficher le mot de passe");
+          passwordToggle.textContent = isHidden ? tpfLabelHide : tpfLabelShow;
+          passwordToggle.setAttribute("aria-label", isHidden ? tpfAriaHide : tpfAriaShow);
           passwordToggle.setAttribute("aria-pressed", String(isHidden));
         });
       });
