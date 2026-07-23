@@ -1,0 +1,85 @@
+# ============================================================================
+# Template for Site/src/main/resources/application.properties (gitignored,
+# never committed with real values). Copy this file to application.properties
+# and fill in real values, OR set every key as an environment variable
+# (Spring Boot relaxed binding: app.api.key -> APP_API_KEY, etc.) - this is
+# the preferred approach for Docker/Railway/Render deployments, see
+# DEPLOYMENT.md. Every placeholder below MUST be replaced; none of these
+# example values are safe to use as-is.
+# ============================================================================
+
+# ==================== SERVEUR ====================
+server.port=8080
+server.address=0.0.0.0
+
+# ==================== APPLICATION ====================
+spring.application.name=sms-gateway-server
+
+# =================== DATABASE ===================
+spring.datasource.url=jdbc:postgresql://CHANGE_ME_HOST:5432/CHANGE_ME_DB
+spring.datasource.username=CHANGE_ME_DB_USER
+spring.datasource.password=CHANGE_ME_DB_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA Configuration
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+# ddl-auto=update is convenient for pre-production but is NOT a real
+# migration strategy - review before using against a production database.
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=true
+
+# =================== MESSAGE ====================
+message.separator=/
+info.separator=~
+
+# =================== EMAIL =====================
+# Generate at https://app.sendgrid.com/settings/api_keys - restrict to "Mail Send" only.
+sendgrid.api.key=CHANGE_ME_SENDGRID_API_KEY
+sendgrid.from.email=CHANGE_ME_FROM_EMAIL
+logging.level.com.sendgrid=INFO
+
+# ==================== SECURITE ====================
+# Shared secret required in header "X-API-Key" on every /api/** and
+# /sync/** call (Android app + SMS gateway). Generate with e.g.:
+#   openssl rand -base64 32
+app.api.key=CHANGE_ME_RANDOM_32BYTE_KEY
+
+# HMAC secret used to sign the "rememberUserEmail" cookie. Generate with:
+#   openssl rand -base64 32
+app.remember-me.secret=CHANGE_ME_RANDOM_32BYTE_SECRET
+
+# Credentials the SMS gateway (SMSSync) uses to call back into this server's
+# gateway-management endpoints AND (reused) as an alternate Basic-auth path
+# for /api/** and /sync/** if the gateway device cannot send custom headers.
+gateway.auth.username=CHANGE_ME_GATEWAY_USERNAME
+gateway.auth.password=CHANGE_ME_GATEWAY_PASSWORD
+gateway.internal-send-url=http://CHANGE_ME_GATEWAY_HOST:8080/message
+
+# Gateway webhook configuration
+gateway.base-url=http://CHANGE_ME_GATEWAY_HOST:8080
+gateway.webhook.create-path=/webhooks
+gateway.webhook.delete-path=/webhooks/{id}
+gateway.webhook.id=CHANGE_ME_WEBHOOK_ID
+gateway.webhook.event=sms:received
+gateway.webhook.callback-url=http://CHANGE_ME_PUBLIC_SERVER_HOST/api/webhook
+
+# Comma-separated ranger phone numbers allowed to send alerts (leave unset
+# to fall back to whatever AllowedNumbersService/patrouilleurs table has).
+# gateway.allowed-numbers=+261xxxxxxxxx,+261xxxxxxxxx
+
+# AES key (16, 24, or 32 characters) used with AES/GCM/NoPadding. MUST match
+# secret.key in application/app/src/main/assets/config.properties on the
+# Android side exactly (symmetric key). Generate with e.g.:
+#   openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 32
+encryption.secret-key=CHANGE_ME_RANDOM_32BYTE_AES_KEY
+
+# ==================== LOGGING ====================
+sms.logfile.path=/var/log/tpf/sms_logs.txt
+deadletter.logfile.path=/var/log/tpf/dead_letter.log
+
+logging.level.org.springframework.web=INFO
+logging.level.org.springframework.http.converter=INFO
+logging.level.com.example.serveur.controller=INFO
+
+spring.datasource.sql-script-encoding=UTF-8
